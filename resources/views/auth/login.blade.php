@@ -63,7 +63,7 @@
                                    placeholder="Enter your password"
                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm pr-10">
                             <button type="button" tabindex="-1"
-                                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 top-3"
+                                class="absolute inset-y-0 right-0 flex px-3 text-gray-500 top-3"
                                 onclick="togglePasswordVisibility()">
                                 <i id="password-toggle-icon" class="fa-regular fa-eye"></i>
                             </button>
@@ -86,7 +86,7 @@
                     <!-- Login Button -->
                     <div>
                         <button type="submit"
-                                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm font-medium text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                             Sign in
                         </button>
                     </div>
@@ -100,22 +100,6 @@
             </div>
         </div>
     </section>
-
-    <script>
-        function togglePasswordVisibility() {
-            const input = document.getElementById('password');
-            const icon = document.getElementById('password-toggle-icon');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        }
-    </script>
 
 </body>
 </html>

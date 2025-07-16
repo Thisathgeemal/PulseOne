@@ -95,9 +95,9 @@
                         ['name' => 'Omar Ali', 'role' => 'Fitness Trainer', 'img' => 'trainer1.jpg'],
                         ['name' => 'Ravindu Perera', 'role' => 'Fitness Instructor & Wellness Coach', 'img' => 'trainer2.jpg'],
                         ['name' => 'Natalie Fernando', 'role' => 'Fitness Trainer & Sports Messiah', 'img' => 'trainer3.jpg'],
-                        ['name' => 'John Smith', 'role' => 'Yoga Expert', 'img' => 'trainer1.jpg'],
-                        ['name' => 'Ayesha Silva', 'role' => 'Pilates Instructor', 'img' => 'trainer2.jpg'],
-                        ['name' => 'Kavin Raj', 'role' => 'CrossFit Coach', 'img' => 'trainer3.jpg'],
+                        ['name' => 'John Smith', 'role' => 'Yoga Expert', 'img' => 'trainer4.jpg'],
+                        ['name' => 'Ayesha Silva', 'role' => 'Pilates Instructor', 'img' => 'trainer5.jpg'],
+                        ['name' => 'Kavin Raj', 'role' => 'CrossFit Coach', 'img' => 'trainer6.jpg'],
                     ] as $trainer)
                     <div class="swiper-slide">
                     <div class="bg-white shadow-lg rounded-xl overflow-hidden text-center">
