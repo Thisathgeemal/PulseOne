@@ -3,71 +3,125 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Role;
+use App\Models\User;
+use App\Models\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
 {
-    // show login form
-    public function showLoginForm()
-    {
-        return view('auth.login');
-    }
-
     // handle login request
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        $credentials = $request->validate([
+            'email'    => ['required', 'email'],
+            'password' => ['required'],
+        ]);
 
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user();
-            $role = $user->roles();
-
-            if ($role->count() > 1) {
-                session(['available_roles' => $roles]);
-                return redirect()->route('select-role');
-            } else {
-                $role = $role->first();
-                return $this->redirectToDashboard($role->name);
-            }
+        if (! Auth::attempt($credentials, $request->filled('remember'))) {
+            return back()->withErrors(['email' => 'Invalid credentials'])->onlyInput('email');
         }
 
-        return back()->withErrors([
-            'email' => 'Invalid credentials',
-        ]);
+        $request->session()->regenerate();
+
+        $user      = Auth::user();
+        $roles     = UserRole::where('user_id', $user->id)->pluck('role_id');
+        $roleNames = Role::whereIn('role_id', $roles)->pluck('role_name')->toArray();
+
+        session(['user_roles' => $roleNames]);
+
+        if ($user->mfa_enabled) {
+            $code      = rand(100000, 999999);
+            $expiresAt = now()->addMinutes(3);
+            session([
+                '2fa_code'       => $code,
+                '2fa_expires_at' => $expiresAt,
+            ]);
+
+            Mail::send('emails.2faCode', ['user' => $user, 'code' => $code], function ($message) use ($user) {
+                $message->to($user->email)
+                    ->subject('Your 2FA Verification Code');
+            });
+
+            return redirect()->route('2fa.verify');
+        }
+
+        return $this->handleRoleRedirect($roleNames);
     }
 
-    // show role selection form
-    public function showRoleSelection()
+    // handle 2FA verification
+    public function verify2FA(Request $request)
     {
-        $roles = session('available_roles');
-        return view('auth.selectRole', compact('roles'));
+        $request->validate([
+            'code' => ['required', 'digits:6'],
+        ]);
+
+        $code      = session('2fa_code');
+        $expiresAt = session('2fa_expires_at');
+
+        if (now()->greaterThan($expiresAt)) {
+            return back()->withErrors(['code' => 'Verification code has expired.']);
+        }
+
+        if ($request->code != $code) {
+            return back()->withErrors(['code' => 'Invalid verification code.']);
+        }
+
+        $roles = session('user_roles');
+        return $this->handleRoleRedirect($roles);
+    }
+
+    // handle role selection logic
+    protected function handleRoleRedirect(array $roles)
+    {
+        if (count($roles) == 1) {
+            return redirect()->route($roles[0] . '.dashboard');
+        }
+
+        return redirect()->route('selectRole');
     }
 
     // handle role selection
-    public function selectRole(Request $request)
+    public function submitSelectedRole(Request $request)
     {
-        $roleId = $request->input('role_id');
-        $role   = Role::find($roleId);
+        $request->validate([
+            'selected_role' => ['required', 'string'],
+        ]);
 
-        return $this->redirectToDashboard($role->name);
+        $selectedRole = $request->input('selected_role');
+
+        if (! in_array($selectedRole, session('user_roles'))) {
+            return back()->withErrors(['selected_role' => 'Invalid role selection.']);
+        }
+
+        return redirect()->route($selectedRole . '.dashboard');
     }
 
-    // redirect to dashboard based on role
-    protected function redirectToDashboard($roleName)
+    // resend the 2FA code
+    public function resend2FA(Request $request)
     {
-        switch ($roleName) {
-            case 'Admin':
-                return redirect()->route('admin.dashboard');
-            case 'Trainer':
-                return redirect()->route('trainer.dashboard');
-            case 'Dietitian':
-                return redirect()->route('dietitian.dashboard');
-            case 'Member':
-                return redirect()->route('member.dashboard');
-            default:
-                return redirect('/');
+        $user = Auth::user();
+
+        if (! $user || ! $user->mfa_enabled) {
+            return redirect()->route('login')->withErrors(['email' => 'Session expired or MFA not enabled.']);
         }
+
+        $code      = rand(100000, 999999);
+        $expiresAt = now()->addMinutes(3);
+
+        session([
+            '2fa_code'       => $code,
+            '2fa_expires_at' => $expiresAt,
+        ]);
+
+        Mail::send('emails.2faNewCode', ['user' => $user, 'code' => $code], function ($message) use ($user) {
+            $message->to($user->email)
+                ->subject('Your New 2FA Verification Code');
+        });
+
+        return back()->with('status', 'A new verification code has been sent to your email.');
     }
 
     // handle logout

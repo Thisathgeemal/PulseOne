@@ -57,8 +57,11 @@
             color: #4b5563;
             margin: 0 0 16px;
         }
-        .content strong {
-            color: #dc2626;
+        .content .code {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1f2937;
+            margin: 20px 0;
         }
         .content .highlight {
             font-weight: 500;
@@ -89,6 +92,11 @@
             margin-top: 32px;
             text-align: center;
         }
+        .footer hr {
+            margin-bottom: 16px;
+            border: 0;
+            border-top: 1px solid #e5e7eb;
+        }
         .footer p {
             font-size: 14px;
             color: #6b7280;
@@ -103,26 +111,22 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Welcome to PulseOne!</h1>
-            <h2>Hi {{ $user->first_name }} {{ $user->last_name }},</h2>
+            <h1>Your 2FA Verification Code</h1>
+            <h2>Hello {{ $user->first_name ?? 'User' }},</h2>
         </div>
         <div class="content">
-            <p>
-                Thank you for purchasing the 
-                <strong>{{ $membershipType->type_name }}</strong> 
-                membership for <strong>Rs.{{ $membershipType->price }}</strong>!
-            </p>
-            <p>
-                Your membership is active from <span class="highlight">today</span> until 
-                <span class="highlight">{{ now()->addDays($membershipType->duration)->toFormattedDateString() }}</span>.
-            </p>
+            <p>Your two-factor authentication (2FA) verification code is:</p>
+            <div class="code">{{ $code }}</div>
+            <p>This code will expire in <span class="highlight">3 minutes</span>.</p>
+            <p>If you didn't request this, please ignore this email.</p>
         </div>
         <div class="cta">
             <p>Have questions? We're here to help!</p>
             <a href="mailto:pulseone.app@gmail.com">Contact Us</a>
         </div>
         <div class="footer">
-            <p>Best regards,<br><span>PulseOne Team</span></p>
+            <hr>
+            <p>© {{ date('Y') }} <span>PulseOne</span>. All rights reserved.</p>
         </div>
     </div>
 </body>

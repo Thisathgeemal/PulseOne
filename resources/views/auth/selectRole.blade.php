@@ -15,14 +15,36 @@
 
 </head>
 
-<body>
-    <h2>Select a Role</h2>
-    @foreach ($roles as $role)
-        <form method="POST" action="{{ route('select.role') }}" style="display:inline-block; margin:10px;">
-            @csrf
-            <input type="hidden" name="role_id" value="{{ $role->id }}">
-            <button type="submit">{{ $role->name }}</button>
-        </form>
-    @endforeach
+<body class="bg-white text-gray-800 overflow-hidden">
+    <!-- Header -->
+    <nav class="sticky top-0 z-50 flex justify-between items-center px-10 py-3 bg-white/80 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+        <!-- Logo -->
+        <a href="{{ route('home') }}">
+            <img src="{{ asset('images/logo.png') }}" alt="PulseOne Logo" class="h-12 w-auto">
+        </a>
+    </nav>
+
+    <!-- Main Content -->
+    <section class="h-[calc(100vh-64px)] bg-cover bg-center flex items-center justify-center min-h-full" style="background-image: url('{{ url('images/gym-red.jpg') }}');">
+        <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">Which dashboard would you like to access?</h2>
+            @if(session('user_roles'))
+                <form action="{{ route('selectRole.submit') }}" method="POST" class="flex flex-col gap-4">
+                    @csrf
+                    @foreach (session('user_roles') as $role)
+                        <button type="submit" name="selected_role" value="{{ $role }}"
+                                class="w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+                            {{ ucfirst($role) }}
+                        </button>
+                    @endforeach
+                </form>
+            @else
+                <div class="text-red-600 text-center">
+                    No roles found in session.
+                </div>
+            @endif
+        </div>
+    </section>
+
 </body>
 </html>

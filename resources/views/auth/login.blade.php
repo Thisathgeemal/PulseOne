@@ -32,7 +32,12 @@
         <div class="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
             <div class="bg-white rounded-xl shadow-xl p-8 w-full max-w-md">
                 <h2 class="text-3xl md:text-4xl font-bold text-center mb-3">Welcome back!</h2>
-                <p class="text-sm text-gray-600 mb-6 text-center">Sign in to your PulseOne account</p>
+                <p class="text-sm text-gray-600 mb-4 text-center">Sign in to your PulseOne account</p>
+                <div class="flex justify-center items-center w-full">
+                    @error('email')
+                        <span class="text-red-600 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
 
                 <form method="POST" action="{{ route('login') }}" class="space-y-6">
                     @csrf
@@ -47,9 +52,6 @@
                                placeholder="Enter your email"
                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                                value="{{ old('email') }}">
-                        @error('email')
-                            <span class="text-red-600 text-sm">{{ $message }}</span>
-                        @enderror
                     </div>
 
                     <!-- Password -->
@@ -68,9 +70,6 @@
                                 <i id="password-toggle-icon" class="fa-regular fa-eye"></i>
                             </button>
                         </div>
-                        @error('password')
-                            <span class="text-red-600 text-sm">{{ $message }}</span>
-                        @enderror
                     </div>
 
                     <!-- Remember Me and Forgot Password -->
@@ -100,6 +99,5 @@
             </div>
         </div>
     </section>
-
 </body>
 </html>
