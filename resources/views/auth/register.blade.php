@@ -15,6 +15,7 @@
 
     <link rel="icon" href="{{ asset('images/favicon.png') }}">
     <script src="https://kit.fontawesome.com/bc9b460555.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </head>
 <body class="bg-white text-gray-800">
@@ -34,7 +35,7 @@
             <div id="create-form" class="w-full max-w-sm md:max-w-md bg-white rounded-xl shadow-xl p-8">
                 <h2 class="text-3xl md:text-4xl font-bold text-center mb-3">Create Account</h2>                
 
-                <form method="POST" action="{{ route('register') }}" class="space-y-6">
+                <form method="POST" action="{{ route('register.member') }}" class="space-y-6">
                     @csrf
 
                     <!-- Member Details Section -->
@@ -48,7 +49,7 @@
                         <input id="first_name" type="text" name="first_name" required autofocus
                                 placeholder="Enter your first name"
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                                value="{{ old('first_name') }}">
+                                value="{{ old('first_name', session('member_data.first_name')) }}">
                         @error('first_name')
                             <span class="text-red-600 text-sm">{{ $message }}</span>
                         @enderror
@@ -63,7 +64,7 @@
                         <input id="last_name" type="text" name="last_name" required
                                 placeholder="Enter your last name"
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                                value="{{ old('last_name') }}">
+                                value="{{ old('last_name', session('member_data.last_name')) }}">
                         @error('last_name')
                             <span class="text-red-600 text-sm">{{ $message }}</span>
                         @enderror
@@ -78,7 +79,7 @@
                         <input id="email" type="email" name="email" required autofocus
                             placeholder="Enter your email"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                            value="{{ old('email') }}">
+                            value="{{ old('email', session('member_data.email')) }}">
                         @error('email')
                             <span class="text-red-600 text-sm">{{ $message }}</span>
                         @enderror
@@ -93,6 +94,7 @@
                         <div class="relative">
                             <input id="password" type="password" name="password" required
                                 placeholder="Enter your password"
+                                value="{{ old('Password has been saved') }}"
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm pr-10">
                             <button type="button" tabindex="-1"
                                 class="absolute inset-y-0 right-0 flex px-3 text-gray-500 top-3"
@@ -114,7 +116,7 @@
                         <input id="contact_number" type="text" name="contact_number" required
                                 placeholder="Enter your contact number"
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                                value="{{ old('contact_number') }}">
+                                value="{{ old('contact_number', session('member_data.contact_number')) }}">
                         @error('contact_number')
                             <span class="text-red-600 text-sm">{{ $message }}</span>
                         @enderror
@@ -127,20 +129,39 @@
                             Membership Type
                         </label>
                         <select id="membership_type" name="membership_type" required
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm">
-                            <option value="" disabled selected>Select membership type</option>
-                            <option value="basic" {{ old('membership_type') == 'basic' ? 'selected' : '' }}>Basic</option>
-                            <option value="premium" {{ old('membership_type') == 'premium' ? 'selected' : '' }}>Premium</option>
-                            <option value="vip" {{ old('membership_type') == 'vip' ? 'selected' : '' }}>VIP</option>
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                                onchange="setPriceFromSelect('membership_type', 'price')">
+                            <option value="" disabled selected>Select Membership Type</option>
+                            @foreach($membershipType as $type)
+                                <option value="{{ $type->type_id }}" data-price="{{ $type->price }}"
+                                    {{ old('membership_type', session('member_data.membership_type')) == $type->type_id ? 'selected' : '' }}>
+                                    {{ $type->type_name }}
+                                </option>
+                            @endforeach
                         </select>
                         @error('membership_type')
                             <span class="text-red-600 text-sm">{{ $message }}</span>
                         @enderror
                     </div>
 
+                    <!-- Price -->
+                    <div>
+                        <label for="price" class="block text-sm font-medium text-gray-700 items-center gap-2 mt-4">
+                            <i class="fa-solid fa-dollar-sign text-sm mr-1.5 ml-1"></i>
+                            Price
+                        </label>
+                        <input id="price" type="text" name="price" required readonly
+                            placeholder="Membership Price"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed sm:text-sm"
+                            value="{{ old('price', session('member_data.price')) }}">
+                        @error('price')
+                            <span class="text-red-600 text-sm">{{ $message }}</span>
+                        @enderror
+                    </div>
+
                     <!-- Next Button -->
                     <div class="mt-6">
-                        <button type="submit" onclick="goToPaymentSection()"
+                        <button type="submit"
                                 class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm font-medium text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                             Proceed to Payment
                         </button>
@@ -158,10 +179,11 @@
             </div>
 
             <!-- Payment Form -->
-            <div id="payment-form" class="w-full max-w-sm md:max-w-md bg-white rounded-xl shadow-xl p-8 hidden">
+            @if(session()->has('member_data'))
+            <div id="payment-form" class="w-full max-w-sm md:max-w-md bg-white rounded-xl shadow-xl p-8 {{ $showPayment ? '' : 'hidden' }}">
                 <h2 class="text-3xl md:text-4xl font-bold text-center mb-3">Complete Payment</h2>                
 
-                <form method="POST" action="{{ route('register') }}" class="space-y-6">
+                <form method="POST" action="{{ route('register.payment') }}" class="space-y-6">
                     @csrf
 
                     <!-- Payment Details Section -->
@@ -283,6 +305,19 @@
                         </div>
                     </div>
 
+                    <!-- Consent -->
+                    <div class="mt-4">
+                        <label class="inline-flex items-start">
+                            <input type="checkbox" name="consent" required
+                                class="h-8 w-8 mt-3 text-red-600 border-gray-300 rounded focus:ring-red-500">
+                            <span class="ml-2 text-sm text-gray-600" style="text-align: justify;">
+                                I hereby confirm that I have read and fully agree to the
+                                <a href="#" class="text-red-600 hover:text-red-500 font-semibold">Terms of Service</a> and
+                                <a href="#" class="text-red-600 hover:text-red-500 font-semibold">Privacy Policy</a> provided on this platform.
+                            </span>
+                        </label>
+                    </div>
+
                     <!-- Submit Button -->
                     <div class="mt-6">
                         <button type="submit" 
@@ -301,8 +336,37 @@
                     
                 </form>
             </div>
+            @endif
         </div>
     </section>
+
+    @if(session('showSuccess'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Registration Successful!',
+            text: 'Please log in now.',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#d32f2f'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{{ route('login') }}";
+            }
+        });
+    </script>
+    @endif
+
+    @if($errors->any())
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: "{{ $errors->first() }}",
+            confirmButtonText: 'OK',                   
+            confirmButtonColor: '#d32f2f'   
+        });
+    </script>
+    @endif
 
 </body>
 </html>

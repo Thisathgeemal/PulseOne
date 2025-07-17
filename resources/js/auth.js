@@ -31,3 +31,16 @@ window.goToPaymentSection = function () {
     container.classList.remove("justify-center");
     container.classList.add("justify-between");
 };
+
+window.setPriceFromSelect = function (selectId, targetInputId) {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+
+    const selectedOption = select.options[select.selectedIndex];
+    const price = selectedOption.getAttribute("data-price") || "0.00";
+    const targetInput = document.getElementById(targetInputId);
+
+    if (targetInput) {
+        targetInput.value = price;
+    }
+};

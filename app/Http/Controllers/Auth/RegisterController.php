@@ -2,66 +2,121 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\MembershipConfirmationMail;
+use App\Models\Membership;
+use App\Models\MembershipType;
+use App\Models\Payment;
+use App\Models\Role;
+use App\Models\User;
+use App\Models\UserRole;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 
 class RegisterController extends Controller
 {
     // show registration form
     public function showRegistrationForm()
     {
-        return view('auth.register');
+        $showPayment    = session()->has('member_data');
+        $membershipType = MembershipType::all();
+        return view('auth.register', compact('membershipType', 'showPayment'));
     }
 
-    // // handle registration step one
-    // public function registerStepOne(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'first_name'      => 'required|string|max:255',
-    //         'last_name'       => 'required|string|max:255',
-    //         'email'           => 'required|string|email|max:255|unique:users,email',
-    //         'password'        => 'required|string|min:8',
-    //         'contact_number'  => 'required|string|max:20',
-    //         'membership_type' => 'required|string|max:20',
-    //     ]);
+    // Store member details in session
+    public function registerMember(Request $request)
+    {
+        try {
+            $data = $request->validate([
+                'first_name'      => 'required|string|max:255',
+                'last_name'       => 'required|string|max:255',
+                'email'           => 'required|string|email|max:255|unique:users,email',
+                'password'        => 'required|string|min:8',
+                'contact_number'  => 'required|string|max:15',
+                'membership_type' => 'required|exists:membership_types,type_id',
+                'price'           => 'required|numeric',
+            ]);
 
-    //     session([
-    //         'registration_data' => $validated,
-    //         'show_payment'      => true,
-    //     ]);
+            $data['password'] = Hash::make($data['password']);
 
-    //     return redirect()->route('register')->withInput();
-    // }
+            if (! session()->has('member_data')) {
+                session(['member_data' => $data]);
+            }
 
-    // // handle registration step two
-    // public function registerStepTwo(Request $request)
-    // {
-    //     if (! session('show_payment') || ! session('registration_data')) {
-    //         abort(403, 'Please complete registration first.');
-    //     }
+            return redirect()->route('register')->with('showPayment', true);
 
-    //     $request->validate([
-    //         'card_type'    => 'required|string',
-    //         'card_name'    => 'required|string|max:255',
-    //         'card_number'  => 'required|string|max:16',
-    //         'cvv'          => 'required|string|max:3',
-    //         'expiry_month' => 'required|string',
-    //         'expiry_year'  => 'required|string',
-    //     ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors($e->getMessage())->withInput();
+        }
+    }
 
-    //     $registrationData = session('registration_data');
+    // Handle payment processing
+    public function registerPayment(Request $request)
+    {
+        try {
+            $data = $request->validate([
+                'card_type'    => 'required|string',
+                'card_name'    => 'required|string',
+                'card_number'  => 'required|string|size:16',
+                'expiry_month' => 'required|between:1,12',
+                'expiry_year'  => 'required|digits:4',
+                'cvv'          => 'required|string|size:3',
+            ]);
 
-    //     $user = User::create([
-    //         'first_name'      => $registrationData['first_name'],
-    //         'last_name'       => $registrationData['last_name'],
-    //         'email'           => $registrationData['email'],
-    //         'password'        => Hash::make($registrationData['password']),
-    //         'contact_number'  => $registrationData['contact_number'],
-    //         'membership_type' => $registrationData['membership_type'],
-    //     ]);
+            $memberData = session('member_data');
+            if (! $memberData) {
+                return redirect()->route('register')->withErrors('Member data not found.');
+            }
 
-    //     Auth::login($user);
+            $memberSelectType = MembershipType::find($memberData['membership_type']);
+            if (! $memberSelectType) {
+                return redirect()->route('register')->withErrors('Invalid membership type selected.');
+            }
 
-    //     session()->forget(['registration_data', 'show_payment']);
+            $startDate = now();
+            $endDate   = $startDate->copy()->addDays($memberSelectType->duration);
 
-    //     return redirect()->route('home');
-    // }
+            $user = User::create([
+                'email'         => $memberData['email'],
+                'password'      => bcrypt($memberData['password']),
+                'first_name'    => $memberData['first_name'],
+                'last_name'     => $memberData['last_name'],
+                'mobile_number' => $memberData['contact_number'],
+            ]);
+
+            $memberRole = Role::where('role_name', 'Member')->first();
+            if (! $memberRole) {
+                return redirect()->route('register')->withErrors('Member role not found.');
+            }
+
+            UserRole::create([
+                'user_id' => $user->id,
+                'role_id' => $memberRole->role_id,
+            ]);
+
+            Membership::create([
+                'user_id'    => $user->id,
+                'type_id'    => $memberData['membership_type'],
+                'start_date' => $startDate,
+                'end_date'   => $endDate,
+            ]);
+
+            Payment::create([
+                'user_id'      => $user->id,
+                'type_id'      => $memberData['membership_type'],
+                'amount'       => $memberData['price'],
+                'payment_date' => $startDate,
+            ]);
+
+            Mail::to($user->email)->send(new MembershipConfirmationMail($user, $memberSelectType));
+            session()->forget('member_data');
+            return redirect()->route('register')->with('showSuccess', true);
+
+        } catch (\Exception $e) {
+            session()->forget('member_data');
+            return redirect()->route('register')->withErrors($e->getMessage());
+        }
+    }
+
 }

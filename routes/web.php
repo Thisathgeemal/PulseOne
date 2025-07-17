@@ -28,8 +28,8 @@ Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login']);
 
 Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('register/step1', [RegisterController::class, 'registerStepOne'])->name('register.step1');
-Route::post('register/step2', [RegisterController::class, 'registerStepTwo'])->name('register.step2');
+Route::post('register/member', [RegisterController::class, 'registerMember'])->name('register.member');
+Route::post('register/payment', [RegisterController::class, 'registerPayment'])->name('register.payment');
 
 Route::post('logout', [LoginController::class, 'logout']);
 
