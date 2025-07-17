@@ -70,38 +70,6 @@ class LoginController extends Controller
         }
     }
 
-    // show registration form
-    public function showRegistrationForm()
-    {
-        return view('auth.register');
-    }
-
-    // handle registration request
-    public function register(Request $request)
-    {
-        $request->validate([
-            'first_name'      => 'required|string|max:255',
-            'last_name'       => 'required|string|max:255',
-            'email'           => 'required|string|email|max:255|unique:users',
-            'contact_number'  => 'required|string|max:20',
-            'membership_type' => 'required|string|max:20',
-            'password'        => 'required|string|min:8|confirmed',
-        ]);
-
-        $user = User::create([
-            'first_name'      => $request->first_name,
-            'last_name'       => $request->last_name,
-            'email'           => $request->email,
-            'password'        => Hash::make($request->password),
-            'contact_number'  => $request->contact_number,
-            'membership_type' => $request->membership_type,
-        ]);
-
-        Auth::login($user);
-
-        return redirect()->route('home');
-    }
-
     // handle logout
     public function logout(Request $request)
     {

@@ -20,19 +20,14 @@ window.selectCardType = function (type) {
 };
 
 window.goToPaymentSection = function () {
-    const memberSection = document.getElementById("member-details-section");
-    const paymentSection = document.getElementById("payment-details-section");
-    if (memberSection && paymentSection) {
-        memberSection.style.display = "none";
-        paymentSection.style.display = "grid";
-    }
-};
+    const createForm = document.getElementById("create-form");
+    const paymentForm = document.getElementById("payment-form");
 
-window.goToMemberSection = function () {
-    const memberSection = document.getElementById("member-details-section");
-    const paymentSection = document.getElementById("payment-details-section");
-    if (memberSection && paymentSection) {
-        memberSection.style.display = "grid";
-        paymentSection.style.display = "none";
-    }
+    createForm.classList.remove("max-w-md");
+    paymentForm.classList.remove("hidden");
+
+    const container = createForm.parentElement;
+    container.classList.add("md:space-x-10");
+    container.classList.remove("justify-center");
+    container.classList.add("justify-between");
 };

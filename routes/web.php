@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -26,8 +27,9 @@ Route::get('/contact', function () {
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login']);
 
-Route::get('register', [LoginController::class, 'showRegistrationForm'])->name('register');
-Route::post('register', [LoginController::class, 'register']);
+Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('register/step1', [RegisterController::class, 'registerStepOne'])->name('register.step1');
+Route::post('register/step2', [RegisterController::class, 'registerStepTwo'])->name('register.step2');
 
 Route::post('logout', [LoginController::class, 'logout']);
 
