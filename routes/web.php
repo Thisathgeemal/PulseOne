@@ -11,13 +11,20 @@ Route::get('/challenges', fn() => view('challenges'))->name('challenges');
 Route::get('/contact', fn() => view('contact'))->name('contact');
 
 Route::get('/login', fn() => view('auth.login'))->name('login');
-Route::get('/2fa', fn() => view('auth.2fa'))->name('2fa');
-Route::get('/selectRole', fn() => view('auth.selectRole'))->name('selectRole');
-
 Route::post('login', [LoginController::class, 'login']);
+
+Route::get('/2fa', fn() => view('auth.2fa'))->name('2fa');
 Route::post('2fa', [LoginController::class, 'verify2FA'])->name('2fa.verify');
 Route::post('2fa/resend', [LoginController::class, 'resend2FA'])->name('2fa.resend');
+
+Route::get('/forgotPassword', [LoginController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('forgotPassword', [LoginController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/resetPassword/{token}', [LoginController::class, 'showResetForm'])->name('password.reset');
+Route::post('resetPassword', [LoginController::class, 'reset'])->name('password.update');
+
+Route::get('/selectRole', fn() => view('auth.selectRole'))->name('selectRole');
 Route::post('selectRole', [LoginController::class, 'submitSelectedRole'])->name('selectRole.submit');
+
 Route::post('logout', [LoginController::class, 'logout']);
 
 Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');

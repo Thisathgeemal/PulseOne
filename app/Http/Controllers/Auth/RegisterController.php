@@ -103,10 +103,9 @@ class RegisterController extends Controller
             ]);
 
             Payment::create([
-                'user_id'      => $user->id,
-                'type_id'      => $memberData['membership_type'],
-                'amount'       => $memberData['price'],
-                'payment_date' => $startDate,
+                'user_id' => $user->id,
+                'type_id' => $memberData['membership_type'],
+                'amount'  => $memberData['price'],
             ]);
 
             Mail::to($user->email)->send(new MembershipConfirmationMail($user, $memberSelectType));

@@ -33,7 +33,7 @@
                     @csrf
                     @foreach (session('user_roles') as $role)
                         <button type="submit" name="selected_role" value="{{ $role }}"
-                                class="w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+                                class="w-full px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                             {{ ucfirst($role) }}
                         </button>
                     @endforeach

@@ -79,7 +79,7 @@
                                    class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
                             <label for="remember_me" class="ml-2 block text-sm font-medium text-gray-700">Remember me</label>
                         </div>
-                        <a href="#" class="text-sm font-medium text-gray-700 hover:text-red-500">Forgot password</a>
+                        <a href="{{ route('password.request') }}" class="text-sm font-medium text-gray-700 hover:text-red-500">Forgot password</a>
                     </div>
 
                     <!-- Login Button -->

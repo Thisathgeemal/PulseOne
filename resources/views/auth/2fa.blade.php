@@ -37,7 +37,7 @@
                         <div class="text-red-600 text-sm mt-2">{{ $message }}</div>
                     @enderror
                 </div>
-                <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">Verify Code</button>
+                <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">Verify Code</button>
             </form>
 
             <form method="POST" action="{{ route('2fa.resend') }}" class="text-center mt-4">

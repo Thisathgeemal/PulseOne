@@ -7,7 +7,9 @@ use App\Models\User;
 use App\Models\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
@@ -122,6 +124,55 @@ class LoginController extends Controller
         });
 
         return back()->with('status', 'A new verification code has been sent to your email.');
+    }
+
+    // show forget password email enter form
+    public function showForgotPasswordForm()
+    {
+        return view('auth.forgotPassword');
+    }
+
+    // handles sending the password reset link
+    public function sendResetLinkEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $status = Password::sendResetLink($request->only('email'));
+
+        return $status === Password::RESET_LINK_SENT
+        ? back()->with(['status' => __($status)])
+        : back()->withErrors(['email' => __($status)]);
+    }
+
+    // show password reset from
+    public function showResetForm($token)
+    {
+        return view('auth.resetPassword', ['token' => $token]);
+    }
+
+    // handles resetting a user's password
+    public function reset(Request $request)
+    {
+        $request->validate([
+            'token'    => 'required',
+            'email'    => 'required|email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password),
+                ])->save();
+            }
+        );
+
+        if ($status === Password::PASSWORD_RESET) {
+            return back()->with('reset_success', true);
+        }
+
+        return back()->with('reset_error', __($status));
     }
 
     // handle logout

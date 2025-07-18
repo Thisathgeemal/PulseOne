@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('type_id');
             $table->decimal('amount', 8, 2);
-            $table->dateTime('payment_date');
+            $table->dateTime('payment_date')->default(now());
 
             // Foreign key constraints
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
