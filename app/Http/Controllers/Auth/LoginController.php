@@ -14,6 +14,22 @@ use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
 {
+    // show login form
+    public function showLoginForm()
+    {
+        if (Auth::check()) {
+            $user = Auth::user();
+
+            $roles     = UserRole::where('user_id', $user->id)->pluck('role_id');
+            $roleNames = Role::whereIn('role_id', $roles)->pluck('role_name')->toArray();
+
+            session(['user_roles' => $roleNames]);
+
+            return $this->handleRoleRedirect($roleNames);
+        }
+        return view('auth.login');
+    }
+
     // handle login request
     public function login(Request $request)
     {
@@ -21,8 +37,9 @@ class LoginController extends Controller
             'email'    => ['required', 'email'],
             'password' => ['required'],
         ]);
+        $remember = $request->filled('remember');
 
-        if (! Auth::attempt($credentials, $request->filled('remember'))) {
+        if (! Auth::attempt($credentials, $remember)) {
             return back()->withErrors(['email' => 'Invalid credentials'])->onlyInput('email');
         }
 

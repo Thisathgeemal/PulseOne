@@ -10,6 +10,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\UserRole;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
@@ -51,7 +52,6 @@ class RegisterController extends Controller
         }
     }
 
-    // Handle payment processing
     public function registerPayment(Request $request)
     {
         try {
@@ -66,16 +66,18 @@ class RegisterController extends Controller
 
             $memberData = session('member_data');
             if (! $memberData) {
-                return redirect()->route('register')->withErrors('Member data not found.');
+                return redirect()->route('register')->withErrors(['session' => 'Member data session expired. Please register again.']);
             }
 
             $memberSelectType = MembershipType::find($memberData['membership_type']);
             if (! $memberSelectType) {
-                return redirect()->route('register')->withErrors('Invalid membership type selected.');
+                return redirect()->route('register')->withErrors(['membership' => 'Invalid membership type selected.']);
             }
 
             $startDate = now();
             $endDate   = $startDate->copy()->addDays($memberSelectType->duration);
+
+            DB::beginTransaction();
 
             $user = User::create([
                 'email'         => $memberData['email'],
@@ -85,9 +87,13 @@ class RegisterController extends Controller
                 'mobile_number' => $memberData['contact_number'],
             ]);
 
+            if (! $user) {
+                throw new \Exception('Failed to create user.');
+            }
+
             $memberRole = Role::where('role_name', 'Member')->first();
             if (! $memberRole) {
-                return redirect()->route('register')->withErrors('Member role not found.');
+                throw new \Exception('Member role not found in the system.');
             }
 
             UserRole::create([
@@ -109,12 +115,19 @@ class RegisterController extends Controller
             ]);
 
             Mail::to($user->email)->send(new MembershipConfirmationMail($user, $memberSelectType));
+
+            DB::commit();
+
             session()->forget('member_data');
             return redirect()->route('register')->with('showSuccess', true);
 
         } catch (\Exception $e) {
+            DB::rollBack();
             session()->forget('member_data');
-            return redirect()->route('register')->withErrors($e->getMessage());
+
+            return redirect()->route('register')->withErrors([
+                'registration' => 'Registration failed: ' . $e->getMessage(),
+            ]);
         }
     }
 

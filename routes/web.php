@@ -10,7 +10,7 @@ Route::get('/features', fn() => view('features'))->name('features');
 Route::get('/challenges', fn() => view('challenges'))->name('challenges');
 Route::get('/contact', fn() => view('contact'))->name('contact');
 
-Route::get('/login', fn() => view('auth.login'))->name('login');
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login']);
 
 Route::get('/2fa', fn() => view('auth.2fa'))->name('2fa');
@@ -25,7 +25,7 @@ Route::post('resetPassword', [LoginController::class, 'reset'])->name('password.
 Route::get('/selectRole', fn() => view('auth.selectRole'))->name('selectRole');
 Route::post('selectRole', [LoginController::class, 'submitSelectedRole'])->name('selectRole.submit');
 
-Route::post('logout', [LoginController::class, 'logout']);
+Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('register/member', [RegisterController::class, 'registerMember'])->name('register.member');

@@ -7,6 +7,18 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Member dashboard wellcome </h1>
+    @if(Auth::check())
+        <h1>Welcome, {{ Auth::user()->first_name }}!</h1>
+    @else
+        <h1>Welcome, Guest!</h1>
+    @endif
+    <p>You are now logged in as a member.</p>
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit" class="btn btn-danger">
+            Logout
+        </button>
+    </form>
+
 </body>
 </html>
