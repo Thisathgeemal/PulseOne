@@ -15,6 +15,11 @@ class UserRole extends Model
     protected $fillable = [
         'user_id',
         'role_id',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     public function user()

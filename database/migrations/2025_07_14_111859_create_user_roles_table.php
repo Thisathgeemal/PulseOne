@@ -15,6 +15,7 @@ return new class extends Migration
             $table->bigIncrements('user_role_id');
             $table->unsignedBigInteger('user_id')->index();
             $table->unsignedBigInteger('role_id')->index();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

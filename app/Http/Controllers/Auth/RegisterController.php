@@ -32,12 +32,27 @@ class RegisterController extends Controller
             $data = $request->validate([
                 'first_name'      => 'required|string|max:255',
                 'last_name'       => 'required|string|max:255',
-                'email'           => 'required|string|email|max:255|unique:users,email',
+                'email'           => 'required|string|email|max:255',
                 'password'        => 'required|string|min:8',
-                'contact_number'  => 'required|string|max:15',
+                'contact_number'  => [
+                    'required',
+                    'regex:/^07[0-9]{8}$/',
+                ],
                 'membership_type' => 'required|exists:membership_types,type_id',
                 'price'           => 'required|numeric',
             ]);
+
+            $user = User::where('email', $data['email'])->first();
+
+            if ($user) {
+                $hasMemberRole = $user->roles()->where('role_name', 'Member')->exists();
+
+                if ($hasMemberRole) {
+                    return redirect()->back()
+                        ->withErrors(['email' => 'This email is already registered as a member.'])
+                        ->withInput();
+                }
+            }
 
             $data['password'] = Hash::make($data['password']);
 
@@ -79,16 +94,20 @@ class RegisterController extends Controller
 
             DB::beginTransaction();
 
-            $user = User::create([
-                'email'         => $memberData['email'],
-                'password'      => $memberData['password'],
-                'first_name'    => $memberData['first_name'],
-                'last_name'     => $memberData['last_name'],
-                'mobile_number' => $memberData['contact_number'],
-            ]);
+            $user = User::where('email', $memberData['email'])->first();
 
             if (! $user) {
-                throw new \Exception('Failed to create user.');
+                $user = User::create([
+                    'email'         => $memberData['email'],
+                    'password'      => $memberData['password'],
+                    'first_name'    => $memberData['first_name'],
+                    'last_name'     => $memberData['last_name'],
+                    'mobile_number' => $memberData['contact_number'],
+                ]);
+
+                if (! $user) {
+                    throw new \Exception('Failed to create user.');
+                }
             }
 
             $memberRole = Role::where('role_name', 'Member')->first();

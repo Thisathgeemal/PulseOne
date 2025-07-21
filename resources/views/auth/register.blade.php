@@ -111,9 +111,9 @@
                     <div>
                         <label for="contact_number" class="block text-sm font-medium text-gray-700 items-center gap-2 mt-4">
                             <i class="fa-solid fa-phone text-sm mr-1.5 ml-1"></i>
-                            Contact Number
+                            Mobile Number
                         </label>
-                        <input id="contact_number" type="text" name="contact_number" required
+                        <input id="contact_number" type="tel" name="contact_number" required
                                 placeholder="Enter your contact number"
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                                 value="{{ old('contact_number', session('member_data.contact_number')) }}">

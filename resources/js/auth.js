@@ -1,4 +1,5 @@
 window.togglePasswordVisibility = function () {
+    // Toggle password visibility based on input type
     const input = document.getElementById("password");
     const icon = document.getElementById("password-toggle-icon");
     if (input.type === "password") {
@@ -13,6 +14,7 @@ window.togglePasswordVisibility = function () {
 };
 
 window.selectCardType = function (type) {
+    // Select a specific card type in the dropdown and trigger change event
     const select = document.getElementById("card_type");
     if (!select) return;
     select.value = type;
@@ -20,6 +22,7 @@ window.selectCardType = function (type) {
 };
 
 window.goToPaymentSection = function () {
+    // Show the payment form and adjust layout for payment section
     const createForm = document.getElementById("create-form");
     const paymentForm = document.getElementById("payment-form");
 
@@ -33,6 +36,7 @@ window.goToPaymentSection = function () {
 };
 
 window.setPriceFromSelect = function (selectId, targetInputId) {
+    // Set price in an input field based on selected option from dropdown
     const select = document.getElementById(selectId);
     if (!select) return;
 
