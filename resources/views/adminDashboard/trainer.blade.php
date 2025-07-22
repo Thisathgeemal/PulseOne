@@ -227,10 +227,22 @@
 
         <script>
         document.querySelector('form[action="{{ route('trainer.bulkAction') }}"]').addEventListener('submit', function(e) {
+            const checkboxes = document.querySelectorAll('input[name="selector[]"]:checked');
             const submitter = e.submitter;
 
-            if (submitter && submitter.name === 'action' && submitter.value === 'delete') {
+            if (checkboxes.length === 0) {
                 e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No selection',
+                    text: 'Please select at least one dietitian.',
+                    confirmButtonColor: '#d32f2f'
+                });
+                return; 
+            }
+
+            if (submitter && submitter.name === 'action' && submitter.value === 'delete') {
+                e.preventDefault(); // Prevent form immediately
 
                 Swal.fire({
                     title: 'Are you sure?',
@@ -243,14 +255,14 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Create a hidden input manually to preserve the action
+                        // Add hidden input for the action
                         const hiddenInput = document.createElement('input');
                         hiddenInput.type = 'hidden';
                         hiddenInput.name = 'action';
                         hiddenInput.value = 'delete';
                         e.target.appendChild(hiddenInput);
 
-                        e.target.submit();
+                        e.target.submit(); 
                     }
                 });
             }

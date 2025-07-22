@@ -35,4 +35,18 @@ class ReportController extends Controller
         $pdf = Pdf::loadView('report.adminReport', compact('formattedDate', 'admins'));
         return $pdf->download('Admin_Report.pdf');
     }
+
+    // dietitian detail report
+    public function generateDietitianReport(Request $request)
+    {
+        $datetimeInput = $request->input('datetime');
+
+        $datetime      = Carbon::parse($datetimeInput);
+        $formattedDate = $datetime->format('Y-m-d');
+
+        $dietitians = User::whereHas('roles', fn($q) => $q->where('role_name', 'Dietitian'))->get();
+
+        $pdf = Pdf::loadView('report.dietitianReport', compact('formattedDate', 'dietitians'));
+        return $pdf->download('Dietitian_Report.pdf');
+    }
 }

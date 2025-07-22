@@ -80,11 +80,19 @@ Route::middleware(['auth'])->group(function () {
     Route::post('admin/trainer/bulkAction', [UserController::class, 'handleTrainerAction'])->name('trainer.bulkAction');
     Route::post('admin/trainer/report', [ReportController::class, 'generateTrainerReport'])->name('trainer.report');
 
-    Route::view('/admin/dietitian', 'adminDashboard.dietitian')->name('admin.dietitian');
+    Route::get('/admin/dietitian', [UserController::class, 'getDietitianData'])->name('admin.dietitian');
+    Route::post('admin/dietitian', [UserController::class, 'createDietitian'])->name('dietitian.create');
+    Route::post('admin/dietitian/update', [UserController::class, 'updateDietitian'])->name('dietitian.update');
+    Route::post('admin/dietitian/bulkAction', [UserController::class, 'handleDietitianAction'])->name('dietitian.bulkAction');
+    Route::post('admin/dietitian/report', [ReportController::class, 'generateDietitianReport'])->name('dietitian.report');
+
     Route::view('/admin/member', 'adminDashboard.member')->name('admin.member');
 
     Route::view('/admin/attendance', 'adminDashboard.attendance')->name('admin.attendance');
     Route::view('/admin/message', 'adminDashboard.message')->name('admin.message');
     Route::view('/admin/payment', 'adminDashboard.payment')->name('admin.payment');
     Route::view('/admin/feedback', 'adminDashboard.feedback')->name('admin.feedback');
+    Route::view('/admin/report', 'adminDashboard.report')->name('admin.report');
+    Route::view('/admin/role', 'adminDashboard.role')->name('admin.role');
+    Route::view('/admin/membership', 'adminDashboard.membership')->name('admin.membership');
 });

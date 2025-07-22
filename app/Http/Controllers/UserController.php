@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 use App\Mail\AdminAccountDeleteMail;
 use App\Mail\AdminRegistrationMail;
 use App\Mail\AdminUpdatedMail;
+use App\Mail\DietitianAccountDeleteMail;
+use App\Mail\DietitianRegistrationMail;
+use App\Mail\DietitianUpdatedMail;
 use App\Mail\TrainerAccountDeleteMail;
 use App\Mail\TrainerRegistrationMail;
 use App\Mail\TrainerUpdatedMail;
@@ -518,6 +521,258 @@ class UserController extends Controller
         } catch (Exception $e) {
             return redirect()->back()
                 ->with('error', 'Something went wrong while updating the admin.')
+                ->withInput();
+        }
+    }
+
+    // display trainer details
+    public function getDietitianData(Request $request)
+    {
+        $search = $request->input('search');
+
+        $dietitians = User::whereHas('roles', function ($query) {
+            $query->where('role_name', 'Dietitian');
+        })
+            ->when($search, function ($query, $search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('first_name', 'LIKE', "%$search%")
+                        ->orWhere('last_name', 'LIKE', "%$search%")
+                        ->orWhere('email', 'LIKE', "%$search%")
+                        ->orWhere('mobile_number', 'LIKE', "%$search%")
+                        ->orWhere('address', 'LIKE', "%$search%");
+                });
+            })
+            ->with(['roles' => function ($query) {
+                $query->where('role_name', 'Dietitian');
+            }])
+            ->paginate(5)
+            ->appends(['search' => $search]);
+
+        return view('adminDashboard.dietitian', compact('dietitians'));
+    }
+
+    // create dietitian
+    public function createDietitian(Request $request)
+    {
+        $request->validate([
+            'first_name'     => 'required|string',
+            'last_name'      => 'required|string',
+            'email'          => 'required|email',
+            'contact_number' => [
+                'required',
+                'regex:/^07[0-9]{8}$/',
+            ],
+        ]);
+
+        $defaultPassword = 'pulseone@2025';
+        $loginUrl        = route('login');
+
+        DB::beginTransaction();
+
+        try {
+            $user = User::where('email', $request->email)->first();
+
+            $dietitianRole = Role::where('role_name', 'Dietitian')->first();
+            if (! $dietitianRole) {
+                throw new \Exception('Dietitian role not found in the system.');
+            }
+
+            if ($user) {
+                $hasDietitianRole = UserRole::where('user_id', $user->id)
+                    ->where('role_id', $dietitianRole->role_id)
+                    ->exists();
+
+                if ($hasDietitianRole) {
+                    return redirect()->route('admin.dietitian')->with('error', 'This email is already assigned to a Dietitian.');
+                }
+
+                UserRole::create([
+                    'user_id' => $user->id,
+                    'role_id' => $dietitianRole->role_id,
+                ]);
+
+                if (! $user->is_active) {
+                    $user->update(['is_active' => true]);
+                }
+
+                Mail::to($user->email)->send(new DietitianRegistrationMail($user, 'Existing password', $loginUrl));
+
+                DB::commit();
+                return redirect()->route('admin.dietitian')->with('success', 'Dietitian role assigned to existing user.');
+            }
+
+            $user = User::create([
+                'first_name'    => $request->first_name,
+                'last_name'     => $request->last_name,
+                'email'         => $request->email,
+                'mobile_number' => $request->contact_number,
+                'password'      => Hash::make($defaultPassword),
+            ]);
+
+            if (! $user) {
+                throw new \Exception('Failed to create dietitian.');
+            }
+
+            UserRole::create([
+                'user_id' => $user->id,
+                'role_id' => $dietitianRole->role_id,
+            ]);
+
+            Mail::to($user->email)->send(new DietitianRegistrationMail($user, $defaultPassword, $loginUrl));
+
+            DB::commit();
+            return redirect()->route('admin.dietitian')->with('success', 'Dietitian created successfully!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('admin.dietitian')->with('error', 'Dietitian creation failed: ' . $e->getMessage());
+        }
+    }
+
+    // handle activate, deactivate, delete dietitian
+    public function handleDietitianAction(Request $request)
+    {
+        $role = Role::where('role_name', 'Dietitian')->first();
+        if (! $role) {
+            throw new \Exception('Dietitian role not found in the system.');
+        }
+
+        $userIds = $request->input('selector');
+        $action  = $request->input('action');
+
+        if (! in_array($action, ['activate', 'deactivate', 'delete'])) {
+            return redirect()->back()->with('error', 'Invalid action selected.');
+        }
+
+        if (empty($userIds)) {
+            return redirect()->back()->with('error', 'No users selected.');
+        }
+
+        $roleId = $role->role_id;
+
+        $userRoles = UserRole::whereIn('user_id', $userIds)
+            ->where('role_id', $roleId)
+            ->get();
+
+        foreach ($userRoles as $userRole) {
+            $isActive = $userRole->is_active;
+
+            if (($action === 'activate' && $isActive) || ($action === 'deactivate' && ! $isActive)) {
+                return redirect()->back()->with('error', 'Cannot perform action on already ' . ($isActive ? 'active' : 'inactive') . ' user(s).');
+            }
+        }
+
+        try {
+            DB::beginTransaction();
+
+            if ($action === 'delete') {
+                $dietitians = User::whereIn('id', $userIds)->get();
+                foreach ($dietitians as $dietitian) {
+                    Mail::to($dietitian->email)->send(new DietitianAccountDeleteMail($dietitian));
+                }
+
+                UserRole::whereIn('user_id', $userIds)
+                    ->where('role_id', $roleId)
+                    ->delete();
+
+                foreach ($userIds as $userId) {
+                    $remainingRoles = UserRole::where('user_id', $userId)->count();
+
+                    if ($remainingRoles === 0) {
+                        User::where('id', $userId)->delete();
+                    } else {
+                        $hasActiveRole = UserRole::where('user_id', $userId)
+                            ->where('is_active', true)
+                            ->exists();
+
+                        User::where('id', $userId)->update([
+                            'is_active' => $hasActiveRole,
+                        ]);
+                    }
+                }
+
+                DB::commit();
+
+                return redirect()->route('admin.dietitian')->with('success', 'Selected dietitian(s) deleted successfully.');
+            } else {
+                $isActive = $action === 'activate';
+
+                UserRole::whereIn('user_id', $userIds)
+                    ->where('role_id', $roleId)
+                    ->update(['is_active' => $isActive]);
+
+                foreach ($userIds as $userId) {
+                    $hasActiveRole = UserRole::where('user_id', $userId)
+                        ->where('is_active', true)
+                        ->exists();
+
+                    User::where('id', $userId)->update([
+                        'is_active' => $hasActiveRole,
+                    ]);
+                }
+
+                DB::commit();
+
+                $status = $isActive ? 'activated' : 'deactivated';
+                return redirect()->route('admin.dietitian')->with('success', "Selected dietitian(s) {$status} successfully.");
+            }
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+
+    // update dietitian
+    public function updateDietitian(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'first_name'     => 'required|string|max:255',
+                'last_name'      => 'required|string|max:255',
+                'email'          => 'required|email|max:255',
+                'contact_number' => [
+                    'required',
+                    'regex:/^07[0-9]{8}$/',
+                ],
+                'dietitian_id'   => 'required|integer|exists:users,id',
+            ]);
+
+            $defaultPassword = 'pulseone@2025';
+            $loginUrl        = route('login');
+
+            DB::transaction(function () use ($validated, $defaultPassword, $loginUrl) {
+                $id        = $validated['dietitian_id'];
+                $dietitian = User::findOrFail($id);
+
+                if ($validated['email'] !== $dietitian->email) {
+                    $existingEmail = User::where('email', $validated['email'])
+                        ->where('id', '!=', $id)
+                        ->first();
+                    if ($existingEmail) {
+                        throw ValidationException::withMessages([
+                            'email' => ['This email is already taken by another user.'],
+                        ]);
+                    }
+                }
+
+                $dietitian->first_name    = $validated['first_name'];
+                $dietitian->last_name     = $validated['last_name'];
+                $dietitian->email         = $validated['email'];
+                $dietitian->mobile_number = $validated['contact_number'];
+                $dietitian->password      = Hash::make($defaultPassword);
+                $dietitian->save();
+
+                Mail::to($dietitian->email)->send(new DietitianUpdatedMail($dietitian, $defaultPassword, $loginUrl));
+            });
+
+            return redirect()->route('admin.dietitian')->with('success', 'Dietitian updated successfully!');
+        } catch (ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->validator)
+                ->withInput();
+        } catch (Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Something went wrong while updating the dietitian.')
                 ->withInput();
         }
     }
