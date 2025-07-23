@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Admin Report</title>
+    <title>Role Report</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,6 +11,7 @@
             padding: 0;
         }
         .page-container {
+            border: 2px solid #000000;
             padding: 20px;
             min-height: 900px;
             border: 3px solid #000000; 
@@ -41,7 +42,7 @@
         th, td {
             padding: 8px;
             border: 1px solid #333;
-            width: 20%; 
+            width: 33%; 
         }
         th {
             background-color: #f2f2f2;
@@ -63,7 +64,7 @@
             <h1>PULSEONE</h1>
         </header>
 
-        <h2>Admin Management Report</h2>
+        <h2>User Role Management Report</h2>
         <div class="report-info">
             <p><strong>Date:</strong> {{ $formattedDate }}</p>
         </div>
@@ -71,21 +72,15 @@
         <table>
             <thead>
                 <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
-                    <th>Mobile</th>
-                    <th>Status</th>
+                    <th>Role Name</th>
+                    <th>Total Users</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($admins as $admin)
+                @foreach ($roles as $role)
                 <tr>
-                    <td>{{ $admin->first_name }}</td>
-                    <td>{{ $admin->last_name }}</td>
-                    <td>{{ $admin->email }}</td>
-                    <td>{{ $admin->mobile_number }}</td>
-                    <td>{{ $admin->roles->first()?->pivot->is_active ? 'Active' : 'Inactive' }}</td>
+                    <td>{{ $role->role_name }}</td>
+                    <td>{{ $role->users_count }}</td>
                 </tr>
                 @endforeach
             </tbody>

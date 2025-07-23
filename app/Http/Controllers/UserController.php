@@ -7,6 +7,8 @@ use App\Mail\AdminUpdatedMail;
 use App\Mail\DietitianAccountDeleteMail;
 use App\Mail\DietitianRegistrationMail;
 use App\Mail\DietitianUpdatedMail;
+use App\Mail\MemberAccountDeleteMail;
+use App\Mail\MemberUpdatedMail;
 use App\Mail\TrainerAccountDeleteMail;
 use App\Mail\TrainerRegistrationMail;
 use App\Mail\TrainerUpdatedMail;
@@ -308,7 +310,7 @@ class UserController extends Controller
             'email'          => 'required|email',
             'contact_number' => [
                 'required',
-                'regex:/^07[0-9]{8}$/',
+                'regex:/^0[0-9]{9}$/',
             ],
         ]);
 
@@ -525,7 +527,7 @@ class UserController extends Controller
         }
     }
 
-    // display trainer details
+    // display dietitian details
     public function getDietitianData(Request $request)
     {
         $search = $request->input('search');
@@ -777,4 +779,251 @@ class UserController extends Controller
         }
     }
 
+    // display member details
+    public function getMemberData(Request $request)
+    {
+        $search = $request->input('search');
+
+        $members = User::whereHas('roles', function ($query) {
+            $query->where('role_name', 'Member');
+        })
+            ->when($search, function ($query, $search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('first_name', 'LIKE', "%$search%")
+                        ->orWhere('last_name', 'LIKE', "%$search%")
+                        ->orWhere('email', 'LIKE', "%$search%")
+                        ->orWhere('mobile_number', 'LIKE', "%$search%")
+                        ->orWhere('address', 'LIKE', "%$search%");
+                });
+            })
+            ->with(['roles' => function ($query) {
+                $query->where('role_name', 'Member');
+            }])
+            ->paginate(5)
+            ->appends(['search' => $search]);
+
+        return view('adminDashboard.member', compact('members'));
+    }
+
+    // create member
+    public function createMember(Request $request)
+    {
+        $request->validate([
+            'first_name'     => 'required|string',
+            'last_name'      => 'required|string',
+            'email'          => 'required|email',
+            'contact_number' => [
+                'required',
+                'regex:/^07[0-9]{8}$/',
+            ],
+        ]);
+
+        $defaultPassword = 'pulseone@2025';
+        $loginUrl        = route('login');
+
+        DB::beginTransaction();
+
+        try {
+            $user = User::where('email', $request->email)->first();
+
+            $memberRole = Role::where('role_name', 'Member')->first();
+            if (! $memberRole) {
+                throw new \Exception('Member role not found in the system.');
+            }
+
+            if ($user) {
+                $hasMemberRole = UserRole::where('user_id', $user->id)
+                    ->where('role_id', $memberRole->role_id)
+                    ->exists();
+
+                if ($hasMemberRole) {
+                    return redirect()->route('admin.member')->with('error', 'This email is already assigned to a Member.');
+                }
+
+                UserRole::create([
+                    'user_id' => $user->id,
+                    'role_id' => $memberRole->role_id,
+                ]);
+
+                if (! $user->is_active) {
+                    $user->update(['is_active' => true]);
+                }
+
+                DB::commit();
+                return redirect()->route('admin.membership')->with('success', 'Member role assigned to existing user.');
+            }
+
+            $user = User::create([
+                'first_name'    => $request->first_name,
+                'last_name'     => $request->last_name,
+                'email'         => $request->email,
+                'mobile_number' => $request->contact_number,
+                'password'      => Hash::make($defaultPassword),
+            ]);
+
+            if (! $user) {
+                throw new \Exception('Failed to create member.');
+            }
+
+            UserRole::create([
+                'user_id' => $user->id,
+                'role_id' => $memberRole->role_id,
+            ]);
+
+            DB::commit();
+            return redirect()->route('admin.membership')->with('success', 'Member created successfully!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('admin.member')->with('error', 'Member creation failed: ' . $e->getMessage());
+        }
+    }
+
+    // handle activate, deactivate, delete member
+    public function handleMemberAction(Request $request)
+    {
+        $role = Role::where('role_name', 'Member')->first();
+        if (! $role) {
+            throw new \Exception('Member role not found in the system.');
+        }
+
+        $userIds = $request->input('selector');
+        $action  = $request->input('action');
+
+        if (! in_array($action, ['activate', 'deactivate', 'delete'])) {
+            return redirect()->back()->with('error', 'Invalid action selected.');
+        }
+
+        if (empty($userIds)) {
+            return redirect()->back()->with('error', 'No users selected.');
+        }
+
+        $roleId = $role->role_id;
+
+        $userRoles = UserRole::whereIn('user_id', $userIds)
+            ->where('role_id', $roleId)
+            ->get();
+
+        foreach ($userRoles as $userRole) {
+            $isActive = $userRole->is_active;
+
+            if (($action === 'activate' && $isActive) || ($action === 'deactivate' && ! $isActive)) {
+                return redirect()->back()->with('error', 'Cannot perform action on already ' . ($isActive ? 'active' : 'inactive') . ' user(s).');
+            }
+        }
+
+        try {
+            DB::beginTransaction();
+
+            if ($action === 'delete') {
+                $members = User::whereIn('id', $userIds)->get();
+                foreach ($members as $member) {
+                    Mail::to($member->email)->send(new MemberAccountDeleteMail($member));
+                }
+
+                UserRole::whereIn('user_id', $userIds)
+                    ->where('role_id', $roleId)
+                    ->delete();
+
+                foreach ($userIds as $userId) {
+                    $remainingRoles = UserRole::where('user_id', $userId)->count();
+
+                    if ($remainingRoles === 0) {
+                        User::where('id', $userId)->delete();
+                    } else {
+                        $hasActiveRole = UserRole::where('user_id', $userId)
+                            ->where('is_active', true)
+                            ->exists();
+
+                        User::where('id', $userId)->update([
+                            'is_active' => $hasActiveRole,
+                        ]);
+                    }
+                }
+
+                DB::commit();
+
+                return redirect()->route('admin.member')->with('success', 'Selected member(s) deleted successfully.');
+            } else {
+                $isActive = $action === 'activate';
+
+                UserRole::whereIn('user_id', $userIds)
+                    ->where('role_id', $roleId)
+                    ->update(['is_active' => $isActive]);
+
+                foreach ($userIds as $userId) {
+                    $hasActiveRole = UserRole::where('user_id', $userId)
+                        ->where('is_active', true)
+                        ->exists();
+
+                    User::where('id', $userId)->update([
+                        'is_active' => $hasActiveRole,
+                    ]);
+                }
+
+                DB::commit();
+
+                $status = $isActive ? 'activated' : 'deactivated';
+                return redirect()->route('admin.member')->with('success', "Selected member(s) {$status} successfully.");
+            }
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+
+    // update member
+    public function updateMember(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'first_name'     => 'required|string|max:255',
+                'last_name'      => 'required|string|max:255',
+                'email'          => 'required|email|max:255',
+                'contact_number' => [
+                    'required',
+                    'regex:/^07[0-9]{8}$/',
+                ],
+                'member_id'      => 'required|integer|exists:users,id',
+            ]);
+
+            $defaultPassword = 'pulseone@2025';
+            $loginUrl        = route('login');
+
+            DB::transaction(function () use ($validated, $defaultPassword, $loginUrl) {
+                $id     = $validated['member_id'];
+                $member = User::findOrFail($id);
+
+                if ($validated['email'] !== $member->email) {
+                    $existingEmail = User::where('email', $validated['email'])
+                        ->where('id', '!=', $id)
+                        ->first();
+                    if ($existingEmail) {
+                        throw ValidationException::withMessages([
+                            'email' => ['This email is already taken by another user.'],
+                        ]);
+                    }
+                }
+
+                $member->first_name    = $validated['first_name'];
+                $member->last_name     = $validated['last_name'];
+                $member->email         = $validated['email'];
+                $member->mobile_number = $validated['contact_number'];
+                $member->password      = Hash::make($defaultPassword);
+                $member->save();
+
+                Mail::to($member->email)->send(new MemberUpdatedMail($member, $defaultPassword, $loginUrl));
+            });
+
+            return redirect()->route('admin.member')->with('success', 'Member updated successfully!');
+        } catch (ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->validator)
+                ->withInput();
+        } catch (Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Something went wrong while updating the member.')
+                ->withInput();
+        }
+    }
 }

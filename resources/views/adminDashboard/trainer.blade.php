@@ -26,9 +26,10 @@
                 </div>
 
                 <div class="relative group">
-                    <form method="POST" action="{{ route('trainer.report') }}" target="_blank" class="relative group" onsubmit="setCurrentDateTime()">
+                    <form method="POST" action="{{ route('user.report') }}" target="_blank" class="relative group" onsubmit="setCurrentDateTime()">
                         @csrf
                         <input type="hidden" name="datetime" id="currentDatetime">
+                        <input type="hidden" name="role" value="Trainer">
 
                         <button type="submit"
                             class="bg-blue-500 text-white p-1.5 rounded hover:bg-blue-600 flex items-center justify-center w-8 h-8">
@@ -126,7 +127,7 @@
         <!-- Modal -->
         <div id="addTrainerModal" role="dialog" aria-modal="true" class="fixed inset-0 backdrop-blur-sm bg-white/20 hidden items-center justify-center z-50">
             <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-[0_0_15px_4px_rgba(241,30,19,0.5)]">
-                <h2 class="text-md md:text-3xl font-bold text-center mb-4">Create Trainer Account</h2>                
+                <h2 class="text-md md:text-3xl font-bold text-center mb-4" id="modalHeader">Create Trainer Account</h2>                
 
                 <form method="POST" id="trainerForm">
                     @csrf
@@ -235,7 +236,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'No selection',
-                    text: 'Please select at least one dietitian.',
+                    text: 'Please select at least one trainer.',
                     confirmButtonColor: '#d32f2f'
                 });
                 return; 
@@ -277,6 +278,7 @@
 
             document.getElementById('trainerForm').action = "{{ route('trainer.create') }}";
             document.getElementById('modalSubmitButton').textContent = 'Create';
+            document.getElementById('modalHeader').textContent = 'Create Trainer Account';
             const modal = document.getElementById('addTrainerModal');
             if (modal) {
                 modal.classList.remove('hidden');
@@ -301,6 +303,7 @@
             form.action = "{{ route('trainer.update') }}"; 
 
             document.getElementById('modalSubmitButton').textContent = 'Update';
+            document.getElementById('modalHeader').textContent = 'Update Trainer Account';
             const modal = document.getElementById('addTrainerModal');
             if (modal) {
                 modal.classList.remove('hidden');

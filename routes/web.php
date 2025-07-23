@@ -2,42 +2,142 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\MemberSettingsController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn() => view('home'))->name('home');
-Route::get('/about', fn() => view('about'))->name('about');
-Route::get('/features', fn() => view('features'))->name('features');
-Route::get('/challenges', fn() => view('challenges'))->name('challenges');
-Route::get('/contact', fn() => view('contact'))->name('contact');
+// Public Pages
+Route::view('/', 'home')->name('home');
+Route::view('/about', 'about')->name('about');
+Route::view('/features', 'features')->name('features');
+Route::view('/challenges', 'challenges')->name('challenges');
+Route::view('/contact', 'contact')->name('contact');
 
+// Authentication
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('login', [LoginController::class, 'login']);
+Route::post('/login', [LoginController::class, 'login']);
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::get('/2fa', fn() => view('auth.2fa'))->name('2fa');
-Route::post('2fa', [LoginController::class, 'verify2FA'])->name('2fa.verify');
-Route::post('2fa/resend', [LoginController::class, 'resend2FA'])->name('2fa.resend');
+// 2FA
+Route::view('/2fa', 'auth.2fa')->name('2fa');
+Route::post('/2fa', [LoginController::class, 'verify2FA'])->name('2fa.verify');
+Route::post('/2fa/resend', [LoginController::class, 'resend2FA'])->name('2fa.resend');
 
+// Forgot/Reset Password
 Route::get('/forgotPassword', [LoginController::class, 'showForgotPasswordForm'])->name('password.request');
-Route::post('forgotPassword', [LoginController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::post('/forgotPassword', [LoginController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('/resetPassword/{token}', [LoginController::class, 'showResetForm'])->name('password.reset');
-Route::post('resetPassword', [LoginController::class, 'reset'])->name('password.update');
+Route::post('/resetPassword', [LoginController::class, 'reset'])->name('password.update');
 
-Route::get('/selectRole', fn() => view('auth.selectRole'))->name('selectRole');
-Route::post('selectRole', [LoginController::class, 'submitSelectedRole'])->name('selectRole.submit');
+// Role selection after login
+Route::view('/selectRole', 'auth.selectRole')->name('selectRole');
+Route::post('/selectRole', [LoginController::class, 'submitSelectedRole'])->name('selectRole.submit');
 
-Route::post('logout', [LoginController::class, 'logout'])->name('logout');
-
+// Registration
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('register/member', [RegisterController::class, 'registerMember'])->name('register.member');
-Route::post('register/payment', [RegisterController::class, 'registerPayment'])->name('register.payment');
+Route::post('/register/member', [RegisterController::class, 'registerMember'])->name('register.member');
+Route::post('/register/payment', [RegisterController::class, 'registerPayment'])->name('register.payment');
 
-Route::get('/member/dashboard', fn() => view('memberDashboard.dashboard'))->name('Member.dashboard');
-Route::get('/dietitian/dashboard', fn() => view('dietitianDashboard.dashboard'))->name('Dietitian.dashboard');
-Route::get('/trainer/dashboard', fn() => view('trainerDashboard.dashboard'))->name('Trainer.dashboard');
-Route::get('/admin/dashboard', fn() => view('adminDashboard.dashboard'))->name('Admin.dashboard');
+// Dashboards
+Route::middleware(['auth'])->group(function () {
+    Route::view('/member/dashboard', 'memberDashboard.dashboard')->name('Member.dashboard');
+    Route::view('/dietitian/dashboard', 'dietitianDashboard.dashboard')->name('Dietitian.dashboard');
+    Route::view('/trainer/dashboard', 'trainerDashboard.dashboard')->name('Trainer.dashboard');
+    Route::view('/admin/dashboard', 'adminDashboard.dashboard')->name('Admin.dashboard');
+});
 
+// Admin role routing
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+
+    // Admin Routes
+    Route::get('/admin', [UserController::class, 'getAdminData'])->name('admin.admin');
+    Route::post('/admin', [UserController::class, 'createAdmin'])->name('admin.create');
+    Route::post('/admin/update', [UserController::class, 'updateAdmin'])->name('admin.update');
+    Route::post('/admin/bulkAction', [UserController::class, 'handleAdminAction'])->name('admin.bulkAction');
+
+    // Trainer Routes
+    Route::get('/trainer', [UserController::class, 'getTrainerData'])->name('admin.trainer');
+    Route::post('/trainer', [UserController::class, 'createTrainer'])->name('trainer.create');
+    Route::post('/trainer/update', [UserController::class, 'updateTrainer'])->name('trainer.update');
+    Route::post('/trainer/bulkAction', [UserController::class, 'handleTrainerAction'])->name('trainer.bulkAction');
+
+    // Dietitian Routes
+    Route::get('/dietitian', [UserController::class, 'getDietitianData'])->name('admin.dietitian');
+    Route::post('/dietitian', [UserController::class, 'createDietitian'])->name('dietitian.create');
+    Route::post('/dietitian/update', [UserController::class, 'updateDietitian'])->name('dietitian.update');
+    Route::post('/dietitian/bulkAction', [UserController::class, 'handleDietitianAction'])->name('dietitian.bulkAction');
+
+    // Member Routes
+    Route::get('/member', [UserController::class, 'getMemberData'])->name('admin.member');
+    Route::post('/member', [UserController::class, 'createMember'])->name('member.create');
+    Route::post('/member/update', [UserController::class, 'updateMember'])->name('member.update');
+    Route::post('/member/bulkAction', [UserController::class, 'handleMemberAction'])->name('member.bulkAction');
+
+    // Report Generation Route
+    Route::post('/user/report', [ReportController::class, 'generateUserReport'])->name('user.report');
+    Route::post('/role/report', [ReportController::class, 'generateRoleReport'])->name('role.report');
+
+    // User roll Route
+    Route::get('/role', [RoleController::class, 'getRoleData'])->name('admin.role');
+    Route::post('/role', [RoleController::class, 'createRole'])->name('role.create');
+    Route::post('/role/delete', [RoleController::class, 'deleteRole'])->name('role.delete');
+
+    // Profile
+    Route::get('/profile', [UserController::class, 'getMemberData'])->name('admin.profile');
+
+    // // Settings
+    // Route::get('/settings', [UserController::class, 'showSettings'])->name('admin.settings');
+
+    // Static View Routes
+    Route::view('/attendance', 'adminDashboard.attendance')->name('admin.attendance');
+    Route::view('/message', 'adminDashboard.message')->name('admin.message');
+    Route::view('/payment', 'adminDashboard.payment')->name('admin.payment');
+    Route::view('/feedback', 'adminDashboard.feedback')->name('admin.feedback');
+    Route::view('/report', 'adminDashboard.report')->name('admin.report');
+    Route::view('/membership', 'adminDashboard.membership')->name('admin.membership');
+
+});
+
+// Dietitian role routing
+Route::middleware(['auth'])->prefix('dietitian')->group(function () {
+
+    // Profile
+    Route::get('/profile', [UserController::class, 'getMemberData'])->name('dietitian.profile');
+
+    // // Settings
+    // Route::get('/settings', [UserController::class, 'showSettings'])->name('admin.settings');
+
+    // Static View Routes
+    Route::view('/request', 'dietitianDashboard.request')->name('dietitian.request');
+    Route::view('/dietplan', 'dietitianDashboard.dietplan')->name('dietitian.dietplan');
+    Route::view('/meals', 'dietitianDashboard.meals')->name('dietitian.meals');
+    Route::view('/feedback', 'dietitianDashboard.feedback')->name('dietitian.feedback');
+    Route::view('/message', 'dietitianDashboard.message')->name('dietitian.message');
+
+});
+
+// Trainer role routing
+Route::middleware(['auth'])->prefix('trainer')->group(function () {
+
+    // Profile
+    Route::get('/profile', [UserController::class, 'getTrainerData'])->name('trainer.profile');
+
+    // // Settings
+    // Route::get('/settings', [UserController::class, 'showSettings'])->name('trainer.settings');
+
+    // Static View Routes
+    Route::view('/request', 'trainerDashboard.request')->name('trainer.request');
+    Route::view('/workoutplan', 'trainerDashboard.workoutplan')->name('trainer.workoutplan');
+    Route::view('/exercises', 'trainerDashboard.exercises')->name('trainer.exercises');
+    Route::view('/booking', 'trainerDashboard.booking')->name('trainer.booking');
+    Route::view('/message', 'trainerDashboard.message')->name('trainer.message');
+    Route::view('/feedback', 'trainerDashboard.feedback')->name('trainer.feedback');
+
+});
+
+// Member role routing
 Route::middleware(['auth'])->group(function () {
     // 👤 Member views QR scanner and past attendance
     Route::get('/member/qrscanner', [AttendanceController::class, 'showMemberQR'])->name('member.qrscanner');
@@ -64,35 +164,4 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/member/settings', [MemberSettingsController::class, 'update'])->name('Member.settings.update');
     Route::delete('/member/settings/remove-image', [MemberSettingsController::class, 'removeImage'])->name('Member.settings.removeImage');
     Route::post('/member/settings/check-password', [MemberSettingsController::class, 'checkPassword'])->name('Member.settings.checkPassword');
-});
-
-Route::middleware(['auth'])->group(function () {
-
-    Route::get('/admin/admin', [UserController::class, 'getAdminData'])->name('admin.admin');
-    Route::post('admin/admin', [UserController::class, 'createAdmin'])->name('admin.create');
-    Route::post('admin/admin/update', [UserController::class, 'updateAdmin'])->name('admin.update');
-    Route::post('admin/admin/bulkAction', [UserController::class, 'handleAdminAction'])->name('admin.bulkAction');
-    Route::post('admin/admin/report', [ReportController::class, 'generateAdminReport'])->name('admin.report');
-
-    Route::get('/admin/trainer', [UserController::class, 'getTrainerData'])->name('admin.trainer');
-    Route::post('admin/trainer', [UserController::class, 'createTrainer'])->name('trainer.create');
-    Route::post('admin/trainer/update', [UserController::class, 'updateTrainer'])->name('trainer.update');
-    Route::post('admin/trainer/bulkAction', [UserController::class, 'handleTrainerAction'])->name('trainer.bulkAction');
-    Route::post('admin/trainer/report', [ReportController::class, 'generateTrainerReport'])->name('trainer.report');
-
-    Route::get('/admin/dietitian', [UserController::class, 'getDietitianData'])->name('admin.dietitian');
-    Route::post('admin/dietitian', [UserController::class, 'createDietitian'])->name('dietitian.create');
-    Route::post('admin/dietitian/update', [UserController::class, 'updateDietitian'])->name('dietitian.update');
-    Route::post('admin/dietitian/bulkAction', [UserController::class, 'handleDietitianAction'])->name('dietitian.bulkAction');
-    Route::post('admin/dietitian/report', [ReportController::class, 'generateDietitianReport'])->name('dietitian.report');
-
-    Route::view('/admin/member', 'adminDashboard.member')->name('admin.member');
-
-    Route::view('/admin/attendance', 'adminDashboard.attendance')->name('admin.attendance');
-    Route::view('/admin/message', 'adminDashboard.message')->name('admin.message');
-    Route::view('/admin/payment', 'adminDashboard.payment')->name('admin.payment');
-    Route::view('/admin/feedback', 'adminDashboard.feedback')->name('admin.feedback');
-    Route::view('/admin/report', 'adminDashboard.report')->name('admin.report');
-    Route::view('/admin/role', 'adminDashboard.role')->name('admin.role');
-    Route::view('/admin/membership', 'adminDashboard.membership')->name('admin.membership');
 });

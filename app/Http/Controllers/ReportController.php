@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -8,45 +9,50 @@ use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
-    // trainer detail report
-    public function generateTrainerReport(Request $request)
+    // User detail report
+    public function generateUserReport(Request $request)
     {
         $datetimeInput = $request->input('datetime');
+        $role          = $request->input('role');
+
+        if (! $datetimeInput || ! $role) {
+            abort(400, 'Missing required parameters.');
+        }
 
         $datetime      = Carbon::parse($datetimeInput);
         $formattedDate = $datetime->format('Y-m-d');
 
-        $trainers = User::whereHas('roles', fn($q) => $q->where('role_name', 'Trainer'))->get();
+        $users = User::whereHas('roles', fn($q) => $q->where('role_name', $role))->get();
 
-        $pdf = Pdf::loadView('report.trainerReport', compact('formattedDate', 'trainers'));
-        return $pdf->download('Trainer_Report.pdf');
+        $pdf = Pdf::loadView('report.userReport', [
+            'formattedDate' => $formattedDate,
+            'role'          => $role,
+            'users'         => $users,
+        ]);
+
+        return $pdf->download("{$role}_Report.pdf");
     }
 
-    // admin detail report
-    public function generateAdminReport(Request $request)
+    // Role detail report
+    public function generateRoleReport(Request $request)
     {
         $datetimeInput = $request->input('datetime');
+
+        if (! $datetimeInput) {
+            abort(400, 'Missing required parameters.');
+        }
 
         $datetime      = Carbon::parse($datetimeInput);
         $formattedDate = $datetime->format('Y-m-d');
 
-        $admins = User::whereHas('roles', fn($q) => $q->where('role_name', 'Admin'))->get();
+        $roles = Role::withCount('users')->get();
 
-        $pdf = Pdf::loadView('report.adminReport', compact('formattedDate', 'admins'));
-        return $pdf->download('Admin_Report.pdf');
+        $pdf = Pdf::loadView('report.roleReport', [
+            'formattedDate' => $formattedDate,
+            'roles'         => $roles,
+        ]);
+
+        return $pdf->download("Role_Report.pdf");
     }
 
-    // dietitian detail report
-    public function generateDietitianReport(Request $request)
-    {
-        $datetimeInput = $request->input('datetime');
-
-        $datetime      = Carbon::parse($datetimeInput);
-        $formattedDate = $datetime->format('Y-m-d');
-
-        $dietitians = User::whereHas('roles', fn($q) => $q->where('role_name', 'Dietitian'))->get();
-
-        $pdf = Pdf::loadView('report.dietitianReport', compact('formattedDate', 'dietitians'));
-        return $pdf->download('Dietitian_Report.pdf');
-    }
 }

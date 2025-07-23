@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Dietitian Report</title>
+    <title>{{ ucfirst($role) }} Report</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -64,7 +64,7 @@
             <h1>PULSEONE</h1>
         </header>
 
-        <h2>Dietitian Management Report</h2>
+        <h2>{{ ucfirst($role) }} Management Report</h2>
         <div class="report-info">
             <p><strong>Date:</strong> {{ $formattedDate }}</p>
         </div>
@@ -72,21 +72,19 @@
         <table>
             <thead>
                 <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
+                    <th>Full Name</th>
                     <th>Email</th>
                     <th>Mobile</th>
                     <th>Status</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($dietitians as $dietitian)
+                @foreach ($users as $user)
                 <tr>
-                    <td>{{ $dietitian->first_name }}</td>
-                    <td>{{ $dietitian->last_name }}</td>
-                    <td>{{ $dietitian->email }}</td>
-                    <td>{{ $dietitian->mobile_number }}</td>
-                    <td>{{ $dietitian->roles->first()?->pivot->is_active ? 'Active' : 'Inactive' }}</td>
+                    <td>{{ $user->first_name }} {{ $user->last_name }}</td>
+                    <td>{{ $user->email }}</td>
+                    <td>{{ $user->mobile_number }}</td>
+                    <td>{{ $user->roles->first()?->pivot->is_active ? 'Active' : 'Inactive' }}</td>
                 </tr>
                 @endforeach
             </tbody>

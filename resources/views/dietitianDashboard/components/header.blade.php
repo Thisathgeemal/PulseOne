@@ -81,7 +81,7 @@
         x-show="showSettings"
         x-transition
         @click.away="showSettings = false"
-        class="absolute right-0 top-16 w-[400px] bg-white text-black rounded-md shadow-lg z-50 p-6">
+        class="absolute right-0 top-16 w-[600px] bg-white text-black rounded-md shadow-lg z-50 p-6">
         <h2 class="text-2xl font-bold mb-6 text-gray-800">Settings</h2>
 
         <!-- Notification Settings -->

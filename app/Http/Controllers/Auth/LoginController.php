@@ -43,13 +43,22 @@ class LoginController extends Controller
             return back()->withErrors(['email' => 'Invalid credentials'])->onlyInput('email');
         }
 
+        $user = Auth::user();
+
+        if ($user->is_active !== true) {
+            Auth::logout();
+            return back()->withErrors(['email' => 'Your account is inactive.'])->onlyInput('email');
+        }
+
+        $activeRoleNames = UserRole::where('user_id', $user->id)
+            ->where('is_active', true)
+            ->join('roles', 'user_roles.role_id', '=', 'roles.role_id')
+            ->pluck('roles.role_name')
+            ->toArray();
+
         $request->session()->regenerate();
 
-        $user      = Auth::user();
-        $roles     = UserRole::where('user_id', $user->id)->pluck('role_id');
-        $roleNames = Role::whereIn('role_id', $roles)->pluck('role_name')->toArray();
-
-        session(['user_roles' => $roleNames]);
+        session(['user_roles' => $activeRoleNames]);
 
         if ($user->mfa_enabled) {
             $code      = rand(100000, 999999);
@@ -67,7 +76,7 @@ class LoginController extends Controller
             return redirect()->route('2fa.verify');
         }
 
-        return $this->handleRoleRedirect($roleNames);
+        return $this->handleRoleRedirect($activeRoleNames);
     }
 
     // handle 2FA verification
@@ -102,7 +111,7 @@ class LoginController extends Controller
         return redirect()->route('selectRole');
     }
 
-    // handle role selection
+    // handle role selection form
     public function submitSelectedRole(Request $request)
     {
         $request->validate([
