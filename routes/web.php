@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\MemberSettingsController;
+use App\Http\Controllers\Auth\SecuritySettingsController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -19,17 +19,6 @@ Route::view('/contact', 'contact')->name('contact');
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-
-// 2FA
-Route::view('/2fa', 'auth.2fa')->name('2fa');
-Route::post('/2fa', [LoginController::class, 'verify2FA'])->name('2fa.verify');
-Route::post('/2fa/resend', [LoginController::class, 'resend2FA'])->name('2fa.resend');
-
-// Forgot/Reset Password
-Route::get('/forgotPassword', [LoginController::class, 'showForgotPasswordForm'])->name('password.request');
-Route::post('/forgotPassword', [LoginController::class, 'sendResetLinkEmail'])->name('password.email');
-Route::get('/resetPassword/{token}', [LoginController::class, 'showResetForm'])->name('password.reset');
-Route::post('/resetPassword', [LoginController::class, 'reset'])->name('password.update');
 
 // Role selection after login
 Route::view('/selectRole', 'auth.selectRole')->name('selectRole');
@@ -138,30 +127,46 @@ Route::middleware(['auth'])->prefix('trainer')->group(function () {
 });
 
 // Member role routing
+Route::middleware(['auth'])->prefix('member')->group(function () {
+
+    // Profile
+    Route::get('/profile', [UserController::class, 'getMemberData'])->name('member.profile');
+
+    // // Settings
+    // Route::get('/settings', [UserController::class, 'showSettings'])->name('member.settings');
+
+    Route::post('/workoutplan/request', [WorkoutPlanController::class, 'requestWorkout'])->name('member.workout.request');
+
+    // Static View Routes
+    Route::view('/qr', 'memberDashboard.qr')->name('member.qr');
+    Route::view('/attendance', 'memberDashboard.attendance')->name('member.attendance');
+    Route::view('/workoutplan', 'memberDashboard.workoutplan')->name('member.workoutplan');
+    Route::view('/dietplan', 'memberDashboard.dietplan')->name('member.dietplan');
+    Route::view('/booking', 'memberDashboard.booking')->name('member.booking');
+    Route::view('/payment', 'memberDashboard.payment')->name('member.payment');
+    Route::view('/feedback', 'memberDashboard.feedback')->name('member.feedback');
+    Route::view('/message', 'memberDashboard.message')->name('member.message');
+    Route::view('/report', 'memberDashboard.report')->name('member.report');
+    Route::view('/leaderboard', 'memberDashboard.leaderboard')->name('member.leaderboard');
+
+});
+
+// Security route
 Route::middleware(['auth'])->group(function () {
-    // 👤 Member views QR scanner and past attendance
-    Route::get('/member/qrscanner', [AttendanceController::class, 'showMemberQR'])->name('member.qrscanner');
 
-    // 🔘 Manual attendance marking from inside dashboard (button)
-    Route::post('/member/mark-attendance', [AttendanceController::class, 'markAttendance'])->name('mark.attendance');
+    // Track and Logout User Sessions
+    Route::post('/logout/device', [SecuritySettingsController::class, 'logoutDevice'])->name('security.logout.device');
+    Route::post('/logout/all/devices', [SecuritySettingsController::class, 'logoutAllDevices'])->name('security.logout.all');
 
-    // 📱 QR scan route - accessed via GET (no form, from QR code scan)
-    Route::get('/mark-attendance', [AttendanceController::class, 'markAttendanceViaQR'])->name('mark.attendance.qr');
+    // Forgot and Reset Password
+    Route::get('/forgotPassword', [LoginController::class, 'showForgotPasswordForm'])->name('password.request');
+    Route::post('/forgotPassword', [LoginController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('/resetPassword/{token}', [LoginController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/resetPassword', [LoginController::class, 'reset'])->name('password.update');
 
-    Route::view('/member/workoutplan', 'memberDashboard.workoutplan')->name('Member.workoutplan');
-    Route::view('/member/dietplan', 'memberDashboard.dietplan')->name('Member.dietplan');
-    Route::view('/member/bookings', 'memberDashboard.bookings')->name('Member.bookings');
-    Route::view('/member/message', 'memberDashboard.message')->name('Member.message');
-    Route::view('/member/leaderboard', 'memberDashboard.leaderboard')->name('Member.leaderboard');
-    Route::view('/member/payment', 'memberDashboard.payment')->name('Member.payment');
-
-    /*
-    |--------------------------------------------------------------------------
-    | Member Settings
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/member/settings', [MemberSettingsController::class, 'index'])->name('Member.settings');
-    Route::put('/member/settings', [MemberSettingsController::class, 'update'])->name('Member.settings.update');
-    Route::delete('/member/settings/remove-image', [MemberSettingsController::class, 'removeImage'])->name('Member.settings.removeImage');
-    Route::post('/member/settings/check-password', [MemberSettingsController::class, 'checkPassword'])->name('Member.settings.checkPassword');
+    // 2FA
+    Route::view('/2fa', 'auth.2fa')->name('2fa');
+    Route::post('/2fa', [LoginController::class, 'verify2FA'])->name('2fa.verify');
+    Route::post('/2fa/resend', [LoginController::class, 'resend2FA'])->name('2fa.resend');
+    Route::post('/mfa-toggle', [SecuritySettingsController::class, 'toggleMfa'])->name('settings.mfa-toggle');
 });

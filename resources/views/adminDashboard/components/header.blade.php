@@ -1,41 +1,3 @@
-{{-- <div class="flex items-center justify-between bg-[#1E1E1E] text-white px-6 py-3 shadow-sm">
-    <!-- Left: Welcome Message -->
-    <div class="flex items-center gap-4 text-lg font-semibold">
-        <i class="fa-solid fa-user-tie text-white text-xl"></i>
-        <span class="font-semibold">
-            Welcome, {{ Auth::user()->first_name }}
-        </span>
-    </div>
-
-    <!-- Right: Icons -->
-    <div class="flex items-center gap-6">
-        <!-- Settings -->
-        <a href="{{ route('admin.settings') }}">
-            <i class="fas fa-cog text-white text-xl cursor-pointer hover:text-yellow-400"></i>
-        </a>
-
-        <!-- Notifications -->
-        <div class="relative cursor-pointer">
-            <i class="fas fa-bell text-white text-xl"></i>
-            <span class="absolute -top-1 -right-2 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">3</span>
-        </div>
-
-        <!-- Avatar with fallback and cache-busting -->
-        <a href="{{ route('admin.profile') }}">
-            @if(Auth::user()->profile_image)
-                <img src="{{ asset(Auth::user()->profile_image) }}?v={{ time() }}"
-                    alt="User Avatar"
-                    class="w-10 h-10 rounded-full border-2 border-white object-cover hover:ring-2 ring-yellow-400 transition">
-            @else
-                <div class="w-10 h-10 rounded-full bg-orange-300 text-orange-900 flex items-center justify-center font-bold uppercase border-2 border-white hover:ring-2 ring-yellow-400 transition">
-                    {{ strtoupper(substr(Auth::user()->first_name, 0, 1)) }}
-                </div>
-            @endif
-        </a>
-    </div>
-</div> --}}
-
-
 <div x-data="{ showSettings: false }" class="relative">
 
     <!-- Topbar -->
@@ -53,7 +15,7 @@
             <!-- Settings -->
             <button @click="showSettings = !showSettings">
                 <i class="fas fa-cog text-white text-xl cursor-pointer hover:text-yellow-400"></i>
-            </button>
+            </button>         
 
             <!-- Notifications -->
             <div class="relative cursor-pointer">
@@ -82,76 +44,85 @@
         x-transition
         @click.away="showSettings = false"
         class="absolute right-0 top-16 w-[400px] bg-white text-black rounded-md shadow-lg z-50 p-6">
-        <h2 class="text-2xl font-bold mb-6 text-gray-800">Settings</h2>
+        <h2 class="text-2xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2 mb-2">Settings</h2>
 
-        <!-- Notification Settings -->
-        <div class="mb-6">
-            <h3 class="text-lg font-semibold mb-2 text-gray-700">Notification Settings</h3>
-
-            <div class="space-y-3 text-sm text-gray-600">
-                <label class="flex items-center gap-2">
-                    <input type="checkbox" checked class="accent-yellow-500 rounded">
-                    Receive email notifications for upcoming sessions
-                </label>
-
-                <label class="flex items-center gap-2">
-                    <input type="checkbox" checked class="accent-yellow-500 rounded">
-                    Notify me when a trainer updates my workout plan
-                </label>
-
-                <label class="flex items-center gap-2">
-                    <input type="checkbox" class="accent-yellow-500 rounded">
-                    Receive promotional emails
-                </label>
-            </div>
+        <!-- MFA Security -->
+        <div class="py-4">
+            <h2 class="text-xl font-semibold mb-4">MFA Security</h2>
+            <form action="{{ route('settings.mfa-toggle') }}" method="POST" class="border rounded-lg p-4 shadow-md">
+                @csrf
+                <p class="mb-2">Two-Factor Authentication is currently <strong>{{ auth()->user()->mfa_enabled ? 'Enabled' : 'Disabled' }}</strong>.</p>
+                @if(auth()->user()->mfa_enabled)
+                    <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                        Disable Two-Factor Authentication
+                    </button>
+                @else
+                    <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                        Enable Two-Factor Authentication
+                    </button>
+                @endif
+            </form>
         </div>
 
-        <!-- Security Settings -->
-        <div class="mb-6 border-t pt-4">
-            <h3 class="text-lg font-semibold mb-2 text-gray-700">Security Settings</h3>
+        <!-- Active Sessions -->
+        <div class="py-4">
+            <h2 class="text-xl font-semibold mb-4">Active Sessions</h2>
+            @foreach ($sessions as $session)
+                <div class="border rounded-lg p-4 shadow-md mb-4">
+                    <div><strong>IP:</strong> {{ $session['ip_address'] }}</div>
+                    <div><strong>Device:</strong> {{ $session['device'] }}</div>
+                    <div><strong>Last Active:</strong> {{ $session['last_activity'] }}</div>
+                    <div>
+                        @if ($session['is_current'])
+                            <span class="text-green-600 font-semibold">Current Session</span>
+                        @else
+                            <form action="{{ route('security.logout.device') }}" method="POST" class="inline">
+                                @csrf
+                                <input type="hidden" name="session_id" value="{{ $session['id'] }}">
+                                <button type="submit" class="ml-4 mt-2 px-4 py-2 bg-red-500 text-white font-bold rounded hover:bg-red-700">
+                                    Log out
+                                </button>
+                            </form>
+                        @endif
+                    </div>
+                </div>
+            @endforeach
 
-            <div class="mb-3 text-sm text-gray-600">
-                <p>Last Password Change: <span class="font-medium text-gray-800">2025-06-01</span></p>
-                <p>Two-Factor Authentication: 
-                    <span class="font-semibold text-green-600 ml-1">Enabled</span>
-                </p>
-            </div>
-
-            <!-- Active Sessions -->
-            <div class="bg-gray-100 rounded p-3 text-sm space-y-2">
-                <p class="text-gray-700 font-medium">Active Sessions:</p>
-                <ul class="list-disc ml-5 text-gray-600">
-                    <li>Windows, Chrome – Today, 9:45 AM</li>
-                    <li>Mobile App – Yesterday, 5:22 PM</li>
-                </ul>
-            </div>
-
-            <!-- Logout from all devices -->
-            <div class="mt-4">
-                <form method="POST" action="#">
+            @if ($sessions->count() > 1)
+                <form action="{{ route('security.logout.all') }}" method="POST" class="mt-4">
                     @csrf
-                    <button type="submit" class="mt-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-sm font-medium">
-                        Log out from all devices
+                    <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                        Logout from all other devices
                     </button>
                 </form>
-            </div>
-        </div>
-
-        <!-- Language & Region -->
-        <div class="mb-6 border-t pt-4">
-            <h3 class="text-lg font-semibold mb-2 text-gray-700">Language & Region</h3>
-            <div class="space-y-2 text-sm text-gray-600">
-                <p>Language: <span class="font-medium text-gray-800">English (UK)</span></p>
-                <p>Timezone: <span class="font-medium text-gray-800">Asia/Colombo (GMT+5:30)</span></p>
-            </div>
-        </div>
-
-        <!-- Optional Save Button -->
-        <div class="border-t pt-4 flex justify-end">
-            <button type="button" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 text-sm font-semibold">
-                Save Preferences
-            </button>
+            @endif
         </div>
     </div>
 
 </div>
+
+@push('scripts')
+    @if(session('success'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: "{{ session('success') }}",
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#d32f2f'
+        });
+    </script>
+    @endif
+
+    @if(session('error'))
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: "{{ session('error') }}",
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#d32f2f'
+        });
+    </script>
+    @endif
+@endpush
