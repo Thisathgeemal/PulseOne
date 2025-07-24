@@ -29,6 +29,12 @@ Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->na
 Route::post('/register/member', [RegisterController::class, 'registerMember'])->name('register.member');
 Route::post('/register/payment', [RegisterController::class, 'registerPayment'])->name('register.payment');
 
+// Forgot and Reset Password
+Route::get('/forgotPassword', [LoginController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('/forgotPassword', [LoginController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/resetPassword/{token}', [LoginController::class, 'showResetForm'])->name('password.reset');
+Route::post('/resetPassword', [LoginController::class, 'reset'])->name('password.update');
+
 // Dashboards
 Route::middleware(['auth'])->group(function () {
     Route::view('/member/dashboard', 'memberDashboard.dashboard')->name('Member.dashboard');
@@ -157,12 +163,6 @@ Route::middleware(['auth'])->group(function () {
     // Track and Logout User Sessions
     Route::post('/logout/device', [SecuritySettingsController::class, 'logoutDevice'])->name('security.logout.device');
     Route::post('/logout/all/devices', [SecuritySettingsController::class, 'logoutAllDevices'])->name('security.logout.all');
-
-    // Forgot and Reset Password
-    Route::get('/forgotPassword', [LoginController::class, 'showForgotPasswordForm'])->name('password.request');
-    Route::post('/forgotPassword', [LoginController::class, 'sendResetLinkEmail'])->name('password.email');
-    Route::get('/resetPassword/{token}', [LoginController::class, 'showResetForm'])->name('password.reset');
-    Route::post('/resetPassword', [LoginController::class, 'reset'])->name('password.update');
 
     // 2FA
     Route::view('/2fa', 'auth.2fa')->name('2fa');

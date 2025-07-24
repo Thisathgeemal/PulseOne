@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
@@ -101,7 +102,7 @@ class LoginController extends Controller
         return $this->handleRoleRedirect($roles);
     }
 
-    // handle role selection logic
+    // handle one role selection
     protected function handleRoleRedirect(array $roles)
     {
         if (count($roles) == 1) {
@@ -119,9 +120,17 @@ class LoginController extends Controller
         ]);
 
         $selectedRole = $request->input('selected_role');
+        $user         = Auth::user();
 
-        if (! in_array($selectedRole, session('user_roles'))) {
-            return back()->withErrors(['selected_role' => 'Invalid role selection.']);
+        $isRoleStillActive = DB::table('user_roles')
+            ->join('roles', 'user_roles.role_id', '=', 'roles.role_id')
+            ->where('user_roles.user_id', $user->id)
+            ->where('roles.role_name', $selectedRole)
+            ->where('user_roles.is_active', true)
+            ->exists();
+
+        if (! $isRoleStillActive) {
+            return back()->with(['error' => 'Selected role is not active.']);
         }
 
         return redirect()->route($selectedRole . '.dashboard');

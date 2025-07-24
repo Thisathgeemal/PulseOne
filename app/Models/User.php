@@ -71,4 +71,39 @@ class User extends Authenticatable
         return $this->hasMany(Membership::class);
     }
 
+    public function bookingsAsTrainer()
+    {
+        return $this->hasMany(Booking::class, 'trainer_id');
+    }
+
+    public function bookingsAsMember()
+    {
+        return $this->hasMany(Booking::class, 'member_id');
+    }
+
+    public function feedbackGiven()
+    {
+        return $this->hasMany(Feedback::class, 'from_user_id');
+    }
+
+    public function feedbackReceived()
+    {
+        return $this->hasMany(Feedback::class, 'to_user_id');
+    }
+
+    public function dietPlansAsDietitian()
+    {
+        return $this->hasMany(DietPlan::class, 'dietitian_id');
+    }
+
+    public function dietPlansAsMember()
+    {
+        return $this->hasMany(DietPlan::class, 'member_id');
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'user_id');
+    }
+
 }

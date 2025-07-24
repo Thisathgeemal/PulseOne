@@ -14,7 +14,7 @@ return new class extends Migration
             $table->unsignedBigInteger('member_id')->index();
             $table->unsignedBigInteger('trainer_id')->nullable()->index();
             $table->unsignedBigInteger('dietitian_id')->nullable()->index();
-            $table->enum('type', ['Workout', 'Diet', 'Booking']);
+            $table->enum('type', ['Workout', 'Diet']);
             $table->enum('status', ['Pending', 'Approved', 'Rejected'])->default('Pending');
             $table->timestamps();
 

@@ -13,6 +13,8 @@
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 
 <body class="bg-white text-gray-800 overflow-hidden">
@@ -46,5 +48,15 @@
         </div>
     </section>
 
+    @if (session('error'))
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: '{{ session('error') }}',
+            confirmButtonColor: '#d32f2f'
+        });
+    </script>
+    @endif
 </body>
 </html>
