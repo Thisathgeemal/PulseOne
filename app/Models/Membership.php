@@ -18,6 +18,11 @@ class Membership extends Model
         'status',
     ];
 
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date'   => 'date',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -30,7 +35,7 @@ class Membership extends Model
 
     public function payment()
     {
-        return $this->hasOne(Payment::class);
+        return $this->belongsTo(Payment::class);
     }
 
 }

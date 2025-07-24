@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->bigIncrements('payment_id');
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('type_id');
+            $table->unsignedBigInteger('user_id')->index();
+            $table->unsignedBigInteger('type_id')->index();
             $table->decimal('amount', 8, 2);
             $table->dateTime('payment_date')->default(now());
 

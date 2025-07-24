@@ -20,6 +20,10 @@ class Payment extends Model
         'payment_date',
     ];
 
+    protected $casts = [
+        'payment_date' => 'datetime',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -27,6 +31,6 @@ class Payment extends Model
 
     public function membership()
     {
-        return $this->belongsTo(Membership::class);
+        return $this->hasOne(Membership::class);
     }
 }

@@ -11,7 +11,7 @@ class RoleSeeder extends Seeder
     {
         DB::table('roles')->updateOrInsert(
             ['role_name' => 'Admin'],
-            ['created_at' => now(), 'updated_at' => now()]
+            ['created_at' => now()]
         );
     }
 }

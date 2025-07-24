@@ -41,14 +41,34 @@ class User extends Authenticatable
             ->withPivot('is_active');
     }
 
-    public function users()
-    {
-        return $this->belongsToMany(User::class, 'user_roles');
-    }
-
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new CustomResetPassword($token, $this->email));
+    }
+
+    public function requests()
+    {
+        return $this->hasMany(Request::class, 'member_id');
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function workoutPlansAsTrainer()
+    {
+        return $this->hasMany(WorkoutPlan::class, 'trainer_id');
+    }
+
+    public function workoutPlansAsMember()
+    {
+        return $this->hasMany(WorkoutPlan::class, 'member_id');
+    }
+
+    public function memberships()
+    {
+        return $this->hasMany(Membership::class);
     }
 
 }
