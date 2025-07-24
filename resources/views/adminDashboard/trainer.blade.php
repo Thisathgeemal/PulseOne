@@ -192,7 +192,7 @@
                     </div>
 
                     <div class="flex justify-end space-x-2 mt-4">
-                        <button type="button" class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"><a href="{{ route('admin.trainer') }}">Cancel</a></button>
+                        <button type="button" class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded" onclick="closeModal()">Cancel</button>
                         <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" id="modalSubmitButton">Save</button>
                     </div>
                 </form>
@@ -315,6 +315,10 @@
             const now = new Date();
             const formattedDateTime = now.toISOString(); 
             document.getElementById('currentDatetime').value = formattedDateTime;
+        }
+
+        function closeModal() {
+            document.getElementById('addTrainerModal').classList.add('hidden');
         }
 
         </script>

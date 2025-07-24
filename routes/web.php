@@ -3,9 +3,11 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\SecuritySettingsController;
+use App\Http\Controllers\DietPlanController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WorkoutPlanController;
 use Illuminate\Support\Facades\Route;
 
 // Public Pages
@@ -141,13 +143,16 @@ Route::middleware(['auth'])->prefix('member')->group(function () {
     // // Settings
     // Route::get('/settings', [UserController::class, 'showSettings'])->name('member.settings');
 
+    Route::get('/workoutplan', [WorkoutPlanController::class, 'index'])->name('member.workoutplan');
     Route::post('/workoutplan/request', [WorkoutPlanController::class, 'requestWorkout'])->name('member.workout.request');
+
+    Route::get('/dietplan', [DietPlanController::class, 'index'])->name('member.dietplan');
+    Route::post('/dietplan/request', [DietPlanController::class, 'requestDietPlan'])->name('member.diet.request');
 
     // Static View Routes
     Route::view('/qr', 'memberDashboard.qr')->name('member.qr');
     Route::view('/attendance', 'memberDashboard.attendance')->name('member.attendance');
-    Route::view('/workoutplan', 'memberDashboard.workoutplan')->name('member.workoutplan');
-    Route::view('/dietplan', 'memberDashboard.dietplan')->name('member.dietplan');
+    Route::view('/membership', 'memberDashboard.membership')->name('member.membership');
     Route::view('/booking', 'memberDashboard.booking')->name('member.booking');
     Route::view('/payment', 'memberDashboard.payment')->name('member.payment');
     Route::view('/feedback', 'memberDashboard.feedback')->name('member.feedback');

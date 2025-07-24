@@ -14,6 +14,7 @@ class Request extends Model
         'member_id',
         'trainer_id',
         'dietitian_id',
+        'description',
         'type',
         'status',
     ];
@@ -22,7 +23,7 @@ class Request extends Model
     {
         return $this->hasOne(WorkoutPlan::class, 'request_id');
     }
-    
+
     public function member()
     {
         return $this->belongsTo(User::class, 'member_id');

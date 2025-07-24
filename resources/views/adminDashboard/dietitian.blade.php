@@ -192,7 +192,7 @@
                     </div>
 
                     <div class="flex justify-end space-x-2 mt-4">
-                        <button type="button" class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"><a href="{{ route('admin.dietitian') }}">Cancel</a></button>
+                        <button type="button" class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded" onclick="closeModal()">Cancel</a></button>
                         <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" id="modalSubmitButton">Save</button>
                     </div>
                 </form>
@@ -317,6 +317,9 @@
             document.getElementById('currentDatetime').value = formattedDateTime;
         }
 
+        function closeModal() {
+            document.getElementById('addDietitianModal').classList.add('hidden');
+        }
         </script>
 
     @endpush

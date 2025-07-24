@@ -15,7 +15,6 @@ return new class extends Migration
             $table->string('type');
             $table->string('meal_category')->nullable();
             $table->string('description')->nullable();
-            $table->string('image')->nullable();
             $table->timestamps();
         });
     }
