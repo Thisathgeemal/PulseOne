@@ -1,6 +1,8 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Membership;
+use App\Models\MembershipType;
 use App\Models\Role;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -53,6 +55,51 @@ class ReportController extends Controller
         ]);
 
         return $pdf->download("Role_Report.pdf");
+    }
+
+    // Membership detail report
+    public function generateMembershipReport(Request $request)
+    {
+        $datetimeInput = $request->input('datetime');
+
+        if (! $datetimeInput) {
+            abort(400, 'Missing required parameters.');
+        }
+
+        $datetime       = Carbon::parse($datetimeInput);
+        $formattedDate  = $datetime->format('Y-m-d');
+        $memberships    = Membership::all();
+        $membershipType = MembershipType::all();
+
+        $pdf = Pdf::loadView('report.membershipReport', [
+            'formattedDate'  => $formattedDate,
+            'memberships'    => $memberships,
+            'membershipType' => $membershipType,
+        ]);
+
+        return $pdf->download("Membership_Report.pdf");
+    }
+
+    // Membertype detail report
+    public function generateMembertypeReport(Request $request)
+    {
+        $datetimeInput = $request->input('datetime');
+
+        if (! $datetimeInput) {
+            abort(400, 'Missing required parameters.');
+        }
+
+        $datetime      = Carbon::parse($datetimeInput);
+        $formattedDate = $datetime->format('Y-m-d');
+
+        $memberTypes = MembershipType::all();
+
+        $pdf = Pdf::loadView('report.membertypeReport', [
+            'formattedDate' => $formattedDate,
+            'memberTypes'   => $memberTypes,
+        ]);
+
+        return $pdf->download("Membershiptype_Report.pdf");
     }
 
 }

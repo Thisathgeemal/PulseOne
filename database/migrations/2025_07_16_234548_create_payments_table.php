@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->index();
             $table->unsignedBigInteger('type_id')->index();
             $table->decimal('amount', 8, 2);
+            $table->enum('payment_method', ['Card', 'Cash']);
             $table->dateTime('payment_date')->default(now());
 
             // Foreign key constraints

@@ -27,7 +27,6 @@
                 <form method="POST" action="{{ route('role.report') }}" target="_blank" onsubmit="setCurrentDateTime()">
                     @csrf
                     <input type="hidden" name="datetime" id="currentDatetime">
-                    <input type="hidden" name="role" value="Trainer">
                     <button type="submit"
                         class="bg-blue-500 text-white p-1.5 rounded hover:bg-blue-600 flex items-center justify-center w-8 h-8">
                         <i class="fas fa-download text-white text-sm"></i>

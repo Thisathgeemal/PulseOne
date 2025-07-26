@@ -850,7 +850,11 @@ class UserController extends Controller
                 }
 
                 DB::commit();
-                return redirect()->route('admin.membership')->with('success', 'Member role assigned to existing user.');
+                return redirect()->route('admin.membership')
+                    ->with('success', 'Member role assigned to existing user.')
+                    ->with('member_id', $user->id)
+                    ->with('member_name', $user->first_name . ' ' . $user->last_name);
+
             }
 
             $user = User::create([
@@ -871,7 +875,10 @@ class UserController extends Controller
             ]);
 
             DB::commit();
-            return redirect()->route('admin.membership')->with('success', 'Member created successfully!');
+            return redirect()->route('admin.membership')
+                ->with('success', 'Member created successfully!')
+                ->with('member_id', $user->id)
+                ->with('member_name', $user->first_name . ' ' . $user->last_name);
 
         } catch (\Exception $e) {
             DB::rollBack();

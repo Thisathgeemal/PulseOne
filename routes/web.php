@@ -4,6 +4,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\SecuritySettingsController;
 use App\Http\Controllers\DietPlanController;
+use App\Http\Controllers\MembershipController;
+use App\Http\Controllers\MembershipTypeController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -75,26 +77,35 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     // Report Generation Route
     Route::post('/user/report', [ReportController::class, 'generateUserReport'])->name('user.report');
     Route::post('/role/report', [ReportController::class, 'generateRoleReport'])->name('role.report');
+    Route::post('/membership/report', [ReportController::class, 'generateMembershipReport'])->name('membership.report');
+    Route::post('/membertype/report', [ReportController::class, 'generateMembertypeReport'])->name('membertype.report');
 
     // User roll Route
     Route::get('/role', [RoleController::class, 'getRoleData'])->name('admin.role');
     Route::post('/role', [RoleController::class, 'createRole'])->name('role.create');
     Route::post('/role/delete', [RoleController::class, 'deleteRole'])->name('role.delete');
 
+    // Membership Route
+    Route::get('/membership', [MembershipController::class, 'getmembershipData'])->name('admin.membership');
+    Route::post('/membership', [MembershipController::class, 'createMembership'])->name('membership.create');
+    Route::post('/membership/cancel', [MembershipController::class, 'cancelMembership'])->name('membership.cancel');
+
+    // Membershiptype Route
+    Route::get('/membertype', [MembershipTypeController::class, 'getMembertypeData'])->name('admin.membertype');
+    Route::post('/membertype', [MembershipTypeController::class, 'createMembertype'])->name('membertype.create');
+    Route::post('/membertype/update', [MembershipTypeController::class, 'updateMembertype'])->name('membertype.update');
+    Route::post('/membertype/delete', [MembershipTypeController::class, 'deleteMembertype'])->name('membertype.delete');
+
     // Profile
     Route::get('/profile', [UserController::class, 'getMemberData'])->name('admin.profile');
-
-    // // Settings
-    // Route::get('/settings', [UserController::class, 'showSettings'])->name('admin.settings');
 
     // Static View Routes
     Route::view('/attendance', 'adminDashboard.attendance')->name('admin.attendance');
     Route::view('/message', 'adminDashboard.message')->name('admin.message');
+    // Route::view('/membertype', 'adminDashboard.membertype')->name('admin.membertype');
     Route::view('/payment', 'adminDashboard.payment')->name('admin.payment');
     Route::view('/feedback', 'adminDashboard.feedback')->name('admin.feedback');
     Route::view('/report', 'adminDashboard.report')->name('admin.report');
-    Route::view('/membership', 'adminDashboard.membership')->name('admin.membership');
-
 });
 
 // Dietitian role routing

@@ -91,6 +91,7 @@ class RegisterController extends Controller
 
             $startDate = now();
             $endDate   = $startDate->copy()->addDays($memberSelectType->duration);
+            $method    = 'Card';
 
             DB::beginTransaction();
 
@@ -128,9 +129,10 @@ class RegisterController extends Controller
             ]);
 
             Payment::create([
-                'user_id' => $user->id,
-                'type_id' => $memberData['membership_type'],
-                'amount'  => $memberData['price'],
+                'user_id'        => $user->id,
+                'type_id'        => $memberData['membership_type'],
+                'payment_method' => $method,
+                'amount'         => $memberData['price'],
             ]);
 
             Mail::to($user->email)->send(new MembershipConfirmationMail($user, $memberSelectType));

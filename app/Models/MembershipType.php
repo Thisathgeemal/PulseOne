@@ -9,8 +9,8 @@ class MembershipType extends Model
 {
     use HasFactory, Notifiable;
 
-    protected $table = 'membership_types';
-
+    protected $table      = 'membership_types';
+    public $timestamps    = false;
     protected $primaryKey = 'type_id';
 
     protected $fillable = [

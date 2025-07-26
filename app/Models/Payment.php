@@ -17,6 +17,7 @@ class Payment extends Model
         'user_id',
         'type_id',
         'amount',
+        'payment_method',
         'payment_date',
     ];
 
