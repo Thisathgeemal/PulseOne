@@ -70,6 +70,8 @@
                             </th>
                             <th class="py-3 text-left px-4 border-b border-gray-300">Type Name</th>
                             <th class="py-3 text-left px-4 border-b border-gray-300">Duration (Days)</th>
+                            <th class="py-3 text-left px-4 border-b border-gray-300">Amount</th>
+                            <th class="py-3 text-left px-4 border-b border-gray-300">Discount (%)</th>
                             <th class="py-3 text-left px-4 border-b border-gray-300">Price</th>
                             <th class="py-3 text-left px-4 border-b border-gray-300">Edit</th>
                         </tr>
@@ -82,10 +84,14 @@
                                 </td>
                                 <td class="py-3 text-left px-4 border-b border-gray-200">{{ $type->type_name }}</td>
                                 <td class="py-3 text-left px-4 border-b border-gray-200">{{ $type->duration }}</td>
+                                <td class="py-3 text-left px-4 border-b border-gray-200">{{ $type->amount }}</td>
+                                <td class="py-3 text-left px-4 border-b border-gray-200">
+                                    {{ intval($type->discount) == $type->discount ? intval($type->discount) : number_format($type->discount, 2) }}%
+                                </td>
                                 <td class="py-3 text-left px-4 border-b border-gray-200">{{ $type->price }}</td>
                                 <td class="py-3 text-left px-4 border-b border-gray-200">
                                     <a href="javascript:void(0);" onclick="openEditModal(this)" data-type_id="{{ $type->type_id }}" data-type_name="{{ $type->type_name }}"
-                                        data-duration="{{ $type->duration }}" data-price="{{ $type->price }}"
+                                        data-duration="{{ $type->duration }}" data-amount="{{ $type->amount }}" data-discount="{{ $type->discount }}"
                                         class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-red-50 hover:bg-red-100 transition duration-200 text-red-500 hover:text-red-700"
                                         title="Edit">
                                         <i class="fas fa-pen"></i>
@@ -141,17 +147,32 @@
                         @enderror
                     </div>
 
-                    <!-- Price -->
+                    <!-- Amount -->
                     <div class="mt-4">
-                        <label for="price" class="block text-left text-sm font-medium text-gray-700 items-center gap-2">
+                        <label for="amount" class="block text-left text-sm font-medium text-gray-700 items-center gap-2">
                             <i class="fa-solid fa-money-bill-wave text-sm mr-1.5 ml-1"></i>
-                            Price
+                            Amount
                         </label>
-                        <input id="price" type="number" name="price" required
-                            placeholder="Enter price"
+                        <input id="amount" type="number" name="amount" required
+                            placeholder="Enter amount"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                            value="{{ old('price') }}">
-                        @error('price')
+                            value="{{ old('amount') }}">
+                        @error('amount')
+                            <span class="text-red-600 text-sm text-left">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <!-- Discount -->
+                    <div class="mt-4">
+                        <label for="discount" class="block text-left text-sm font-medium text-gray-700 items-center gap-2">
+                            <i class="fa-solid fa-percent text-sm mr-1.5 ml-1"></i>
+                            Discount (%)
+                        </label>
+                        <input id="discount" type="number" name="discount" required step="0.01" min="0" max="100"
+                            placeholder="Enter discount percentage"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                            value="{{ old('discount') }}">
+                        @error('discount')
                             <span class="text-red-600 text-sm text-left">{{ $message }}</span>
                         @enderror
                     </div>
@@ -236,7 +257,7 @@
         function openModal() {
             document.getElementById('type_id').value = '';
             document.getElementById('type_name').value = '';
-            document.getElementById('price').value = '';
+            document.getElementById('amount').value = '';
             document.getElementById('duration').value = '';
 
             document.getElementById('typeForm').action = "{{ route('membertype.create') }}";
@@ -252,13 +273,15 @@
         function openEditModal(button) {
             const id = button.getAttribute('data-type_id');
             const membershipType = button.getAttribute('data-type_name');
-            const price = button.getAttribute('data-price');
+            const amount = button.getAttribute('data-amount');
             const duration = button.getAttribute('data-duration');
+            const discount = button.getAttribute('data-discount');
 
             document.getElementById('type_id').value = id;
             document.getElementById('type_name').value = membershipType;
-            document.getElementById('price').value = price;
+            document.getElementById('amount').value = amount;
             document.getElementById('duration').value = duration;
+            document.getElementById('discount').value = discount;
 
             const form = document.getElementById('typeForm');
             form.action = "{{ route('membertype.update') }}"; 

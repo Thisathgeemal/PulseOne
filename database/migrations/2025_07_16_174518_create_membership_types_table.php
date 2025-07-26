@@ -15,6 +15,8 @@ return new class extends Migration
             $table->bigIncrements('type_id');
             $table->string('type_name');
             $table->integer('duration');
+            $table->decimal('amount', 8, 2);
+            $table->decimal('discount', 5, 2)->default(0);
             $table->decimal('price', 8, 2);
             $table->timestamp('created_at')->default(now());
         });

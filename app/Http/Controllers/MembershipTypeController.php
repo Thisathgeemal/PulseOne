@@ -16,6 +16,8 @@ class MembershipTypeController extends Controller
         $membershipType = MembershipType::when($search, function ($query, $search) {
             $query->where('type_name', 'like', "%{$search}%")
                 ->orWhere('duration', 'like', "%{$search}%")
+                ->orWhere('amount', 'like', "%{$search}%")
+                ->orWhere('discount', 'like', "%{$search}%")
                 ->orWhere('price', 'like', "%{$search}%");
         })
             ->orderByDesc('created_at')
@@ -30,16 +32,25 @@ class MembershipTypeController extends Controller
         $validated = $request->validate([
             'type_name' => 'required|string|max:255|unique:membership_types,type_name',
             'duration'  => 'required|integer|min:1',
-            'price'     => 'required|numeric|min:0',
+            'amount'    => 'required|numeric|min:0',
+            'discount'  => 'required',
         ]);
 
         try {
             DB::beginTransaction();
+
+            $amount   = $validated['amount'];
+            $discount = $validated['discount'];
+            $price    = $amount - ($amount * ($discount / 100));
+
             MembershipType::create([
                 'type_name' => $validated['type_name'],
                 'duration'  => $validated['duration'],
-                'price'     => $validated['price'],
+                'amount'    => $amount,
+                'discount'  => $discount,
+                'price'     => $price,
             ]);
+
             DB::commit();
 
             return redirect()->back()->with('success', 'Membership type created successfully!');
@@ -57,15 +68,16 @@ class MembershipTypeController extends Controller
             'type_id'   => 'required|exists:membership_types,type_id',
             'type_name' => 'required|string|max:255',
             'duration'  => 'required|integer|min:1',
-            'price'     => 'required|numeric|min:0',
+            'amount'    => 'required|numeric|min:0',
+            'discount'  => 'required',
         ]);
 
-        $conflict = MembershipType::where('type_name', $request->type_name)
-            ->where('type_id', '!=', $request->type_id)
+        $conflict = MembershipType::where('type_name', $validated['type_name'])
+            ->where('type_id', '!=', $validated['type_id'])
             ->exists();
 
         if ($conflict) {
-            return redirect()->back()->with('error', "Type name '{$request->type_name}' already exists for another type_id!");
+            return redirect()->back()->with('error', "Type name '{$validated['type_name']}' already exists for another membership type!");
         }
 
         try {
@@ -73,10 +85,16 @@ class MembershipTypeController extends Controller
 
             $membershipType = MembershipType::findOrFail($validated['type_id']);
 
+            $amount   = $validated['amount'];
+            $discount = $validated['discount'];
+            $price    = $amount - ($amount * ($discount / 100));
+
             $membershipType->update([
                 'type_name' => $validated['type_name'],
                 'duration'  => $validated['duration'],
-                'price'     => $validated['price'],
+                'amount'    => $amount,
+                'discount'  => $discount,
+                'price'     => $price,
             ]);
 
             DB::commit();
