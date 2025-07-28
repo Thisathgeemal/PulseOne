@@ -66,7 +66,7 @@
 
         <!-- Active Sessions -->
         <div class="py-4">
-            <h2 class="text-xl font-semibold mb-4">Active Sessions</h2>
+            <h2 class="text-xl font-semibold mb-4">Browser Sessions</h2>
             @foreach ($sessions as $session)
                 <div class="border rounded-lg p-4 shadow-md mb-4">
                     <div><strong>IP:</strong> {{ $session['ip_address'] }}</div>

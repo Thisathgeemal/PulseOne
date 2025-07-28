@@ -14,8 +14,12 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <link rel="icon" href="{{ asset('images/favicon.png') }}">
+    
     <script src="https://kit.fontawesome.com/bc9b460555.js" crossorigin="anonymous"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
 <body class="bg-white text-gray-800">

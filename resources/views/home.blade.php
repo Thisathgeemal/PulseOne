@@ -19,7 +19,26 @@
         <!-- AOS CSS -->
         <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
 
+        <!-- Fontawesome -->
         <script src="https://kit.fontawesome.com/bc9b460555.js" crossorigin="anonymous"></script>
+
+        <!-- Favicons -->
+        <link rel="icon" type="image/png" href="{{ asset('favicon-96x96.png') }}" sizes="96x96" />
+        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}" />
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" />
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}" />
+
+        <!-- PWA Meta -->
+        <meta name="apple-mobile-web-app-title" content="PulseOne" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="{{ asset('site.webmanifest') }}">
+
+        <script src="https://cdn.tailwindcss.com"></script>
+
     </head>
 
     <body class="bg-white text-gray-800">
@@ -183,6 +202,12 @@
                 1024: { slidesPerView: 3 },
                 },
             });
+
+            if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => console.log('Service Worker registered:', reg))
+                    .catch(err => console.error('Service Worker registration failed:', err));
+                }
         </script>
     </body>
 </html>
