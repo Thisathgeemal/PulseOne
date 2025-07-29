@@ -15,6 +15,10 @@ return new class extends Migration
             $table->unsignedBigInteger('trainer_id')->nullable()->index();
             $table->unsignedBigInteger('dietitian_id')->nullable()->index();
             $table->string('description')->nullable();
+            $table->float('height')->nullable();
+            $table->float('weight')->nullable();
+            $table->date('preferred_start_date')->nullable();
+            $table->string('available_days')->nullable();
             $table->enum('type', ['Workout', 'Diet']);
             $table->enum('status', ['Pending', 'Approved', 'Rejected'])->default('Pending');
             $table->timestamps();

@@ -1,15 +1,21 @@
 <?php
 
+use App\Http\Controllers\AdminProfileController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\SecuritySettingsController;
+use App\Http\Controllers\DietitianProfileController;
 use App\Http\Controllers\DietPlanController;
+use App\Http\Controllers\ExerciseController;
+use App\Http\Controllers\MemberProfileController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\MembershipTypeController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\TrainerProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkoutPlanController;
+use App\Http\Controllers\WorkoutRequestController;
 use Illuminate\Support\Facades\Route;
 
 // Public Pages
@@ -97,7 +103,10 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::post('/membertype/delete', [MembershipTypeController::class, 'deleteMembertype'])->name('membertype.delete');
 
     // Profile
-    Route::get('/profile', [UserController::class, 'getMemberData'])->name('admin.profile');
+    Route::get('/profile', [UserController::class, 'getAdminData'])->name('admin.profile');
+    Route::put('/profile/update', [AdminProfileController::class, 'update'])->name('admin.profile.update');
+    Route::delete('/profile/remove-image', [AdminProfileController::class, 'removeImage'])->name('admin.profile.removeImage');
+    Route::post('/profile/check-password', [AdminProfileController::class, 'checkPassword'])->name('admin.profile.checkPassword');
 
     // Static View Routes
     Route::view('/attendance', 'adminDashboard.attendance')->name('admin.attendance');
@@ -113,9 +122,9 @@ Route::middleware(['auth'])->prefix('dietitian')->group(function () {
 
     // Profile
     Route::get('/profile', [UserController::class, 'getMemberData'])->name('dietitian.profile');
-
-    // // Settings
-    // Route::get('/settings', [UserController::class, 'showSettings'])->name('admin.settings');
+    Route::put('/profile/update', [DietitianProfileController::class, 'update'])->name('dietitian.profile.update');
+    Route::delete('/profile/remove-image', [DietitianProfileController::class, 'removeImage'])->name('dietitian.profile.removeImage');
+    Route::post('/profile/check-password', [DietitianProfileController::class, 'checkPassword'])->name('dietitian.profile.checkPassword');
 
     // Static View Routes
     Route::view('/request', 'dietitianDashboard.request')->name('dietitian.request');
@@ -130,15 +139,32 @@ Route::middleware(['auth'])->prefix('dietitian')->group(function () {
 Route::middleware(['auth'])->prefix('trainer')->group(function () {
 
     // Profile
-    Route::get('/profile', [UserController::class, 'getTrainerData'])->name('trainer.profile');
+    Route::get('trainer/profile', [UserController::class, 'getTrainerData'])->name('trainer.profile');
+    Route::put('trainer/profile/update', [TrainerProfileController::class, 'update'])->name('trainer.profile.update');
+    Route::delete('trainer/profile/remove-image', [TrainerProfileController::class, 'removeImage'])->name('trainer.profile.removeImage');
+    Route::post('trainer/profile/check-password', [TrainerProfileController::class, 'checkPassword'])->name('trainer.profile.checkPassword');
 
-    // // Settings
-    // Route::get('/settings', [UserController::class, 'showSettings'])->name('trainer.settings');
+    // Workout Plan Management
+    Route::get('/workoutplan', [WorkoutPlanController::class, 'index'])->name('trainer.workoutplan');
+    Route::get('/workoutplan/create/{request_id}', [WorkoutPlanController::class, 'create'])->name('trainer.workoutplan.create');
+    Route::post('/workoutplan/store', [WorkoutPlanController::class, 'store'])->name('trainer.workoutplan.store');
+
+    // Workout Plan Download
+    Route::get('/workoutplan/view/{id}', [WorkoutPlanController::class, 'viewPlan'])->name('trainer.workoutplan.view');
+    Route::get('/workoutplan/download/{id}', [ReportController::class, 'generateWorkoutReport'])->name('workout.report');
+
+    // Workout Request Management
+    Route::get('/request', [WorkoutRequestController::class, 'index'])->name('trainer.request');
+    Route::post('/request/update-status/{id}', [WorkoutRequestController::class, 'updateStatus'])->name('trainer.request.update');
+
+    // Exercises
+    Route::get('/exercises', [ExerciseController::class, 'index'])->name('trainer.exercises');
+    Route::post('/exercises', [ExerciseController::class, 'store'])->name('trainer.exercises.store');
+    Route::delete('/exercises/{id}', [ExerciseController::class, 'destroy'])->name('trainer.exercises.destroy');
 
     // Static View Routes
-    Route::view('/request', 'trainerDashboard.request')->name('trainer.request');
-    Route::view('/workoutplan', 'trainerDashboard.workoutplan')->name('trainer.workoutplan');
-    Route::view('/exercises', 'trainerDashboard.exercises')->name('trainer.exercises');
+    Route::view('/qr', 'trainerDashboard.qr')->name('trainer.qr');
+    Route::view('/attendance', 'trainerDashboard.attendance')->name('trainer.attendance');
     Route::view('/booking', 'trainerDashboard.booking')->name('trainer.booking');
     Route::view('/message', 'trainerDashboard.message')->name('trainer.message');
     Route::view('/feedback', 'trainerDashboard.feedback')->name('trainer.feedback');
@@ -150,9 +176,9 @@ Route::middleware(['auth'])->prefix('member')->group(function () {
 
     // Profile
     Route::get('/profile', [UserController::class, 'getMemberData'])->name('member.profile');
-
-    // // Settings
-    // Route::get('/settings', [UserController::class, 'showSettings'])->name('member.settings');
+    Route::put('/member/profile', [MemberProfileController::class, 'update'])->name('member.profile.update');
+    Route::delete('/member/profile/remove-image', [MemberProfileController::class, 'removeImage'])->name('member.profile.removeImage');
+    Route::post('/member/profile/check-password', [MemberProfileController::class, 'checkPassword'])->name('member.profile.checkPassword');
 
     Route::get('/workoutplan', [WorkoutPlanController::class, 'index'])->name('member.workoutplan');
     Route::post('/workoutplan/request', [WorkoutPlanController::class, 'requestWorkout'])->name('member.workout.request');

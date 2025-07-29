@@ -15,6 +15,8 @@ class Exercise extends Model
         'description',
         'default_sets',
         'default_reps',
+        'goal_type',
+        'muscle_group',
     ];
 
     public function workoutPlanExercises()

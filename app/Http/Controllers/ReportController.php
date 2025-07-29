@@ -5,9 +5,11 @@ use App\Models\Membership;
 use App\Models\MembershipType;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\WorkoutPlan;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
@@ -102,4 +104,31 @@ class ReportController extends Controller
         return $pdf->download("Membershiptype_Report.pdf");
     }
 
+    // Workout plan report
+    public function generateWorkoutReport($id)
+    {
+        $user = Auth::user();
+
+        $plan = WorkoutPlan::with([
+            'member',
+            'trainer',
+            'workoutPlanExercises.exercise',
+        ])
+            ->where(function ($query) use ($user) {
+                $query->where('trainer_id', $user->id)
+                    ->orWhere('member_id', $user->id);
+            })
+            ->findOrFail($id);
+
+        $groupedExercises = $plan->workoutPlanExercises->groupBy('day_number');
+        $date             = Carbon::now()->format('Y-m-d');
+
+        $pdf = Pdf::loadView('report.workoutplanReport', [
+            'plan'             => $plan,
+            'groupedExercises' => $groupedExercises,
+            'date'             => $date,
+        ]);
+
+        return $pdf->download("WorkoutPlan_Report_{$plan->plan_name}.pdf");
+    }
 }

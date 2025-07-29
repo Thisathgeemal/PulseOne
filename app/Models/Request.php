@@ -17,6 +17,11 @@ class Request extends Model
         'description',
         'type',
         'status',
+        'height',
+        'weight',
+        'preferred_start_date',
+        'available_days',
+        
     ];
 
     public function workoutPlan()

@@ -101,6 +101,27 @@
 
     </div>
 
+    <!-- Assigned Plan View -->
+    <div class="w-full max-w-xs md:max-w-7xl p-8 bg-white rounded-lg mb-4 text-center shadow-md mx-auto mt-10">
+        
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+            <div>
+                <h2 class="text-xl sm:text-2xl font-bold text-left">My Workout Plan</h2>
+                <p class="text-sm text-gray-500">Assigned by your personal trainer</p>
+            </div>
+        </div>
+
+         @if(isset($plan))
+
+        @else
+            <div class="bg-yellow-50 text-yellow-700 border border-yellow-300 p-4 rounded">
+                <p>No workout plan has been assigned to you yet. Please contact your trainer for assistance.</p>
+            </div>
+        @endif
+
+    </div>
+
     @push('scripts')
         @if(session('success'))
         <script>

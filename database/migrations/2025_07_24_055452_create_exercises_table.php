@@ -12,9 +12,11 @@ return new class extends Migration
         Schema::create('exercises', function (Blueprint $table) {
             $table->bigIncrements('exercise_id');
             $table->string('name');
-            $table->text('description')->nullable();
             $table->integer('default_sets')->default(3);
             $table->integer('default_reps')->default(10);
+            $table->string('goal_type');
+            $table->string('muscle_group');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
