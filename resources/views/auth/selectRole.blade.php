@@ -36,8 +36,19 @@
                 <form action="{{ route('selectRole.submit') }}" method="POST" class="flex flex-col gap-4">
                     @csrf
                     @foreach (session('user_roles') as $role)
+                        @php
+                            // Map role to color classes
+                            $roleColors = [
+                                'admin' => 'bg-red-600 hover:bg-red-500 focus:ring-red-500',
+                                'trainer' => 'bg-blue-600 hover:bg-blue-500 focus:ring-blue-500',
+                                'dietitian' => 'bg-green-600 hover:bg-green-500 focus:ring-green-500',
+                                'member' => 'bg-orange-500 hover:bg-orange-400 focus:ring-orange-600',
+                            ];
+                            $lowerRole = strtolower($role);
+                            $colorClass = $roleColors[$lowerRole] ?? 'bg-gray-600 hover:bg-gray-500 focus:ring-gray-500'; 
+                        @endphp
                         <button type="submit" name="selected_role" value="{{ $role }}"
-                                class="w-full px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                class="w-full px-4 py-2 text-white rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 {{ $colorClass }}">
                             {{ ucfirst($role) }}
                         </button>
                     @endforeach
@@ -49,6 +60,7 @@
             @endif
         </div>
     </section>
+
 
     @if (session('error'))
     <script>

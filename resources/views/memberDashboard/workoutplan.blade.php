@@ -1,6 +1,7 @@
 @extends('memberDashboard.layout')
 
 @section('content')
+    <!-- Plan request -->
     <div class="w-full max-w-xs md:max-w-7xl p-8 bg-white rounded-lg my-4 text-center shadow-md mx-auto">
 
         <!-- Header -->
@@ -18,6 +19,7 @@
                     <tr>
                         <th class="py-3 px-4 text-left border-b border-gray-300">Trainer Name</th>
                         <th class="py-3 px-4 text-left border-b border-gray-300">Plan Description</th>
+                        <th class="py-3 px-4 text-left border-b border-gray-300">Preferred Start Date</th>
                         <th class="py-3 px-4 text-left border-b border-gray-300">Status</th>
                     </tr>
                 </thead>
@@ -29,6 +31,9 @@
                             </td>
                             <td class="py-3 px-4 text-left border-b border-gray-200">
                                 {{ $request->description ?? '-' }}
+                            </td>
+                             <td class="py-3 px-4 text-left border-b border-gray-200">
+                                {{ $request->preferred_start_date ? \Carbon\Carbon::parse($request->preferred_start_date)->format('d M Y') : '-' }}
                             </td>
                             <td class="py-3 px-4 text-left border-b border-gray-200">
                                 <span class="{{ $request->status === 'Approved' ? 'text-green-600 font-semibold' : ($request->status === 'Rejected' ? 'text-red-600 font-semibold' : 'text-yellow-600 font-semibold') }}">
@@ -86,8 +91,54 @@
                         />
                     </div>
 
+                    <!-- Height & Weight -->
+                    <div class="flex gap-3">
+                        <div class="w-1/2 text-left">
+                            <label class="block text-sm font-medium text-gray-700">Height (cm)</label>
+                            <input type="number" name="height" placeholder="e.g. 170"
+                                class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
+                        </div>
+                        <div class="w-1/2 text-left">
+                            <label class="block text-sm font-medium text-gray-700">Weight (kg)</label>
+                            <input type="number" name="weight" placeholder="e.g. 65"
+                                class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
+                        </div>
+                    </div>
+
+                    <!-- Start Date -->
+                    <div class="text-left">
+                        <label class="block text-sm font-medium text-gray-700">Preferred Start Date</label>
+                        <input type="date" name="preferred_start_date"
+                            class="w-full mt-1 px-3 py-2 border rounded-md border-gray-300 text-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
+                    </div>
+
+                    <!-- Available Days -->
+                    <div x-data="{ days: [], toggleDay(day) { 
+                            this.days.includes(day) 
+                            ? this.days = this.days.filter(d => d !== day) 
+                            : this.days.push(day) 
+                        } }" class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Available Days</label>
+                        
+                        <!-- Day Buttons -->
+                        <div class="flex flex-wrap gap-2 mt-1">
+                            <template x-for="day in ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']" :key="day">
+                                <button type="button" @click="toggleDay(day)"
+                                    :class="days.includes(day) 
+                                        ? 'bg-red-500 text-white border-red-600' 
+                                        : 'bg-white text-gray-700 border-gray-300'"
+                                    class="px-3 py-1 border rounded-md text-sm shadow-sm hover:bg-red-100">
+                                    <span x-text="day"></span>
+                                </button>
+                            </template>
+                        </div>
+
+                        <!-- Hidden Input -->
+                        <input type="hidden" name="available_days" :value="days.join(', ')" />
+                    </div>
+
                     <!-- Action Buttons -->
-                    <div class="flex justify-end space-x-2 mt-4">
+                    <div class="flex justify-end space-x-2 mt-6">
                         <button type="button" onclick="closeRequestModal()" class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded">
                             Cancel
                         </button>
@@ -104,20 +155,68 @@
     <!-- Assigned Plan View -->
     <div class="w-full max-w-xs md:max-w-7xl p-8 bg-white rounded-lg mb-4 text-center shadow-md mx-auto mt-10">
         
-        <!-- Header -->
-        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-            <div>
-                <h2 class="text-xl sm:text-2xl font-bold text-left">My Workout Plan</h2>
-                <p class="text-sm text-gray-500">Assigned by your personal trainer</p>
-            </div>
+         <!-- Header -->
+        <div class="bg-[#1E1E1E] text-white px-8 py-6 rounded-lg shadow mb-6 mt-4">
+            <h2 class="text-2xl font-bold">My Workout Plan</h2>
+            <p class="text-sm text-gray-300 mt-1">Assigned by your personal trainer.</p>
         </div>
 
-         @if(isset($plan))
+        @if($plans->count())
+            <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1">
+                @foreach($plans as $plan)
+                    <div class="group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-300 p-6 overflow-hidden">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-start gap-4">
+                                <!-- Avatar with Gradient -->
+                                <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg shadow">
+                                    {{ strtoupper(substr($plan->trainer->first_name, 0, 1)) }}
+                                </div>
 
-        @else
-            <div class="bg-yellow-50 text-yellow-700 border border-yellow-300 p-4 rounded">
-                <p>No workout plan has been assigned to you yet. Please contact your trainer for assistance.</p>
+                                <!-- Info -->
+                                <div class="text-left">
+                                    <h3 class="text-lg font-bold text-gray-800 mb-1">
+                                        {{ $plan->plan_name }}
+                                    </h3>
+                                    <p class="text-sm text-gray-600 leading-snug">
+                                        <span class="font-semibold text-gray-700">Trainer:</span> {{ $plan->trainer->first_name }} {{ $plan->trainer->last_name }}<br>
+                                        <span class="font-semibold text-gray-700">Duration:</span>
+                                        {{ \Carbon\Carbon::parse($plan->start_date)->format('Y-m-d') }} to
+                                        {{ \Carbon\Carbon::parse($plan->end_date)->format('Y-m-d') }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Status Badge -->
+                            <div class="mt-1">
+                                <span class="inline-block text-xs font-semibold px-3 py-1 rounded-full
+                                    {{ $plan->status === 'Active' ? 'bg-green-100 text-green-700' :
+                                    ($plan->status === 'Cancelled' ? 'bg-red-100 text-red-700' :
+                                    'bg-yellow-100 text-yellow-700') }}">
+                                    {{ ucfirst($plan->status) }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="mt-1 flex gap-3 justify-end opacity-100 transition-opacity duration-300">
+                            <a href="{{ route('member.workoutplan.cancel', $plan->workoutplan_id) }}"
+                            class="w-[110px] px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition text-center">
+                                Cancel
+                            </a>
+                            <a href="{{ route('member.workoutplan.view', $plan->workoutplan_id) }}"
+                            class="w-[110px] px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition text-center">
+                                View
+                            </a>
+                            <a href="{{ route('workout.report', $plan->workoutplan_id) }}"
+                            class="w-[110px] px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition text-center">
+                                Download 
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
             </div>
+        @else
+            <h2 class="text-xl font-semibold text-gray-600">No workout plans have been created yet.</h2>
         @endif
 
     </div>

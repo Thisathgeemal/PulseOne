@@ -18,8 +18,12 @@ class WorkoutPlanController extends Controller
     {
         $user = Auth::user();
 
-        // Trainer View
         if ($request->routeIs('trainer.workoutplan')) {
+            WorkoutPlan::where('trainer_id', $user->id)
+                ->where('end_date', '<', now())
+                ->whereNotIn('status', ['Completed'])
+                ->update(['status' => 'Completed']);
+
             $plans = WorkoutPlan::with('member')
                 ->where('trainer_id', $user->id)
                 ->orderBy('created_at', 'desc')
@@ -28,8 +32,12 @@ class WorkoutPlanController extends Controller
             return view('trainerDashboard.workoutplan', compact('plans'));
         }
 
-        // Member View
         if ($request->routeIs('member.workoutplan')) {
+            WorkoutPlan::where('member_id', $user->id)
+                ->where('end_date', '<', now())
+                ->whereNotIn('status', ['Completed'])
+                ->update(['status' => 'Completed']);
+
             $trainers = User::whereHas('roles', function ($query) {
                 $query->where('role_name', 'Trainer')
                     ->where('user_roles.is_active', 1);
@@ -56,19 +64,29 @@ class WorkoutPlanController extends Controller
     public function requestWorkout(Request $request)
     {
         $request->validate([
-            'trainer_id' => 'required|exists:users,id',
-            'plan_dis'   => 'required|string|max:255',
+            'trainer_id'           => 'required|exists:users,id',
+            'plan_dis'             => 'required|string|max:255',
+            'height'               => 'nullable|numeric|min:1',
+            'weight'               => 'nullable|numeric|min:1',
+            'available_days'       => 'nullable|string|max:255',
+            'preferred_start_date' => 'nullable|date|after_or_equal:today',
         ]);
 
         WorkoutRequest::create([
-            'member_id'   => Auth::id(),
-            'trainer_id'  => $request->trainer_id,
-            'description' => $request->plan_dis,
-            'type'        => 'Workout',
-            'status'      => 'Pending',
+            'member_id'            => Auth::id(),
+            'trainer_id'           => $request->trainer_id,
+            'description'          => $request->plan_dis,
+            'height'               => $request->height,
+            'weight'               => $request->weight,
+            'available_days'       => $request->available_days,
+            'preferred_start_date' => $request->preferred_start_date,
+            'type'                 => 'Workout',
+            'status'               => 'Pending',
         ]);
 
-        return redirect()->route('member.workoutplan')->with('success', 'Workout plan request submitted successfully.');
+        return redirect()
+            ->route('member.workoutplan')
+            ->with('success', 'Workout plan request submitted successfully.');
     }
 
     // Create Plan Form (Trainer)
@@ -145,6 +163,37 @@ class WorkoutPlanController extends Controller
             });
 
         return view('trainerDashboard.workoutplan_view', compact('plan', 'groupedExercises'));
+    }
+
+    // Member View of a Specific Workout Plan
+    public function viewMemberPlan($id)
+    {
+        $plan = WorkoutPlan::with([
+            'trainer',
+            'workoutPlanExercises.exercise',
+        ])
+            ->where('member_id', auth()->id())
+            ->findOrFail($id);
+
+        $groupedExercises = $plan->workoutPlanExercises
+            ->sortBy('day_number')
+            ->groupBy(function ($item) {
+                return (int) $item->day_number;
+            });
+
+        return view('memberDashboard.workoutplan_view', compact('plan', 'groupedExercises'));
+    }
+
+    // Cancel the membership
+    public function cancelMemberPlan($id)
+    {
+        $plan = WorkoutPlan::where('member_id', auth()->id())
+            ->findOrFail($id);
+
+        $plan->status = 'Cancelled';
+        $plan->save();
+
+        return redirect()->back()->with('success', 'Your workout plan has been cancelled successfully.');
     }
 
 }

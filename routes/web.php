@@ -180,9 +180,16 @@ Route::middleware(['auth'])->prefix('member')->group(function () {
     Route::delete('/member/profile/remove-image', [MemberProfileController::class, 'removeImage'])->name('member.profile.removeImage');
     Route::post('/member/profile/check-password', [MemberProfileController::class, 'checkPassword'])->name('member.profile.checkPassword');
 
+    // Workout plan
     Route::get('/workoutplan', [WorkoutPlanController::class, 'index'])->name('member.workoutplan');
     Route::post('/workoutplan/request', [WorkoutPlanController::class, 'requestWorkout'])->name('member.workout.request');
 
+    // Workout Plan Download
+    Route::get('/workoutplan/view/{id}', [WorkoutPlanController::class, 'viewMemberPlan'])->name('member.workoutplan.view');
+    Route::get('/workoutplan/cancel/{id}', [WorkoutPlanController::class, 'cancelMemberPlan'])->name('member.workoutplan.cancel');
+    Route::get('/workoutplan/download/{id}', [ReportController::class, 'generateWorkoutReport'])->name('workout.report');
+
+    // Diet plan
     Route::get('/dietplan', [DietPlanController::class, 'index'])->name('member.dietplan');
     Route::post('/dietplan/request', [DietPlanController::class, 'requestDietPlan'])->name('member.diet.request');
 

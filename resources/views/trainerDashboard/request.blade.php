@@ -27,6 +27,10 @@
                             <p class="text-sm text-gray-600">
                                 <span class="font-semibold text-gray-700">Plan Goal:</span> {{ $req->description }}
                             </p>
+                            <p class="text-sm text-gray-600">
+                                <span class="font-semibold text-gray-700">Preferred Start Date:</span> 
+                                {{ $req->preferred_start_date ? \Carbon\Carbon::parse($req->preferred_start_date)->format('d M Y') : '-' }}
+                            </p>
                         </div>
                     </div>
 

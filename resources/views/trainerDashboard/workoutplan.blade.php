@@ -50,6 +50,30 @@
                     <input type="text" name="goal_type" value="Weight Loss" disabled
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500" />
                 </div>
+
+                <!-- Height & Weight (Disabled) -->
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Height -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Height</label>
+                        <input type="text" name="height" value="175 cm" disabled
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500" />
+                    </div>
+
+                    <!-- Weight -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Weight</label>
+                        <input type="text" name="weight" value="75 kg" disabled
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500" />
+                    </div>
+                </div>
+
+                <!-- Available Days -->
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Available Days</label>
+                    <input type="text" name="available_days" value="Mon, Wed, Fri" disabled
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500" />
+                </div>
             </div>
 
             <!-- Exercise Section -->
