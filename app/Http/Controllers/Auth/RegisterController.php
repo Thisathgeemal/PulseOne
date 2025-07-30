@@ -36,7 +36,7 @@ class RegisterController extends Controller
                 'password'        => 'required|string|min:6',
                 'contact_number'  => [
                     'required',
-                    'regex:/^07[0-9]{8}$/',
+                    'regex:/^\+?[0-9\s\-\(\)]+$/',
                 ],
                 'membership_type' => 'required|exists:membership_types,type_id',
                 'price'           => 'required|numeric',

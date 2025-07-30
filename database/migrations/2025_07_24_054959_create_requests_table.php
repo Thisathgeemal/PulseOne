@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->float('height')->nullable();
             $table->float('weight')->nullable();
+            $table->float('target_weight')->nullable();
             $table->date('preferred_start_date')->nullable();
             $table->string('available_days')->nullable();
             $table->enum('type', ['Workout', 'Diet']);

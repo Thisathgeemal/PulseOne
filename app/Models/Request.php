@@ -19,14 +19,20 @@ class Request extends Model
         'status',
         'height',
         'weight',
+        'target_weight',
         'preferred_start_date',
         'available_days',
-        
+
     ];
 
     public function workoutPlan()
     {
         return $this->hasOne(WorkoutPlan::class, 'request_id');
+    }
+
+    public function dietPlan()
+    {
+        return $this->hasOne(dietPlan::class, 'request_id');
     }
 
     public function member()

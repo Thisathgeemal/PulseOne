@@ -9,21 +9,20 @@ class DietPlan extends Model
     use HasFactory;
 
     protected $primaryKey = 'dietplan_id';
-    public $timestamps    = false;
 
     protected $fillable = [
         'dietitian_id',
         'member_id',
+        'request_id',
         'plan_name',
         'start_date',
         'end_date',
-        'created_at',
+        'status',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date'   => 'date',
-        'created_at' => 'datetime',
     ];
 
     public function dietplanMeals()
@@ -41,4 +40,8 @@ class DietPlan extends Model
         return $this->belongsTo(User::class, 'member_id');
     }
 
+    public function request()
+    {
+        return $this->belongsTo(Request::class, 'request_id');
+    }
 }
