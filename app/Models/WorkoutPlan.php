@@ -41,4 +41,15 @@ class WorkoutPlan extends Model
     {
         return $this->hasMany(WorkoutPlanExercise::class, 'workoutplan_id');
     }
+
+    public function exerciseLogs()
+    {
+        return $this->hasMany(ExerciseLog::class, 'workoutplan_id');
+    }
+
+    public function dailyWorkoutLogs()
+    {
+        return $this->hasMany(DailyWorkoutLog::class, 'workoutplan_id');
+    }
+
 }

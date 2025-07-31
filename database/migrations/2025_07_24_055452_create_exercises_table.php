@@ -14,11 +14,12 @@ return new class extends Migration
             $table->string('name');
             $table->integer('default_sets')->default(3);
             $table->integer('default_reps')->default(10);
-            $table->string('goal_type');
-            $table->string('muscle_group');
+            $table->string('muscle_group'); 
             $table->text('description')->nullable();
+            $table->string('video_link')->nullable(); 
             $table->timestamps();
         });
+
     }
 
     public function down(): void

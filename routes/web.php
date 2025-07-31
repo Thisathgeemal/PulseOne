@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\SecuritySettingsController;
 use App\Http\Controllers\DietitianProfileController;
 use App\Http\Controllers\DietPlanController;
 use App\Http\Controllers\ExerciseController;
+use App\Http\Controllers\ExerciseLogController;
 use App\Http\Controllers\MemberProfileController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\MembershipTypeController;
@@ -180,18 +181,29 @@ Route::middleware(['auth'])->prefix('member')->group(function () {
     Route::delete('/member/profile/remove-image', [MemberProfileController::class, 'removeImage'])->name('member.profile.removeImage');
     Route::post('/member/profile/check-password', [MemberProfileController::class, 'checkPassword'])->name('member.profile.checkPassword');
 
-    // Workout plan
-    Route::get('/workoutplan', [WorkoutPlanController::class, 'index'])->name('member.workoutplan');
-    Route::post('/workoutplan/request', [WorkoutPlanController::class, 'requestWorkout'])->name('member.workout.request');
+    // Workout Plan routes
+    Route::prefix('workoutplan')->name('member.workoutplan.')->group(function () {
+        Route::get('request', [WorkoutPlanController::class, 'request'])->name('request');
+        Route::post('request', [WorkoutPlanController::class, 'requestWorkout'])->name('request');
+        Route::get('myplan', [WorkoutPlanController::class, 'myPlan'])->name('myplan');
+        Route::get('progress', [WorkoutPlanController::class, 'progressTracking'])->name('progress');
+        Route::post('log-exercise', [ExerciseLogController::class, 'store'])->name('exercise.log');
+        Route::post('log-photo', [ExerciseLogController::class, 'storeImage'])->name('photo');
+        Route::get('view/{id}', [WorkoutPlanController::class, 'viewMemberPlan'])->name('view');
+        Route::get('cancel/{id}', [WorkoutPlanController::class, 'cancelMemberPlan'])->name('cancel');
+        Route::get('download/{id}', [ReportController::class, 'generateWorkoutReport'])->name('download');
+    });
 
-    // Workout Plan Download
-    Route::get('/workoutplan/view/{id}', [WorkoutPlanController::class, 'viewMemberPlan'])->name('member.workoutplan.view');
-    Route::get('/workoutplan/cancel/{id}', [WorkoutPlanController::class, 'cancelMemberPlan'])->name('member.workoutplan.cancel');
-    Route::get('/workoutplan/download/{id}', [ReportController::class, 'generateWorkoutReport'])->name('workout.report');
+    // Diet Plan routes
+    Route::prefix('dietplan')->name('member.dietplan.')->group(function () {
+        Route::get('request', [DietPlanController::class, 'request'])->name('request');
+        Route::get('myplan', [DietPlanController::class, 'myPlan'])->name('myplan');
+        Route::get('progress', [DietPlanController::class, 'progressTracking'])->name('progress');
+    });
 
-    // Diet plan
-    Route::get('/dietplan', [DietPlanController::class, 'index'])->name('member.dietplan');
-    Route::post('/dietplan/request', [DietPlanController::class, 'requestDietPlan'])->name('member.diet.request');
+    // // Diet plan
+    // Route::get('/dietplan', [DietPlanController::class, 'index'])->name('member.dietplan');
+    // Route::post('/dietplan/request', [DietPlanController::class, 'requestDietPlan'])->name('member.diet.request');
 
     // Static View Routes
     Route::view('/qr', 'memberDashboard.qr')->name('member.qr');

@@ -10,37 +10,41 @@ class ExerciseController extends Controller
     // Show all exercise
     public function index(Request $request)
     {
-        $goal = $request->input('goal');
+        $muscleGroup = $request->input('muscle_group');
 
         $query = Exercise::query();
 
-        if ($goal) {
-            $query->where('goal_type', $goal);
+        // Filter by muscle group if selected
+        if ($muscleGroup) {
+            $query->where('muscle_group', $muscleGroup);
         }
 
-        $exercises = $query->get();
+        $exercises       = $query->get();
+        $allMuscleGroups = Exercise::select('muscle_group')->distinct()->pluck('muscle_group');
 
-        $allGoals = Exercise::select('goal_type')->distinct()->pluck('goal_type');
-
-        $goalColors = [
-            'Build Muscle'    => '#EF4444',
-            'Weight Loss'     => '#3B82F6',
-            'Flexibility'     => '#10B981',
-            'General Fitness' => '#F59E0B',
-            'custom'          => '#8B5CF6',
+        $muscleColors = [
+            'Chest'     => '#EF4444',
+            'Legs'      => '#F59E0B',
+            'Back'      => '#3B82F6',
+            'Shoulders' => '#10B981',
+            'Abs'       => '#F472B6',
+            'Triceps'   => '#8B5CF6',
+            'Biceps'    => '#D946EF',
+            'Full Body' => '#6366F1',
         ];
 
         $muscleIcons = [
             'Chest'     => '🏋️‍♂️',
+            'Legs'      => '🦵',
             'Back'      => '🧍‍♂️',
             'Shoulders' => '💪',
-            'Legs'      => '🦵',
-            'Arms'      => '🫱',
             'Abs'       => '🧘',
-            'Full Body' => '🧍',
+            'Triceps'   => '🤜',
+            'Biceps'    => '💪',
+            'Full Body' => '🏃‍♂️',
         ];
 
-        return view('trainerDashboard.exercises', compact('exercises', 'goalColors', 'muscleIcons', 'allGoals'));
+        return view('trainerDashboard.exercises', compact('exercises', 'muscleColors', 'muscleIcons', 'allMuscleGroups'));
     }
 
     // Store a new exercise
@@ -51,8 +55,8 @@ class ExerciseController extends Controller
             'description'  => 'required|string',
             'default_sets' => 'required|integer|min:1',
             'default_reps' => 'required|integer|min:1',
-            'goal_type'    => 'nullable|string',
-            'muscle_group' => 'nullable|string',
+            'muscle_group' => 'required|string',
+            'video_link'   => 'nullable|url',
         ]);
 
         Exercise::create([
@@ -60,8 +64,8 @@ class ExerciseController extends Controller
             'description'  => $request->description,
             'default_sets' => $request->default_sets,
             'default_reps' => $request->default_reps,
-            'goal_type'    => $request->goal_type,
             'muscle_group' => $request->muscle_group,
+            'video_link'   => $request->video_link,
         ]);
 
         return redirect()->back()->with('success', 'Exercise added successfully.');

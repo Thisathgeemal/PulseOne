@@ -15,123 +15,107 @@
 
             <!-- Row 1: Exercise Name, Default Sets, Default Reps -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Exercise Name</label>
-                <input
-                type="text"
-                name="name"
-                placeholder="e.g. Push Ups"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
-                required
-                />
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Exercise Name</label>
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="e.g. Push Ups"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                        required
+                    />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Default Sets</label>
+                    <input
+                        type="number"
+                        name="default_sets"
+                        placeholder="e.g. 3"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                        required
+                    />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Default Reps</label>
+                    <input
+                        type="number"
+                        name="default_reps"
+                        placeholder="e.g. 10"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                        required
+                    />
+                </div>
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Default Sets</label>
-                <input
-                type="number"
-                name="default_sets"
-                placeholder="e.g. 3"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
-                required
-                />
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Default Reps</label>
-                <input
-                type="number"
-                name="default_reps"
-                placeholder="e.g. 10"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
-                required
-                />
-            </div>
-            </div>
-
-            <!-- Row 2: Description, Goal Type, Muscle Group -->
+            <!-- Row 2: Description, Video link, Muscle Group -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <input
-                type="text"
-                name="description"
-                placeholder="Describe the exercise"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 resize-none h-10"
-                required
-                ></input>
-            </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Muscle Group</label>
+                    <select
+                        name="muscle_group"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                        required
+                    >
+                        <option value="">--Select Muscle Group--</option>
+                        <option value="Chest">Chest</option>
+                        <option value="Back">Back</option>
+                        <option value="Shoulders">Shoulders</option>
+                        <option value="Legs">Legs</option>
+                        <option value="Biceps">Biceps</option>
+                        <option value="Triceps">Triceps</option>
+                        <option value="Abs">Abs</option>
+                        <option value="Full Body">Full Body</option>
+                    </select>
+                </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Goal Type</label>
-                <select
-                name="goal_type"
-                id="goal_type"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
-                onchange="toggleCustomGoalInput()"
-                required
-                >
-                <option value="">-- Select Goal Type --</option>
-                <option value="Build Muscle">Build Muscle</option>
-                <option value="Weight Loss">Weight Loss</option>
-                <option value="Flexibility">Flexibility</option>
-                <option value="General Fitness">General Fitness</option>
-                <option value="custom">Custom</option>
-                </select>
-            </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Video Link (YouTube)</label>
+                    <input
+                        type="url"
+                        name="video_link"
+                        placeholder="https://www.youtube.com/..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                        required
+                    />
+                </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Muscle Group</label>
-                <select
-                name="muscle_group"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
-                required
-                >
-                <option value="">--Select Muscle Group--</option>
-                <option value="Chest">Chest</option>
-                <option value="Back">Back</option>
-                <option value="Shoulders">Shoulders</option>
-                <option value="Legs">Legs</option>
-                <option value="Arms">Arms</option>
-                <option value="Abs">Abs</option>
-                <option value="Full Body">Full Body</option>
-                </select>
-            </div>
-            </div>
-
-            <!-- Custom Goal (conditionally visible) -->
-            <div id="custom_goal_wrapper" class="hidden">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Custom Goal</label>
-            <input
-                type="text"
-                name="custom_goal_type"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500"
-                placeholder="e.g. Cardio Endurance"
-            />
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <input
+                        type="text"
+                        name="description"
+                        placeholder="Describe the exercise"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 resize-none h-10"
+                    ></input>
+                </div>
             </div>
 
             <!-- Submit Button -->
             <div class="flex justify-end">
-            <button
-                type="submit"
-                class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md shadow font-medium transition-all"
-            >
-                Add Exercise
-            </button>
+                <button
+                    type="submit"
+                    class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md shadow font-medium transition-all"
+                >
+                    Add Exercise
+                </button>
             </div>
 
         </form>
     </div>
 
-    <!-- Filter by Goal -->
+    <!-- Filter by Muscle Group -->
     <div class="flex justify-end items-center mt-6">
         <form method="GET" action="{{ route('trainer.exercises') }}" class="flex items-center space-x-2 bg-white p-4 rounded-md">
-            <label for="goal_filter" class="text-sm font-medium text-gray-700">Filter by Goal</label>
-            <select name="goal" id="goal_filter" onchange="this.form.submit()"
-                class="w-60 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm">
-                <option value="">All Goals</option>
-                @foreach($allGoals as $goal)
-                    <option value="{{ $goal }}" {{ request('goal') == $goal ? 'selected' : '' }}>{{ $goal }}</option>
+            <label for="muscle_filter" class="text-sm font-medium text-gray-700">Filter by Muscle Group</label>
+            <select name="muscle_group" id="muscle_filter" onchange="this.form.submit()"
+                class="w-60 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 text-sm">
+                <option value="">Full Body</option>
+                @foreach($allMuscleGroups as $muscle)
+                    <option value="{{ $muscle }}" {{ request('muscle_group') == $muscle ? 'selected' : '' }}>
+                        {{ $muscle }}
+                    </option>
                 @endforeach
             </select>
         </form>
@@ -144,8 +128,8 @@
             <div
                 class="relative group transition-transform transform hover:scale-[1.02] duration-300
                     border-l-4 p-5 rounded-lg shadow-sm bg-white border-gray-200 hover:shadow-md"
-                style="border-left-color: {{ $goalColors[$exercise->goal_type] ?? '#CBD5E1' }}"
-                data-goal="{{ $exercise->goal_type }}"
+                style="border-left-color: {{ $muscleColors[$exercise->muscle_group] ?? '#CBD5E1' }}"
+                data-muscle="{{ $exercise->muscle_group }}"
             >
                 {{-- Delete button --}}
                 @if(isset($exercise->exercise_id))
@@ -168,12 +152,20 @@
                 <p class="text-gray-700 text-sm mb-3">{{ $exercise->description }}</p>
 
                 <div class="text-sm space-y-1 text-gray-800">
-                    <p><span class="font-medium">🎯 Goal:</span> {{ $exercise->goal_type }}</p>
-                    <p><span class="font-medium">💪 Muscle:</span> {{ $muscleIcons[$exercise->muscle_group] ?? '' }} {{ $exercise->muscle_group }}</p>
+                    <p>
+                        <span class="font-medium">💪 Muscle:</span> 
+                        {{ $muscleIcons[$exercise->muscle_group] ?? '' }} {{ $exercise->muscle_group }}
+                    </p>
                     <p>
                         <span class="font-medium">🔁 Sets:</span> {{ $exercise->default_sets }}
                         <span class="ml-4 font-medium">Reps:</span> {{ $exercise->default_reps }}
                     </p>
+                    @if($exercise->video_link)
+                    <p>
+                        <span class="font-medium">▶️ Video:</span> 
+                        <a href="{{ $exercise->video_link }}" target="_blank" class="text-red-600 hover:underline">Watch</a>
+                    </p>
+                    @endif
                 </div>
             </div>
             @endforeach

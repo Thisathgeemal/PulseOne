@@ -106,4 +106,14 @@ class User extends Authenticatable
         return $this->hasMany(Attendance::class, 'user_id');
     }
 
+    public function exerciseLogs()
+    {
+        return $this->hasMany(ExerciseLog::class, 'member_id');
+    }
+
+    public function dailyWorkoutLogs()
+    {
+        return $this->hasMany(DailyWorkoutLog::class, 'member_id');
+    }
+
 }

@@ -21,6 +21,17 @@ class UserSeeder extends Seeder
                 'created_at'    => now(),
                 'updated_at'    => now(),
             ]);
+
+            User::create([
+                'first_name'    => 'Thisath',
+                'last_name'     => 'Geemal',
+                'email'         => 'thisathgeemal38@gmail.com',
+                'password'      => Hash::make('123456789'),
+                'mobile_number' => '0701733646',
+                'is_active'     => true,
+                'created_at'    => now(),
+                'updated_at'    => now(),
+            ]);
         }
     }
 }

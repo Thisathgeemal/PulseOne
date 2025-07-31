@@ -15,6 +15,7 @@ return new class extends Migration
             $table->unsignedBigInteger('trainer_id')->nullable()->index();
             $table->unsignedBigInteger('dietitian_id')->nullable()->index();
             $table->string('description')->nullable();
+            $table->enum('plan_type', ['Basic', 'Intermediate', 'Advanced']);
             $table->float('height')->nullable();
             $table->float('weight')->nullable();
             $table->float('target_weight')->nullable();

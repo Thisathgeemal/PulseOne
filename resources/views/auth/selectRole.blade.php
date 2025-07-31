@@ -61,7 +61,6 @@
         </div>
     </section>
 
-
     @if (session('error'))
     <script>
         Swal.fire({

@@ -10,31 +10,48 @@ class UserRoleSeeder extends Seeder
 
     public function run(): void
     {
-        $role = DB::table('roles')->where('role_name', 'Admin')->first();
-        if (! $role) {
-            $this->command->error('Admin role not found. Run RoleSeeder first!');
-            return;
-        }
+        // Define roles
+        $rolesToAssign = [
+            'pulseone.app@gmail.com'    => ['Admin'],
+            'thisathgeemal38@gmail.com' => ['Admin', 'Trainer', 'Dietitian'],
+        ];
 
-        $user = User::where('email', 'pulseone.app@gmail.com')->first();
-        if (! $user) {
-            $this->command->error('Admin user not found. Run UserSeeder first!');
-            return;
-        }
+        foreach ($rolesToAssign as $email => $roles) {
+            $user = User::where('email', $email)->first();
 
-        $exists = DB::table('user_roles')
-            ->where('user_id', $user->id)
-            ->where('role_id', $role->role_id)
-            ->exists();
+            if (! $user) {
+                $this->command->warn("User with email {$email} not found. Run UserSeeder first!");
+                continue;
+            }
 
-        if (! $exists) {
-            DB::table('user_roles')->insert([
-                'user_id'    => $user->id,
-                'role_id'    => $role->role_id,
-                'is_active'  => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            foreach ($roles as $roleName) {
+                $role = DB::table('roles')->where('role_name', $roleName)->first();
+
+                if (! $role) {
+                    $this->command->warn("Role '{$roleName}' not found. Run RoleSeeder first!");
+                    continue;
+                }
+
+                $exists = DB::table('user_roles')
+                    ->where('user_id', $user->id)
+                    ->where('role_id', $role->role_id)
+                    ->exists();
+
+                if (! $exists) {
+                    DB::table('user_roles')->insert([
+                        'user_id'    => $user->id,
+                        'role_id'    => $role->role_id,
+                        'is_active'  => true,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+
+                    $this->command->info("Assigned '{$roleName}' role to {$email}");
+                } else {
+                    $this->command->warn("{$email} already has '{$roleName}' role");
+                }
+            }
         }
     }
+
 }

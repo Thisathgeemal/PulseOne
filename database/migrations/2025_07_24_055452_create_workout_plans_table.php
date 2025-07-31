@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('plan_name');
             $table->date('start_date');
             $table->date('end_date');
-            $table->enum('status', ['Active', 'Completed', 'Cancelled'])->default('Active');
+            $table->enum('status', ['Pending', 'Active', 'Completed', 'Cancelled'])->default('Pending');
             $table->timestamps();
 
             $table->foreign('trainer_id')->references('id')->on('users')->onDelete('cascade');

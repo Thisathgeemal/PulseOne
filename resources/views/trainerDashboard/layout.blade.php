@@ -27,6 +27,30 @@
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <!-- Choices.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+
+    <!-- Choices.js JS -->
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+    <style>
+        .choices__inner {
+            min-height: 44px;
+            border-radius: 0.5rem; /* Tailwind rounded-lg */
+            border-color: #d1d5db; /* Tailwind gray-300 */
+            box-shadow: none;
+            transition: box-shadow 0.2s ease;
+        }
+        .choices__inner:focus-within {
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.5); /* Tailwind ring-red-500 */
+            border-color: #ef4444;
+        }
+        /* Optional: Adjust padding inside multi-select input */
+        .choices__input {
+            padding: 0.375rem 0.75rem;
+        }
+    </style>
+    
     {{-- <script src="https://cdn.tailwindcss.com"></script> --}}
 
 </head>

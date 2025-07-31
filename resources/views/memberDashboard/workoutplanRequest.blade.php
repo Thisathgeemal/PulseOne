@@ -18,6 +18,7 @@
                 <thead class="bg-gray-800 text-white">
                     <tr>
                         <th class="py-3 px-4 text-left border-b border-gray-300">Trainer Name</th>
+                        <th class="py-3 px-4 text-left border-b border-gray-300">Plan Type</th>
                         <th class="py-3 px-4 text-left border-b border-gray-300">Plan Description</th>
                         <th class="py-3 px-4 text-left border-b border-gray-300">Preferred Start Date</th>
                         <th class="py-3 px-4 text-left border-b border-gray-300">Status</th>
@@ -28,6 +29,9 @@
                         <tr class="hover:bg-gray-100 transition duration-150">
                             <td class="py-3 px-4 text-left border-b border-gray-200">
                                 {{ $request->trainer ? $request->trainer->first_name . ' ' . $request->trainer->last_name : 'N/A' }}
+                            </td>
+                            <td class="py-3 px-4 text-left border-b border-gray-200">
+                                {{ $request->plan_type ?? '-' }} 
                             </td>
                             <td class="py-3 px-4 text-left border-b border-gray-200">
                                 {{ $request->description ?? '-' }}
@@ -57,7 +61,7 @@
                 <h2 class="text-md md:text-3xl font-bold text-center mb-5">Request a Workout Plan</h2>
                 
                 <!-- Form -->
-                <form action="{{ route('member.workout.request') }}" method="POST" class="space-y-4">
+                <form action="{{ route('member.workoutplan.request') }}" method="POST" class="space-y-4">
                     @csrf
 
                     <!-- Trainer Selection -->
@@ -75,6 +79,21 @@
                         </select>
                     </div>
 
+                    <!-- Plan Type (NEW) -->
+                    <div>
+                        <label for="plan_type" class="block text-left text-sm font-medium text-gray-700 items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-sm mr-1.5 ml-1"></i>
+                            Select Plan Type
+                        </label>
+                        <select id="plan_type" name="plan_type" required
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm">
+                            <option value="" disabled selected>Select Plan Type</option>
+                            <option value="Basic">Basic Plan (Beginner level)</option>
+                            <option value="Intermediate">Intermediate Plan (Some experience)</option>
+                            <option value="Advanced">Advanced Plan (Experienced)</option>
+                        </select>
+                    </div>
+
                     <!-- Plan Description -->
                     <div>
                         <label for="plan_dis" class="block text-left text-sm font-medium text-gray-700 items-center gap-2">
@@ -89,20 +108,6 @@
                             required
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                         />
-                    </div>
-
-                    <!-- Height & Weight -->
-                    <div class="flex gap-3">
-                        <div class="w-1/2 text-left">
-                            <label class="block text-sm font-medium text-gray-700">Height (cm)</label>
-                            <input type="number" name="height" placeholder="e.g. 170"
-                                class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
-                        </div>
-                        <div class="w-1/2 text-left">
-                            <label class="block text-sm font-medium text-gray-700">Weight (kg)</label>
-                            <input type="number" name="weight" placeholder="e.g. 65"
-                                class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
-                        </div>
                     </div>
 
                     <!-- Start Date -->
@@ -152,75 +157,6 @@
 
     </div>
 
-    <!-- Assigned Plan View -->
-    <div class="w-full max-w-xs md:max-w-7xl p-8 bg-white rounded-lg mb-4 text-center shadow-md mx-auto mt-10">
-        
-         <!-- Header -->
-        <div class="bg-[#1E1E1E] text-white px-8 py-6 rounded-lg shadow mb-6 mt-4">
-            <h2 class="text-2xl font-bold">My Workout Plan</h2>
-            <p class="text-sm text-gray-300 mt-1">Assigned by your personal trainer.</p>
-        </div>
-
-        @if($plans->count())
-            <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1">
-                @foreach($plans as $plan)
-                    <div class="group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-300 p-6 overflow-hidden">
-                        <div class="flex justify-between items-start">
-                            <div class="flex items-start gap-4">
-                                <!-- Avatar with Gradient -->
-                                <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg shadow">
-                                    {{ strtoupper(substr($plan->trainer->first_name, 0, 1)) }}
-                                </div>
-
-                                <!-- Info -->
-                                <div class="text-left">
-                                    <h3 class="text-lg font-bold text-gray-800 mb-1">
-                                        {{ $plan->plan_name }}
-                                    </h3>
-                                    <p class="text-sm text-gray-600 leading-snug">
-                                        <span class="font-semibold text-gray-700">Trainer:</span> {{ $plan->trainer->first_name }} {{ $plan->trainer->last_name }}<br>
-                                        <span class="font-semibold text-gray-700">Duration:</span>
-                                        {{ \Carbon\Carbon::parse($plan->start_date)->format('Y-m-d') }} to
-                                        {{ \Carbon\Carbon::parse($plan->end_date)->format('Y-m-d') }}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <!-- Status Badge -->
-                            <div class="mt-1">
-                                <span class="inline-block text-xs font-semibold px-3 py-1 rounded-full
-                                    {{ $plan->status === 'Active' ? 'bg-green-100 text-green-700' :
-                                    ($plan->status === 'Cancelled' ? 'bg-red-100 text-red-700' :
-                                    'bg-yellow-100 text-yellow-700') }}">
-                                    {{ ucfirst($plan->status) }}
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="mt-1 flex gap-3 justify-end opacity-100 transition-opacity duration-300">
-                            <a href="{{ route('member.workoutplan.cancel', $plan->workoutplan_id) }}"
-                            class="w-[110px] px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition text-center">
-                                Cancel
-                            </a>
-                            <a href="{{ route('member.workoutplan.view', $plan->workoutplan_id) }}"
-                            class="w-[110px] px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition text-center">
-                                View
-                            </a>
-                            <a href="{{ route('workout.report', $plan->workoutplan_id) }}"
-                            class="w-[110px] px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition text-center">
-                                Download 
-                            </a>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        @else
-            <h2 class="text-xl font-semibold text-gray-600">No workout plans have been created yet.</h2>
-        @endif
-
-    </div>
-
     @push('scripts')
         @if(session('success'))
         <script>
@@ -255,5 +191,4 @@
             }
         </script>
     @endpush
-
 @endsection

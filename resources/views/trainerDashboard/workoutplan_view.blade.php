@@ -21,8 +21,21 @@
     <!-- Exercises Grouped by Day -->
     @foreach($groupedExercises->sortKeys() as $day => $exercises)
         <div class="mb-8">
+            @php
+                // Get the muscle_groups from the first exercise of the day (all exercises in a day share the same muscle_groups)
+                $muscleGroups = [];
+                if ($exercises->first()->muscle_groups) {
+                    $muscleGroups = json_decode($exercises->first()->muscle_groups, true);
+                }
+            @endphp
+
             <h3 class="text-2xl font-bold text-indigo-700 mb-4 border-b border-indigo-300 pb-2">
                 Day {{ $day }}
+                @if(!empty($muscleGroups))
+                    <span class="text-xl text-gray-600 font-bold">
+                        ({{ implode(' / ', $muscleGroups) }})
+                    </span>
+                @endif
             </h3>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -34,7 +47,11 @@
                         <p class="text-gray-600 mb-1"><strong>Description:</strong> {{ $exercise->exercise->description }}</p>
                         <p class="text-gray-600 mb-1"><strong>Sets:</strong> {{ $exercise->sets }}</p>
                         <p class="text-gray-600 mb-1"><strong>Reps:</strong> {{ $exercise->reps }}</p>
-                        <p class="text-gray-600"><strong>Notes:</strong> {{ $exercise->notes ?: 'N/A' }}</p>
+                        <p>
+                            <span class="font-medium">Video:</span>
+                            <a href="{{ $exercise->exercise->video_link }}" target="_blank" class="text-red-600 hover:underline">Watch ▶️ </a>
+                        </p>
+                        <p class="text-gray-600"><strong>Notes:</strong> {{ $exercise->notes ?: 'N/A' }}</p>                            
                     </div>
                 @endforeach
             </div>

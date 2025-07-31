@@ -17,6 +17,7 @@ class Request extends Model
         'description',
         'type',
         'status',
+        'plan_type',
         'height',
         'weight',
         'target_weight',

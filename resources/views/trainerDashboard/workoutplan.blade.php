@@ -25,6 +25,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">Plan Title</label>
                     <input type="text" name="plan_name"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                        placeholder="Enter Plan Name"
                         required>
                 </div>
 
@@ -32,6 +33,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
                     <input type="date" name="start_date"
+                        value="{{ old('start_date', $request->preferred_start_date ?? '') }}"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                         required>
                 </div>
@@ -44,34 +46,27 @@
                         required>
                 </div>
 
-                <!-- Goal (Disabled) -->
+                <!-- Plan Type -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Goal</label>
-                    <input type="text" name="goal_type" value="Weight Loss" disabled
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Plan Type</label>
+                    <input type="text" name="plan_type" value="{{ $request->plan_type ?? 'N/A' }}" 
+                        disabled
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500" />
                 </div>
 
-                <!-- Height & Weight (Disabled) -->
-                <div class="grid grid-cols-2 gap-4">
-                    <!-- Height -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Height</label>
-                        <input type="text" name="height" value="175 cm" disabled
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500" />
-                    </div>
-
-                    <!-- Weight -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Weight</label>
-                        <input type="text" name="weight" value="75 kg" disabled
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500" />
-                    </div>
+                <!-- Description -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <input type="text" name="description" value="{{ $request->description ?? 'N/A' }}" 
+                        disabled
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500" />
                 </div>
 
                 <!-- Available Days -->
-                <div class="col-span-2">
+                <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Available Days</label>
-                    <input type="text" name="available_days" value="Mon, Wed, Fri" disabled
+                    <input type="text" name="available_days" value="{{ $request->available_days ?? 'N/A' }}" 
+                        disabled
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500" />
                 </div>
             </div>
@@ -92,23 +87,64 @@
                 </button>
             </div>
         </form>
-    </div>
+    </div>    
 
     <!-- Template for Exercise Options -->
     <template id="exercise-options">
         @foreach($exercises as $exercise)
-            <option value="{{ $exercise->exercise_id }}" data-sets="{{ $exercise->default_sets }}" data-reps="{{ $exercise->default_reps }}">
+            <option value="{{ $exercise->exercise_id }}" 
+                    data-sets="{{ $exercise->default_sets }}" 
+                    data-reps="{{ $exercise->default_reps }}" 
+                    data-muscle="{{ $exercise->muscle_group }}">
                 {{ $exercise->name }}
             </option>
         @endforeach
     </template>
 
-    <!-- JavaScript Section -->
+    <!-- Muscle Groups Options -->
+    <template id="muscle-group-options">
+        <option value="Chest">Chest</option>
+        <option value="Back">Back</option>
+        <option value="Shoulders">Shoulders</option>
+        <option value="Legs">Legs</option>
+        <option value="Biceps">Biceps</option>
+        <option value="Triceps">Triceps</option>
+        <option value="Abs">Abs</option>
+        <option value="Full Body">Full Body</option>
+    </template>
+
+    <!-- Container where days are added -->
+    <div id="exercise-days"></div>
+
+    <!-- Your custom JS -->
     <script>
         let dayCount = 0;
         let exerciseCounters = {};
-        const exerciseOptions = document.getElementById('exercise-options').innerHTML;
+        const exerciseOptionsTemplate = document.getElementById('exercise-options').innerHTML;
+        const muscleGroupOptionsTemplate = document.getElementById('muscle-group-options').innerHTML;
         const daysContainer = document.getElementById('exercise-days');
+
+        // Store Choices instances to destroy/re-init later if needed
+        const muscleGroupChoices = {};
+
+        function initChoicesOnMuscleSelect(dayIndex) {
+            const muscleSelect = document.querySelector(`[data-index='${dayIndex}'] .muscle-group-select`);
+            if (!muscleSelect) return;
+
+            // Destroy previous instance if exists
+            if (muscleGroupChoices[dayIndex]) {
+                muscleGroupChoices[dayIndex].destroy();
+            }
+
+            muscleGroupChoices[dayIndex] = new Choices(muscleSelect, {
+                removeItemButton: true,
+                searchEnabled: true,
+                placeholderValue: 'Select muscle groups...',
+                shouldSort: false,
+                itemSelectText: '',
+                // styling class names can be customized if needed
+            });
+        }
 
         function addDay(dayData = null) {
             const index = dayCount++;
@@ -116,10 +152,20 @@
             const dayNumber = index + 1;
 
             const dayHTML = document.createElement('div');
-            dayHTML.className = 'bg-white border border-gray-200 rounded-xl shadow p-5';
+            dayHTML.className = 'bg-white border border-gray-200 rounded-xl shadow p-5 mb-6';
             dayHTML.dataset.index = index;
             dayHTML.innerHTML = `
-                <h4 class="text-lg font-semibold text-gray-800 mb-4">Day <span class="day-number">${dayNumber}</span></h4>
+                <h4 class="text-lg font-semibold text-gray-800 mb-2 day-header">
+                    Day <span class="day-number">${dayNumber}</span>
+                </h4>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Select Muscle Groups</label>
+                    <select name="days[${index}][muscle_groups][]" multiple
+                        class="muscle-group-select w-full"
+                        style="min-height: 44px;">
+                        ${muscleGroupOptionsTemplate}
+                    </select>
+                </div>
                 <input type="hidden" name="days[${index}][day_number]" value="${dayNumber}">
                 <div class="exercise-group space-y-4"></div>
                 <div class="mt-4">
@@ -135,8 +181,32 @@
             `;
             daysContainer.appendChild(dayHTML);
 
+            // Init Choices on the new muscle group select
+            initChoicesOnMuscleSelect(index);
+
             if (dayData) {
-                dayData.forEach((ex, i) => addExercise(index, ex.exercise_id, ex.sets, ex.reps));
+                // Set muscle groups correctly (wait for Choices to init)
+                const muscleSelect = dayHTML.querySelector('.muscle-group-select');
+                if (Array.isArray(dayData.muscle_groups)) {
+                    // Clear selections
+                    Array.from(muscleSelect.options).forEach(opt => opt.selected = false);
+                    dayData.muscle_groups.forEach(muscle => {
+                        const option = Array.from(muscleSelect.options).find(o => o.value === muscle);
+                        if (option) option.selected = true;
+                    });
+                    // Refresh Choices UI with new selections
+                    muscleGroupChoices[index].setValue(dayData.muscle_groups);
+
+                    updateDayHeaderMuscles(dayHTML, dayNumber, dayData.muscle_groups);
+                } else {
+                    updateDayHeaderMuscles(dayHTML, dayNumber, dayData.muscle_groups ? [dayData.muscle_groups] : []);
+                }
+
+                if (Array.isArray(dayData.exercises)) {
+                    dayData.exercises.forEach(ex => addExercise(index, ex.exercise_id, ex.sets, ex.reps));
+                } else {
+                    addExercise(index);
+                }
             } else {
                 addExercise(index);
             }
@@ -152,7 +222,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">Exercise</label>
                     <select name="days[${dayIndex}][exercises][${exerciseIndex}][exercise_id]"
                         class="exercise-select w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
-                        ${exerciseOptions}
+                        <!-- Options populated by JS -->
                     </select>
                 </div>
                 <div>
@@ -171,12 +241,54 @@
             group.appendChild(div);
 
             const select = div.querySelector('select');
+            populateExerciseOptions(select, dayIndex);
+
             if (exerciseId) {
                 select.value = exerciseId;
             } else {
                 const selected = select.options[select.selectedIndex];
-                div.querySelector('input[name$="[sets]"]').value = selected.getAttribute('data-sets');
-                div.querySelector('input[name$="[reps]"]').value = selected.getAttribute('data-reps');
+                div.querySelector('input[name$="[sets]"]').value = selected.getAttribute('data-sets') || '';
+                div.querySelector('input[name$="[reps]"]').value = selected.getAttribute('data-reps') || '';
+            }
+        }
+
+        function populateExerciseOptions(selectElement, dayIndex) {
+            const muscleSelect = document.querySelector(`[data-index='${dayIndex}'] .muscle-group-select`);
+            const selectedMuscles = muscleGroupChoices[dayIndex]
+                ? muscleGroupChoices[dayIndex].getValue(true) // get array of selected muscle values
+                : (muscleSelect ? Array.from(muscleSelect.selectedOptions).map(o => o.value) : []);
+
+            const allOptions = document.createElement('select');
+            allOptions.innerHTML = exerciseOptionsTemplate;
+
+            selectElement.innerHTML = '';
+
+            const filteredOptions = Array.from(allOptions.options).filter(opt => {
+                const muscle = opt.getAttribute('data-muscle');
+                if (selectedMuscles.length === 0) return true; // show all if none selected
+                if (selectedMuscles.includes('Full Body')) return true;
+                return selectedMuscles.includes(muscle);
+            });
+
+            filteredOptions.forEach(opt => selectElement.appendChild(opt.cloneNode(true)));
+
+            if (selectElement.options.length === 0) {
+                const placeholder = document.createElement('option');
+                placeholder.text = 'No exercises for selected muscle groups';
+                placeholder.disabled = true;
+                placeholder.selected = true;
+                selectElement.appendChild(placeholder);
+            }
+        }
+
+        function updateDayHeaderMuscles(dayElement, dayNumber, muscles) {
+            const header = dayElement.querySelector('.day-header');
+            if (header) {
+                if (muscles.length > 0) {
+                    header.textContent = `Day ${dayNumber} (${muscles.join(' / ')})`;
+                } else {
+                    header.textContent = `Day ${dayNumber}`;
+                }
             }
         }
 
@@ -190,12 +302,42 @@
                 }
             });
 
+            // Listen for muscle group changes (Choices fires change event on original select)
             document.body.addEventListener('change', function (e) {
+                if (e.target.classList.contains('muscle-group-select')) {
+                    const dayElement = e.target.closest('[data-index]');
+                    if (!dayElement) return;
+
+                    const dayIndex = dayElement.getAttribute('data-index');
+                    // Get muscles from Choices instance if available
+                    const muscles = muscleGroupChoices[dayIndex]
+                        ? muscleGroupChoices[dayIndex].getValue(true)
+                        : Array.from(e.target.selectedOptions).map(opt => opt.value);
+
+                    const dayNumberSpan = dayElement.querySelector('.day-number');
+                    const dayNumber = dayNumberSpan ? dayNumberSpan.textContent : (parseInt(dayIndex) + 1);
+                    updateDayHeaderMuscles(dayElement, dayNumber, muscles);
+
+                    // Update exercise dropdowns filter
+                    const exercises = dayElement.querySelectorAll('.exercise-select');
+                    exercises.forEach(select => {
+                        const currentValue = select.value;
+                        populateExerciseOptions(select, dayIndex);
+                        if (Array.from(select.options).some(o => o.value === currentValue)) {
+                            select.value = currentValue;
+                        }
+                    });
+                }
+
                 if (e.target.classList.contains('exercise-select')) {
                     const selected = e.target.options[e.target.selectedIndex];
                     const wrapper = e.target.closest('.grid');
-                    wrapper.querySelector('input[name$="[sets]"]').value = selected.getAttribute('data-sets') || '';
-                    wrapper.querySelector('input[name$="[reps]"]').value = selected.getAttribute('data-reps') || '';
+                    if (wrapper) {
+                        const setsInput = wrapper.querySelector('input[name$="[sets]"]');
+                        const repsInput = wrapper.querySelector('input[name$="[reps]"]');
+                        if (setsInput) setsInput.value = selected.getAttribute('data-sets') || '';
+                        if (repsInput) repsInput.value = selected.getAttribute('data-reps') || '';
+                    }
                 }
             });
         });
@@ -238,7 +380,8 @@
                                 <span class="inline-block text-xs font-semibold px-3 py-1 rounded-full
                                     {{ $plan->status === 'Active' ? 'bg-green-100 text-green-700' :
                                     ($plan->status === 'Cancelled' ? 'bg-red-100 text-red-700' :
-                                    'bg-yellow-100 text-yellow-700') }}">
+                                    ($plan->status === 'Completed' ? 'bg-blue-100 text-blue-700' :
+                                    'bg-yellow-100 text-yellow-700')) }}">
                                     {{ ucfirst($plan->status) }}
                                 </span>
                             </div>

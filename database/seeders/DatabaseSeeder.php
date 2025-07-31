@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             UserRoleSeeder::class,
             MembershipTypeSeeder::class,
+            ExerciseSeeder::class,
         ]);
     }
 }

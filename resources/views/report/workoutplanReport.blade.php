@@ -41,7 +41,7 @@
         th, td {
             padding: 8px;
             border: 1px solid #333;
-            width: 20%; 
+            vertical-align: top;
         }
         th {
             background-color: #f2f2f2;
@@ -64,6 +64,10 @@
             color: #333;
             font-size: 12px;
             text-align: center;
+        }
+        .video {
+            color: red;
+            text-decoration: none;
         }
     </style>
 </head>
@@ -90,7 +94,20 @@
         <hr>
 
         @foreach($groupedExercises as $day => $exercises)
-            <h3>Day {{ $day }}</h3>
+            @php
+                $muscleGroups = [];
+                if ($exercises->first()->muscle_groups) {
+                    $muscleGroups = json_decode($exercises->first()->muscle_groups, true);
+                }
+            @endphp
+
+            <h3>
+                Day {{ $day }}
+                @if(!empty($muscleGroups))
+                    <span style="font-size: 15px; color: #555;"> ({{ implode(' / ', $muscleGroups) }})</span>
+                @endif
+            </h3>
+
             <table>
                 <thead>
                     <tr>
@@ -99,6 +116,7 @@
                         <th>Sets</th>
                         <th>Reps</th>
                         <th>Notes</th>
+                        <th>Video</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -108,7 +126,14 @@
                         <td>{{ $exercise->exercise->description }}</td>
                         <td>{{ $exercise->sets }}</td>
                         <td>{{ $exercise->reps }}</td>
-                        <td>{{ $exercise->notes }}</td>
+                        <td>{{ $exercise->notes ?: 'N/A' }}</td>
+                        <td>
+                            @if($exercise->exercise->video_link)
+                                <a href="{{ $exercise->exercise->video_link }}" target="_blank" class="video">Watch</a>
+                            @else
+                                N/A
+                            @endif
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>

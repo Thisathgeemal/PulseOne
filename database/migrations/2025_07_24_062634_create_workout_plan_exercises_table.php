@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('sets');
             $table->integer('reps');
             $table->integer('day_number');
+            $table->json('muscle_groups')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
 

@@ -12,15 +12,21 @@ class Exercise extends Model
 
     protected $fillable = [
         'name',
-        'description',
         'default_sets',
         'default_reps',
-        'goal_type',
         'muscle_group',
+        'description',
+        'video_link',
     ];
 
     public function workoutPlanExercises()
     {
         return $this->hasMany(WorkoutPlanExercise::class, 'exercise_id');
     }
+
+    public function exerciseLogs()
+    {
+        return $this->hasMany(ExerciseLog::class, 'exercise_id');
+    }
+
 }
