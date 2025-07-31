@@ -106,6 +106,8 @@ class WorkoutPlanController extends Controller
 
         $photos = ProgressPhoto::where('user_id', $userId)->orderBy('photo_date', 'desc')->get();
 
+        $photoProgress = $this->getPhotoProgressData($userId);
+
         return view('memberDashboard.workoutplanProgress', [
             'workoutPlan'    => $workoutPlan,
             'exercises'      => $dailyData['exercises'],
@@ -116,6 +118,7 @@ class WorkoutPlanController extends Controller
             'endOfWeek'      => $weeklyLogs['endOfWeek'],
             'weeklyProgress' => $weeklyLogs['weeklyProgress'],
             'photos'         => $photos,
+            'photoProgress'  => $photoProgress,
         ]);
     }
 
@@ -221,6 +224,43 @@ class WorkoutPlanController extends Controller
         return [
             'completed'  => $actualWorkoutDays,
             'percentage' => round($percentage, 0),
+        ];
+    }
+
+    // Get Photo Progress Data
+    protected function getPhotoProgressData($userId)
+    {
+        $startOfWeek = Carbon::now()->startOfWeek();
+        $endOfWeek   = Carbon::now()->endOfWeek();
+
+        // Weekly
+        $weeklyPhotoCount = ProgressPhoto::where('user_id', $userId)
+            ->whereBetween('photo_date', [$startOfWeek, $endOfWeek])
+            ->count();
+
+        $weeklyTarget   = 2;
+        $weeklyProgress = $weeklyTarget > 0
+        ? round(($weeklyPhotoCount / $weeklyTarget) * 100)
+        : 0;
+
+        // Monthly
+        $photoCountThisMonth = ProgressPhoto::where('user_id', $userId)
+            ->whereMonth('photo_date', now()->month)
+            ->whereYear('photo_date', now()->year)
+            ->count();
+
+        $monthlyTarget   = 8;
+        $monthlyProgress = $monthlyTarget > 0
+        ? round(($photoCountThisMonth / $monthlyTarget) * 100)
+        : 0;
+
+        return [
+            'weeklyPhotoCount' => $weeklyPhotoCount,
+            'weeklyTarget'     => $weeklyTarget,
+            'weeklyProgress'   => $weeklyProgress, // can exceed 100
+            'monthlyCount'     => $photoCountThisMonth,
+            'monthlyTarget'    => $monthlyTarget,
+            'monthlyProgress'  => $monthlyProgress, // can exceed 100
         ];
     }
 

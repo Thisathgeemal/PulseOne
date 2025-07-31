@@ -64,20 +64,61 @@
 
         <div id="PhotosTrackSection" class="hidden bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-center shadow-md mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-left">
+                <!-- Monthly Photos Count -->
                 <div class="col-span-1 bg-gray-100 p-4 rounded-lg shadow">
-                    <h3 class="text-lg text-center font-semibold mb-2 text-orange-800">Number of Photos</h3>
-                    <p class="completed-exercise-count font-semibold text-sm text-center text-orange-700">
-                        {{ $dailyProgress['completed'] == 0 ? '0' : str_pad($dailyProgress['completed'], 2, '0', STR_PAD_LEFT) }}
+                    <h3 class="text-lg text-center font-semibold mb-2 text-orange-800">Monthly Photos</h3>
+                    <p class="font-semibold text-sm text-center text-orange-700">
+                        {{ $photoProgress['monthlyCount'] }} / 8 photos
                     </p>
                 </div>
-                <div class="col-span-1 md:col-span-3 bg-gray-50 p-4 rounded-lg shadow">
-                    <div class="w-full bg-gray-200 rounded-full h-4 mt-2">
-                        <div id="progress-bar" class="bg-orange-500 h-4 rounded-full transition-all duration-300 ease-in-out"
-                            style="width: {{ $dailyProgress['percentage'] }}%;">
+
+                @php
+                    $monthlyProgress = $photoProgress['monthlyProgress'] ?? 0;
+                    $monthlyWidth = min($monthlyProgress, 100);
+                    $monthlyExtra = $monthlyProgress > 100 ? $monthlyProgress - 100 : 0;
+                @endphp
+
+                <div class="col-span-1 md:col-span-3 bg-gray-100 p-4 rounded-lg shadow">
+                    <div class="w-full bg-gray-300 rounded-full h-4 mt-2">
+                        <div class="bg-orange-500 h-4 rounded-full transition-all duration-300 ease-in-out"
+                            style="width: {{ $monthlyWidth }}%;">
                         </div>
                     </div>
-                    <p id="progress-text" class="text-sm text-center font-semibold mt-4 text-gray-700">
-                        {{ $dailyProgress['percentage'] }}% completed
+                    <p class="text-sm text-center font-semibold mt-4 text-gray-700">
+                        {{ min($monthlyProgress, 100) }}% completed
+                        @if ($monthlyExtra > 0)
+                            <span class="text-orange-600">+ {{ $monthlyExtra }}% Keep it up! 📸</span>
+                        @endif
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6 text-left">
+                <!-- Weekly Photos Count -->
+                <div class="col-span-1 bg-gray-100 p-4 rounded-lg shadow">
+                    <h3 class="text-lg text-center font-semibold mb-2 text-purple-800">Weekly Photos</h3>
+                    <p class="font-semibold text-sm text-center text-purple-700">
+                        {{ $photoProgress['weeklyPhotoCount'] }} / 2 photos
+                    </p>
+                </div>
+
+                @php
+                    $weeklyPhotoProgress = $photoProgress['weeklyProgress'];
+                    $weeklyPhotoWidth = min($weeklyPhotoProgress, 100);
+                    $weeklyPhotoExtra = $weeklyPhotoProgress > 100 ? $weeklyPhotoProgress - 100 : 0;
+                @endphp
+
+                <div class="col-span-1 md:col-span-3 bg-gray-100 p-4 rounded-lg shadow">
+                    <div class="w-full bg-gray-300 rounded-full h-4 mt-2">
+                        <div class="bg-purple-500 h-4 rounded-full transition-all duration-300 ease-in-out"
+                            style="width: {{ $weeklyPhotoWidth }}%;">
+                        </div>
+                    </div>
+                    <p class="text-sm text-center font-semibold mt-4 text-gray-700">
+                        {{ min($weeklyPhotoProgress, 100) }}% completed
+                        @if ($weeklyPhotoExtra > 0)
+                            <span class="text-purple-600">+ {{ $weeklyPhotoExtra }}% Keep going! 🔥</span>
+                        @endif
                     </p>
                 </div>
             </div>
