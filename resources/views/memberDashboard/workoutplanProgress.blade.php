@@ -45,8 +45,8 @@
                     $extra = $progressPercentage > 100 ? $progressPercentage - 100 : 0;
                 @endphp
 
-                <div class="col-span-1 md:col-span-3 bg-gray-50 p-4 rounded-lg shadow">
-                    <div class="w-full bg-gray-200 rounded-full h-4 mt-2">
+                <div class="col-span-1 md:col-span-3 bg-gray-100 p-4 rounded-lg shadow">
+                    <div class="w-full bg-gray-300 rounded-full h-4 mt-2">
                         <div id="progress-bar" class="bg-green-500 h-4 rounded-full transition-all duration-300 ease-in-out"
                             style="width: {{ $displayedWidth }}%;">
                         </div>

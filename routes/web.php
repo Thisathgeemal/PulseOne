@@ -152,6 +152,7 @@ Route::middleware(['auth'])->prefix('trainer')->group(function () {
 
     // Workout Plan Download
     Route::get('/workoutplan/view/{id}', [WorkoutPlanController::class, 'viewPlan'])->name('trainer.workoutplan.view');
+    Route::get('/workoutplan/progress/{id}', [WorkoutPlanController::class, 'viewProgress'])->name('trainer.workoutplan.progress');
     Route::get('/workoutplan/download/{id}', [ReportController::class, 'generateWorkoutReport'])->name('workout.report');
 
     // Workout Request Management

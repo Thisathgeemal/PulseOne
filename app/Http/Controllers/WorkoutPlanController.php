@@ -257,10 +257,10 @@ class WorkoutPlanController extends Controller
         return [
             'weeklyPhotoCount' => $weeklyPhotoCount,
             'weeklyTarget'     => $weeklyTarget,
-            'weeklyProgress'   => $weeklyProgress, // can exceed 100
+            'weeklyProgress'   => $weeklyProgress,
             'monthlyCount'     => $photoCountThisMonth,
             'monthlyTarget'    => $monthlyTarget,
-            'monthlyProgress'  => $monthlyProgress, // can exceed 100
+            'monthlyProgress'  => $monthlyProgress,
         ];
     }
 
@@ -398,6 +398,39 @@ class WorkoutPlanController extends Controller
             });
 
         return view('trainerDashboard.workoutplan_view', compact('plan', 'groupedExercises'));
+    }
+
+    // View Specific Workout Plann
+    public function viewProgress($id)
+    {
+        $workoutPlan = WorkoutPlan::where('workoutplan_id', $id)
+            ->where('status', 'Active')
+            ->first();
+
+        if (! $workoutPlan) {
+            return redirect()->back()->with('error', 'Workout plan not found or inactive.');
+        }
+
+        $memberId = $workoutPlan->member_id;
+        $today    = Carbon::today();
+
+        $dailyProgress = $this->getDailyProgress($memberId, $id, $today);
+        $weeklyLogData = $this->getWeeklyLogData($memberId);
+        $photoProgress = $this->getPhotoProgressData($memberId);
+        $photos        = ProgressPhoto::where('user_id', $memberId)->orderBy('photo_date', 'desc')->get();
+        $member        = User::find($memberId);
+
+        return view('trainerDashboard.workoutplan_progress', [
+            'workoutPlan'    => $workoutPlan,
+            'member'         => $member,
+            'dailyProgress'  => $dailyProgress,
+            'weeklyProgress' => $weeklyLogData['weeklyProgress'],
+            'weeklyLogs'     => $weeklyLogData['weeklyLogs'],
+            'startOfWeek'    => $weeklyLogData['startOfWeek'],
+            'endOfWeek'      => $weeklyLogData['endOfWeek'],
+            'photos'         => $photos,
+            'photoProgress'  => $photoProgress,
+        ]);
     }
 
 }

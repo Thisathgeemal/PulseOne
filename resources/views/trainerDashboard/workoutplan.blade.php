@@ -388,10 +388,14 @@
                         </div>
 
                         <!-- Action Buttons -->
-                        <div class="mt-3 flex gap-3 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div class="mt-5 flex gap-3 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             <a href="{{ route('trainer.workoutplan.view', $plan->workoutplan_id) }}"
                             class="w-[110px] px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition text-center">
                                 View
+                            </a>
+                            <a href="{{ route('trainer.workoutplan.progress', $plan->workoutplan_id) }}"
+                            class="w-[110px] px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition text-center">
+                                Track
                             </a>
                             <a href="{{ route('workout.report', $plan->workoutplan_id) }}"
                             class="w-[110px] px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition text-center">
