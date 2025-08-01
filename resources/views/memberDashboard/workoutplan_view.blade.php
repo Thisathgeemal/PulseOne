@@ -8,7 +8,11 @@
             <h2 class="text-3xl font-bold text-indigo-700 flex items-center gap-2">
                 🏋️‍♂️ Workout Plan: {{ $plan->plan_name }}
             </h2>
-            @if($plan->status === 'Active' && \Carbon\Carbon::parse($plan->start_date)->isToday())
+            @if(
+                $plan->status === 'Active' &&
+                \Carbon\Carbon::parse($plan->start_date)->isPast() &&
+                \Carbon\Carbon::parse($plan->end_date)->isFuture()
+            )
                 <a href="{{ route('member.workoutplan.progress', $plan->workoutplan_id) }}"
                 class="w-[110px] px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition text-center">
                     Start

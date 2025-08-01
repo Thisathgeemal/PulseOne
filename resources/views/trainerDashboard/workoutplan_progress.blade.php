@@ -68,7 +68,7 @@
     </div>
 
     <div id="PhotosTrackSection" class="bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-left shadow-md mx-auto">
-        <h2 class="text-xl text-gray-800 sm:text-2xl font-bold mb-5">Progress Photos </h2>
+        <h2 class="text-xl text-gray-800 sm:text-2xl font-bold mb-5">Progress Photos ({{ \Carbon\Carbon::now()->format('F Y') }}) </h2>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-left">
             <!-- Monthly Photos Count -->
             <div class="col-span-1 bg-gray-100 p-4 rounded-lg shadow">

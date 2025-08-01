@@ -171,13 +171,26 @@ class WorkoutPlanController extends Controller
     // Calculate the daily progress
     public function getDailyProgress($userId, $workoutPlanId, $date)
     {
-        $totalAssigned = WorkoutPlanExercise::where('workoutplan_id', $workoutPlanId)
-            ->whereDate('created_at', '<=', $date)
+        $totalDays = WorkoutPlanExercise::where('workoutplan_id', $workoutPlanId)
+            ->distinct('day_number')
+            ->count('day_number');
+
+        // Count how many days the user has completed so far
+        $completedWorkoutDays = DailyWorkoutLog::where('member_id', $userId)
+            ->where('workoutplan_id', $workoutPlanId)
             ->count();
 
+        $dayNumber = ($completedWorkoutDays % $totalDays) + 1;
+
+        // Count how many exercises are assigned for today (for that day number)
+        $totalAssigned = WorkoutPlanExercise::where('workoutplan_id', $workoutPlanId)
+            ->where('day_number', $dayNumber)
+            ->count();
+
+        // Count how many of those exercises are completed today
         $completedToday = ExerciseLog::where('workoutplan_id', $workoutPlanId)
             ->where('member_id', $userId)
-            ->whereDate('created_at', $date)
+            ->whereDate('log_date', $date)
             ->distinct('exercise_id')
             ->count('exercise_id');
 

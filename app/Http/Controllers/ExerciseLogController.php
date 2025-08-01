@@ -38,20 +38,20 @@ class ExerciseLogController extends Controller
             return back()->with('error', 'You have already logged this exercise today.');
         }
 
-        // Step 1: Count total workout days in the plan
+        // Count total workout days in the plan
         $totalDays = WorkoutPlanExercise::where('workoutplan_id', $request->workoutplan_id)
             ->distinct('day_number')
             ->count('day_number');
 
-        // Step 2: Count how many workout days the user has completed so far
+        // Count how many workout days the user has completed so far
         $completedWorkoutDays = DailyWorkoutLog::where('member_id', $userId)
             ->where('workoutplan_id', $request->workoutplan_id)
             ->count();
 
-        // Step 3: Determine current workout day based on logs (not calendar)
+        // Determine current workout day based on logs (not calendar)
         $dayNumber = ($completedWorkoutDays % $totalDays) + 1;
 
-        // Step 4: Log the exercise
+        // Log the exercise
         ExerciseLog::create([
             'member_id'      => $userId,
             'workoutplan_id' => $request->workoutplan_id,
@@ -62,19 +62,19 @@ class ExerciseLogController extends Controller
             'weight'         => $request->weight,
         ]);
 
-        // Step 5: Count how many exercises are in the current workout day
+        // Count how many exercises are in the current workout day
         $totalForDay = WorkoutPlanExercise::where('workoutplan_id', $request->workoutplan_id)
             ->where('day_number', $dayNumber)->count();
 
-        // Step 6: Count how many exercises the user has logged today
+        // Count how many exercises the user has logged today
         $completedToday = ExerciseLog::where('member_id', $userId)
             ->where('workoutplan_id', $request->workoutplan_id)
             ->whereDate('log_date', $today)->count();
 
-        // Step 7: Calculate completion %
+        // Calculate completion %
         $completion = $totalForDay > 0 ? round(($completedToday / $totalForDay) * 100) : 0;
 
-        // Step 8: Calculate workout duration
+        // Calculate workout duration
         $firstLogTime = ExerciseLog::where('member_id', $userId)
             ->where('workoutplan_id', $request->workoutplan_id)
             ->whereDate('log_date', $today)
@@ -92,7 +92,7 @@ class ExerciseLogController extends Controller
             $workoutDuration = Carbon::parse($firstLogTime)->diffInMinutes(Carbon::parse($lastLogTime));
         }
 
-        // Step 9: Update or insert summary into daily workout log
+        // Update or insert summary into daily workout log
         DailyWorkoutLog::updateOrCreate(
             [
                 'member_id'      => $userId,
