@@ -281,7 +281,7 @@
         <div id="progressPhotosSection" class="hidden bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-center shadow-md mx-auto">
             <!-- Header -->
             <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-                <h2 class="text-xl text-gray-800 sm:text-2xl font-bold">Progress Photos </h2>
+                <h2 class="text-xl text-gray-800 sm:text-2xl font-bold">Progress Photos ({{ \Carbon\Carbon::now()->format('F Y') }}) </h2>
                 <button onclick="openProgressPhotosModal()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
                     + Add Photo 
                 </button>

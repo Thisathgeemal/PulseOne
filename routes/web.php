@@ -198,6 +198,7 @@ Route::middleware(['auth'])->prefix('member')->group(function () {
     // Diet Plan routes
     Route::prefix('dietplan')->name('member.dietplan.')->group(function () {
         Route::get('request', [DietPlanController::class, 'request'])->name('request');
+        Route::post('request', [DietPlanController::class, 'requestDietPlan'])->name('request');
         Route::get('myplan', [DietPlanController::class, 'myPlan'])->name('myplan');
         Route::get('progress', [DietPlanController::class, 'progressTracking'])->name('progress');
     });

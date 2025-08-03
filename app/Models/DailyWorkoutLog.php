@@ -18,6 +18,7 @@ class DailyWorkoutLog extends Model
         'total_exercises',
         'completion_percentage',
         'workout_duration',
+        'day_number',
     ];
 
     protected $casts = [

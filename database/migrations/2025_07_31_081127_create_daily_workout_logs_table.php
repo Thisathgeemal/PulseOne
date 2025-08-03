@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('workoutplan_id');
             $table->unsignedBigInteger('member_id');
             $table->date('log_date');
+            $table->integer('day_number')->default(1);
             $table->integer('completed_exercises')->default(0);
             $table->integer('total_exercises')->default(0);
             $table->float('completion_percentage')->default(0);

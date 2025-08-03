@@ -43,13 +43,23 @@ class ExerciseLogController extends Controller
             ->distinct('day_number')
             ->count('day_number');
 
-        // Count how many workout days the user has completed so far
-        $completedWorkoutDays = DailyWorkoutLog::where('member_id', $userId)
+        // Check if a workout log already exists today
+        $existingDayLog = DailyWorkoutLog::where('member_id', $userId)
             ->where('workoutplan_id', $request->workoutplan_id)
-            ->count();
+            ->whereDate('log_date', $today)
+            ->first();
 
-        // Determine current workout day based on logs (not calendar)
-        $dayNumber = ($completedWorkoutDays % $totalDays) + 1;
+        // Determine the current workout day
+        if ($existingDayLog) {
+            $dayNumber = $existingDayLog->day_number;
+        } else {
+            // Count how many workout days the user has completed so far
+            $completedWorkoutDays = DailyWorkoutLog::where('member_id', $userId)
+                ->where('workoutplan_id', $request->workoutplan_id)
+                ->count();
+
+            $dayNumber = ($completedWorkoutDays % $totalDays) + 1;
+        }
 
         // Log the exercise
         ExerciseLog::create([
@@ -92,7 +102,7 @@ class ExerciseLogController extends Controller
             $workoutDuration = Carbon::parse($firstLogTime)->diffInMinutes(Carbon::parse($lastLogTime));
         }
 
-        // Update or insert summary into daily workout log
+        // Update or insert summary into daily workout log with day number
         DailyWorkoutLog::updateOrCreate(
             [
                 'member_id'      => $userId,
@@ -100,6 +110,7 @@ class ExerciseLogController extends Controller
                 'log_date'       => $today,
             ],
             [
+                'day_number'            => $dayNumber,
                 'completed_exercises'   => $completedToday,
                 'total_exercises'       => $totalForDay,
                 'completion_percentage' => $completion,

@@ -75,7 +75,7 @@ class WorkoutPlanController extends Controller
 
         WorkoutPlan::where('member_id', $user->id)
             ->whereDate('start_date', now()->toDateString())
-            ->where('status', '!=', 'Active')
+            ->where('status', 'Pending') // <-- only Pending
             ->update(['status' => 'Active']);
 
         $plans = WorkoutPlan::with(['trainer', 'workoutPlanExercises'])
@@ -125,13 +125,37 @@ class WorkoutPlanController extends Controller
     // Get daily log data
     protected function getDailyLogData($workoutPlan, $userId, $today)
     {
-        $dayNumber = Carbon::parse($workoutPlan->start_date)->diffInDays($today) + 1;
+        // Get today's log (if any)
+        $todayLog = DailyWorkoutLog::where('member_id', $userId)
+            ->where('workoutplan_id', $workoutPlan->workoutplan_id)
+            ->whereDate('log_date', $today)
+            ->first();
 
+        // Get total unique days in workout schedule
+        $totalDays = WorkoutPlanExercise::where('workoutplan_id', $workoutPlan->workoutplan_id)
+            ->distinct('day_number')
+            ->count('day_number');
+
+        if ($todayLog) {
+            // If there's already a log for today, use the same day_number
+            $dayNumber = $todayLog->day_number;
+        } else {
+            // Count total workout days (distinct log dates)
+            $completedWorkoutDays = DailyWorkoutLog::where('member_id', $userId)
+                ->where('workoutplan_id', $workoutPlan->workoutplan_id)
+                ->count();
+
+            // Move to next day in rotation
+            $dayNumber = ($completedWorkoutDays % $totalDays) + 1;
+        }
+
+        // Get exercises for the day
         $exercises = WorkoutPlanExercise::with('exercise')
             ->where('workoutplan_id', $workoutPlan->workoutplan_id)
             ->where('day_number', $dayNumber)
             ->get();
 
+        // Get today's logged exercises
         $todayLogs = ExerciseLog::with('exercise')
             ->where('member_id', $userId)
             ->where('workoutplan_id', $workoutPlan->workoutplan_id)
@@ -141,6 +165,7 @@ class WorkoutPlanController extends Controller
         $dailyProgress = $this->getDailyProgress($userId, $workoutPlan->workoutplan_id, $today);
 
         return [
+            'dayNumber'     => $dayNumber,
             'exercises'     => $exercises,
             'todayLogs'     => $todayLogs,
             'dailyProgress' => $dailyProgress,
@@ -300,7 +325,8 @@ class WorkoutPlanController extends Controller
     public function cancelMemberPlan($id)
     {
         $plan = WorkoutPlan::where('member_id', auth()->id())
-            ->findOrFail($id);
+            ->where('workoutplan_id', $id)
+            ->firstOrFail();
 
         $plan->status = 'Cancelled';
         $plan->save();
@@ -368,6 +394,15 @@ class WorkoutPlanController extends Controller
         ]);
 
         $req = WorkoutRequest::findOrFail($request->request_id);
+
+        $latestPlan = WorkoutPlan::where('member_id', $req->member_id)
+            ->whereIn('status', ['Pending', 'Active'])
+            ->orderBy('end_date', 'desc')
+            ->first();
+
+        if ($latestPlan && Carbon::parse($request->start_date)->lte(Carbon::parse($latestPlan->end_date))) {
+            return redirect()->back()->withErrors(['start_date' => 'Start date must be after the end date of the existing workout plan (' . $latestPlan->end_date . ').'])->withInput();
+        }
 
         $plan = WorkoutPlan::create([
             'trainer_id' => Auth::id(),
