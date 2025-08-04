@@ -111,7 +111,6 @@
             'member.feedback' => ['icon' => 'fas fa-comment-dots', 'label' => 'Feedback'],
             'member.message' => ['icon' => 'fas fa-comment-alt', 'label' => 'Message'],
             'member.leaderboard' => ['icon' => 'fas fa-trophy', 'label' => 'Leaderboard'],
-            'member.report' => ['icon' => 'fa fa-line-chart', 'label' => 'Report'],
         ] as $route => $data)
             <li>
                 <a href="{{ route($route) }}"

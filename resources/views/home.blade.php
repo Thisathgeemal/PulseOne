@@ -47,13 +47,15 @@
         @include('components.header')
 
         <!-- Hero Banner -->
-        <section class="relative bg-cover bg-center h-[500px]" style="background-image: url('{{ asset('images/hero.jpg') }}');">
-            <div class="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-center items-center text-white px-4 text-center" data-aos="fade-up">
-                <h1 class="text-5xl font-bold mb-4">WORK MORE!</h1>
-                <p class="max-w-xl mb-6">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quis nostrae exercitatio ullamcorper suscipit lobortis nisi ut aliquip.</p>
-                <div class="space-x-4">
-                    <button class="bg-red-600 px-5 py-2 rounded hover:scale-105">Join us now</button>
-                    <button class="border px-5 py-2 rounded hover:scale-105">Learn more</button>
+        <section class="relative bg-cover bg-center h-[500px]" style="background-image: url('{{ asset('images/banner1.jpg') }}');">
+            <div class="absolute inset-0 bg-black bg-opacity-35 flex flex-col justify-center items-center text-white px-4 text-center" data-aos="fade-up">
+                <div class="absolute bottom-38 left-28 flex space-x-4 z-10" data-aos="fade-up">
+                    <a href="{{ route('register') }}">
+                        <button class="w-38 h-12 bg-white text-black px-5 py-2 rounded-md font-semibold shadow hover:scale-105 transition">Join us now</button>
+                    </a>
+                    <a href="{{ route('about') }}">
+                        <button class="w-38 h-12 border border-white text-white px-5 py-2 rounded-md font-semibold hover:bg-white hover:text-black transition">Learn more</button>
+                    </a>
                 </div>
             </div>
         </section>

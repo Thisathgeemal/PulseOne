@@ -13,16 +13,19 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class AttendanceController extends Controller
 {
+    // Show the QR scanner page for Trainers
     public function showTrainerScanner()
     {
         return view('trainerDashboard.qr');
     }
 
+    // Show the QR scanner page for Members
     public function showMemberScanner()
     {
         return view('memberDashboard.qr');
     }
 
+    // Generate and display a QR code for today's check-in (admin only)
     public function showQR()
     {
         $date  = Carbon::now()->toDateString();
@@ -34,6 +37,7 @@ class AttendanceController extends Controller
         return view('adminDashboard.qr_display', compact('qrCode', 'token', 'url'));
     }
 
+    // Handle token redirect after QR code scan and route users to their dashboard
     public function handleTokenRedirect(Request $request)
     {
         $token = $request->query('token');
@@ -60,6 +64,7 @@ class AttendanceController extends Controller
         }
     }
 
+    // Handle the actual check-in process
     public function checkin(Request $request)
     {
         $request->validate([
@@ -128,20 +133,6 @@ class AttendanceController extends Controller
         }
     }
 
-    private function haversine($lat1, $lon1, $lat2, $lon2)
-    {
-        $earthRadius = 6371;
-        $dLat        = deg2rad($lat2 - $lat1);
-        $dLon        = deg2rad($lon2 - $lon1);
-
-        $a = sin($dLat / 2) * sin($dLat / 2) +
-        cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
-        sin($dLon / 2) * sin($dLon / 2);
-
-        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-        return $earthRadius * $c;
-    }
-
     // Member Attendance
     public function viewMemberAttendance(Request $request)
     {
@@ -176,48 +167,62 @@ class AttendanceController extends Controller
         return view('trainerDashboard.attendance', compact('attendances', 'date'));
     }
 
+    // View all attendance records with filters
     public function viewAll(Request $request)
     {
-        $query = Attendance::with(['user.userRole.role'])->latest();
+        $query = Attendance::with(['user.roles'])->latest();
 
+        // Filter by date
         if ($request->filled('date')) {
             $query->whereDate('check_in_time', $request->input('date'));
         }
 
+        // Filter by member ID
         if ($request->filled('member_id')) {
             $query->where('user_id', $request->input('member_id'));
         }
 
+        // Filter by role name (supports users with multiple roles)
         if ($request->filled('role')) {
             $role = $request->input('role');
-            $query->whereHas('user.userRole.role', function ($q) use ($role) {
+            $query->whereHas('user.roles', function ($q) use ($role) {
                 $q->where('role_name', $role);
+            });
+        } else {
+            // Only include attendances of users with role Member or Trainer
+            $query->whereHas('user.roles', function ($q) {
+                $q->whereIn('role_name', ['Member', 'Trainer']);
             });
         }
 
-        $attendances = $query->paginate(15)->appends($request->all());
+        // Paginate and retain filters
+        $attendances = $query->paginate(10)->appends($request->all());
 
+        // Get only users with Member or Trainer roles
         $members = DB::table('users')
             ->join('user_roles', 'users.id', '=', 'user_roles.user_id')
             ->join('roles', 'user_roles.role_id', '=', 'roles.role_id')
+            ->whereIn('roles.role_name', ['Member', 'Trainer'])
             ->select('users.id', 'users.first_name', 'users.last_name', 'roles.role_name')
             ->get();
 
         return view('adminDashboard.attendance', compact('attendances', 'members'));
     }
 
+    // Manually store attendance for a user
     public function storeManual(Request $request)
     {
         $request->validate([
-            'user_id'       => 'required|exists:users,id',
-            'check_in_time' => 'required|date',
-            'status'        => 'required|in:Present,Absent',
+            'user_id' => 'required|exists:users,id',
+            'date'    => 'required|date',
+            'time'    => 'required|date_format:H:i',
         ]);
+
+        $checkInDateTime = $request->date . ' ' . $request->time . ':00';
 
         Attendance::create([
             'user_id'           => $request->user_id,
-            'check_in_time'     => $request->check_in_time,
-            'status'            => $request->status,
+            'check_in_time'     => $checkInDateTime,
             'qr_code'           => null,
             'token_valid_until' => null,
         ]);
@@ -225,24 +230,44 @@ class AttendanceController extends Controller
         return back()->with('success', 'Manual attendance recorded.');
     }
 
+    // Attendance checkout
+    public function checkout($id)
+    {
+        $attendance = Attendance::findOrFail($id);
+
+        if (! $attendance->check_out_time) {
+            $attendance->check_out_time = now();
+            $attendance->save();
+        }
+
+        return redirect()->back()->with('success', 'Checked out successfully!');
+    }
+
+    // Search members
     public function searchUsers(Request $request)
     {
         $query = $request->input('q');
 
-        $results = DB::table('users')
-            ->join('user_roles', 'users.id', '=', 'user_roles.user_id')
-            ->join('roles', 'user_roles.role_id', '=', 'roles.role_id')
-            ->select('users.id', 'users.first_name', 'users.last_name', 'roles.role_name')
-            ->when($query, function ($q) use ($query) {
-                $q->where(function ($sub) use ($query) {
-                    $sub->where('users.first_name', 'like', '%' . $query . '%')
-                        ->orWhere('users.last_name', 'like', '%' . $query . '%');
-                });
+        $users = User::where(function ($q) use ($query) {
+            $q->where('first_name', 'like', "%$query%")
+                ->orWhere('last_name', 'like', "%$query%");
+        })
+            ->whereHas('roles', function ($q) {
+                $q->whereIn('role_name', ['Member', 'Trainer']);
             })
+            ->with('roles')
             ->limit(10)
-            ->get();
+            ->get()
+            ->map(function ($user) {
+                return [
+                    'id'         => $user->id,
+                    'first_name' => $user->first_name,
+                    'last_name'  => $user->last_name,
+                    'role_name'  => $user->roles->first()->role_name ?? '',
+                ];
+            });
 
-        return response()->json($results);
+        return response()->json($users);
     }
 
 }

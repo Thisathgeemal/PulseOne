@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Attendance;
 use App\Models\Membership;
 use App\Models\MembershipType;
 use App\Models\Role;
@@ -131,4 +132,25 @@ class ReportController extends Controller
 
         return $pdf->download("WorkoutPlan_Report_{$plan->plan_name}.pdf");
     }
+
+    // Attendance report
+    public function generateAttendanceReport()
+    {
+        $user = Auth::user();
+        $date = now()->format('Y-m-d');
+
+        // Get all attendance records with related user and role info
+        $attendances = Attendance::with('user.roles')
+            ->orderBy('check_in_time', 'desc')
+            ->get();
+
+        // Load the PDF view and pass data
+        $pdf = Pdf::loadView('report.attendanceReport', [
+            'attendances' => $attendances,
+            'date'        => $date,
+        ]);
+
+        return $pdf->download("Attendance_Records_{$date}.pdf");
+    }
+
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\SecuritySettingsController;
 use App\Http\Controllers\DietitianProfileController;
 use App\Http\Controllers\DietPlanController;
+use App\Http\Controllers\DietRequestController;
 use App\Http\Controllers\ExerciseController;
 use App\Http\Controllers\ExerciseLogController;
 use App\Http\Controllers\MemberProfileController;
@@ -87,6 +88,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::post('/role/report', [ReportController::class, 'generateRoleReport'])->name('role.report');
     Route::post('/membership/report', [ReportController::class, 'generateMembershipReport'])->name('membership.report');
     Route::post('/membertype/report', [ReportController::class, 'generateMembertypeReport'])->name('membertype.report');
+    Route::post('/attendance/report', [ReportController::class, 'generateAttendanceReport'])->name('attendance.report');
 
     // User roll Route
     Route::get('/role', [RoleController::class, 'getRoleData'])->name('admin.role');
@@ -110,10 +112,14 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::delete('/profile/remove-image', [AdminProfileController::class, 'removeImage'])->name('admin.profile.removeImage');
     Route::post('/profile/check-password', [AdminProfileController::class, 'checkPassword'])->name('admin.profile.checkPassword');
 
+    // Attendance
+    Route::get('/attendance', [AttendanceController::class, 'viewAll'])->name('admin.attendance');
+    Route::post('/attendance/manual', [AttendanceController::class, 'storeManual'])->name('admin.attendance.manual');
+    Route::get('/admin/qr-display', [AttendanceController::class, 'showQR'])->name('admin.qr.display');
+    Route::get('/admin/search-users', [AttendanceController::class, 'searchUsers'])->name('admin.search.users');
+
     // Static View Routes
-    Route::view('/attendance', 'adminDashboard.attendance')->name('admin.attendance');
     Route::view('/message', 'adminDashboard.message')->name('admin.message');
-    // Route::view('/membertype', 'adminDashboard.membertype')->name('admin.membertype');
     Route::view('/payment', 'adminDashboard.payment')->name('admin.payment');
     Route::view('/feedback', 'adminDashboard.feedback')->name('admin.feedback');
     Route::view('/report', 'adminDashboard.report')->name('admin.report');
@@ -128,8 +134,21 @@ Route::middleware(['auth'])->prefix('dietitian')->group(function () {
     Route::delete('/profile/remove-image', [DietitianProfileController::class, 'removeImage'])->name('dietitian.profile.removeImage');
     Route::post('/profile/check-password', [DietitianProfileController::class, 'checkPassword'])->name('dietitian.profile.checkPassword');
 
+    // // Diet Plan Management
+    // Route::get('/dietplan', [DietPlamController::class, 'index'])->name('dietitian.workoutplan');
+    Route::get('/dietplan/create/{request_id}', [DietPlamController::class, 'create'])->name('dietitian.workoutplan.create');
+    // Route::post('/dietplan/store', [DietPlamController::class, 'store'])->name('dietitian.workoutplan.store');
+
+    // // Diet Plan Download
+    // Route::get('/dietplan/view/{id}', [DietPlamController::class, 'viewPlan'])->name('dietitian.workoutplan.view');
+    // Route::get('/dietplan/progress/{id}', [DietPlamController::class, 'viewProgress'])->name('dietitian.workoutplan.progress');
+    // Route::get('/dietplan/download/{id}', [ReportController::class, 'generateWorkoutReport'])->name('diet.report');
+
+    // Diet Request Management
+    Route::get('/request', [DietRequestController::class, 'index'])->name('dietitian.request');
+    Route::post('/request/update-status/{id}', [DietRequestController::class, 'updateStatus'])->name('dietitian.request.update');
+
     // Static View Routes
-    Route::view('/request', 'dietitianDashboard.request')->name('dietitian.request');
     Route::view('/dietplan', 'dietitianDashboard.dietplan')->name('dietitian.dietplan');
     Route::view('/meals', 'dietitianDashboard.meals')->name('dietitian.meals');
     Route::view('/feedback', 'dietitianDashboard.feedback')->name('dietitian.feedback');
@@ -210,6 +229,7 @@ Route::middleware(['auth'])->prefix('member')->group(function () {
     Route::get('/qr', [AttendanceController::class, 'showMemberScanner'])->name('member.qr');
     Route::post('/checkin', [AttendanceController::class, 'checkin'])->name('checkin');
     Route::get('/attendance', [AttendanceController::class, 'viewMemberAttendance'])->name('member.attendance');
+    Route::post('/attendance/checkout/{id}', [AttendanceController::class, 'checkout'])->name('attendance.checkout');
 
     // Static View Routes
     Route::view('/membership', 'memberDashboard.membership')->name('member.membership');

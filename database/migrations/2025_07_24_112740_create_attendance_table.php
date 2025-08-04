@@ -14,7 +14,6 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->dateTime('check_in_time')->nullable();
             $table->dateTime('check_out_time')->nullable();
-            $table->enum('status', ['IN', 'OUT'])->default('IN');
             $table->string('qr_code')->nullable();
             $table->timestamps();
 

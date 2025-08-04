@@ -65,6 +65,35 @@
 
         </li>
 
+        <!-- QR Dropdown Menu -->
+        <li x-data="{ openQR: {{ request()->routeIs('admin.qr.display') || request()->routeIs('admin.attendance') ? 'true' : 'false' }} }" @click.away="openQR = false">
+            <button @click="openQR = !openQR"
+                    class="w-full flex items-center gap-3 px-3 py-2 rounded-lg focus:outline-none 
+                        {{ request()->routeIs('admin.qr.display') || request()->routeIs('admin.attendance') 
+                            ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                <i class="fas fa-qrcode"></i> QR
+
+                <!-- Toggle icon -->
+                <i :class="openQR ? 'fa fa-chevron-circle-up' : 'fa fa-chevron-circle-down'" class="ml-auto transition-all duration-300"></i>
+            </button>
+
+            <!-- Dropdown items -->
+            <ul x-show="openQR" x-transition x-cloak class="mt-2 space-y-1 pl-6">
+                @foreach ([
+                    'admin.qr.display' => ['icon' => 'fas fa-desktop', 'label' => 'QR Display'],
+                    'admin.attendance' => ['icon' => 'fas fa-calendar-check', 'label' => 'Attendance'],
+                ] as $route => $data)
+                    <li>
+                        <a href="{{ route($route) }}"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg 
+                                {{ request()->routeIs($route) ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                            <i class="{{ $data['icon'] }}"></i> {{ $data['label'] }}
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        </li>
+
         <li x-data="{ openSubscription: {{ request()->routeIs('admin.membership') || request()->routeIs('admin.membertype') ? 'true' : 'false' }} }" @click.away="openSubscription = false">
             <button @click="openSubscription = !openSubscription"
                     class="w-full flex items-center gap-3 px-3 py-2 rounded-lg focus:outline-none 
@@ -95,7 +124,6 @@
 
         <!-- Other Links -->
         @foreach ([
-            'admin.attendance' => ['icon' => 'fas fa-qrcode', 'label' => 'Attendance'],
             'admin.payment' => ['icon' => 'fas fa-credit-card', 'label' => 'Payment'],
             'admin.message' => ['icon' => 'fas fa-comment-alt', 'label' => 'Message'],
             'admin.feedback' => ['icon' => 'fas fa-comment-dots', 'label' => 'Feedback'],

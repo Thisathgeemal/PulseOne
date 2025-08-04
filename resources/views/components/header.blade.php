@@ -8,7 +8,7 @@
 
     <!-- Navigation Links -->
     <ul class="flex space-x-16 text-[16px] font-medium">
-        <li>
+        <li class="mr-0">
             <a href="{{ route('home') }}"
                class="{{ request()->routeIs('home') ? 'text-red-600 font-bold' : 'text-gray-800 hover:text-red-600 transition' }}">
                Home
