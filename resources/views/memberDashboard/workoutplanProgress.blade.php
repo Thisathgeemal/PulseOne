@@ -96,8 +96,8 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6 text-left">
                 <!-- Weekly Photos Count -->
                 <div class="col-span-1 bg-gray-100 p-4 rounded-lg shadow">
-                    <h3 class="text-lg text-center font-semibold mb-2 text-purple-800">Weekly Photos</h3>
-                    <p class="font-semibold text-sm text-center text-purple-700">
+                    <h3 class="text-lg text-center font-semibold mb-2 text-yellow-800">Weekly Photos</h3>
+                    <p class="font-semibold text-sm text-center text-yellow-700">
                         {{ $photoProgress['weeklyPhotoCount'] }} / 2 photos
                     </p>
                 </div>
@@ -110,14 +110,55 @@
 
                 <div class="col-span-1 md:col-span-3 bg-gray-100 p-4 rounded-lg shadow">
                     <div class="w-full bg-gray-300 rounded-full h-4 mt-2">
-                        <div class="bg-purple-500 h-4 rounded-full transition-all duration-300 ease-in-out"
+                        <div class="bg-yellow-500 h-4 rounded-full transition-all duration-300 ease-in-out"
                             style="width: {{ $weeklyPhotoWidth }}%;">
                         </div>
                     </div>
                     <p class="text-sm text-center font-semibold mt-4 text-gray-700">
                         {{ min($weeklyPhotoProgress, 100) }}% completed
                         @if ($weeklyPhotoExtra > 0)
-                            <span class="text-purple-600">+ {{ $weeklyPhotoExtra }}% Keep going! 🔥</span>
+                            <span class="text-yellow-600">+ {{ $weeklyPhotoExtra }}% Keep going! 🔥</span>
+                        @endif
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="monthlyProgressSection" class="hidden bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-center shadow-md mx-auto">
+
+            @php
+                // Extract values from backend variable
+                $monthlyCompletedDays = $monthlyProgressData['completed'] ?? 0;
+                $monthlyProgressPercentage = $monthlyProgressData['percentage'] ?? 0;
+
+                // Limit bar to 100% width
+                $monthlyDisplayedWidth = min($monthlyProgressPercentage, 100);
+
+                // Bonus message if exceeded
+                $monthlyExtra = $monthlyProgressPercentage > 100 ? $monthlyProgressPercentage - 100 : 0;
+            @endphp
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-left">
+                <!-- Days Completed Card -->
+                <div class="col-span-1 bg-gray-100 p-4 rounded-lg shadow">
+                    <h3 class="text-lg text-center font-semibold mb-2 text-purple-800">Number of Days</h3>
+                    <p class="completed-exercise-count font-semibold text-sm text-center text-purple-700">
+                        {{ $monthlyCompletedDays }}
+                    </p>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="col-span-1 md:col-span-3 bg-gray-100 p-4 rounded-lg shadow">
+                    <div class="w-full bg-gray-300 rounded-full h-4 mt-2">
+                        <div id="progress-bar" 
+                            class="bg-purple-500 h-4 rounded-full transition-all duration-300 ease-in-out" 
+                            style="width: {{ $monthlyDisplayedWidth }}%;">
+                        </div>
+                    </div>
+                    <p id="progress-text" class="text-sm text-center font-semibold mt-4 text-gray-700">
+                        {{ $monthlyDisplayedWidth }}% completed
+                        @if ($monthlyExtra > 0)
+                            <span class="text-purple-600">+ {{ $monthlyExtra }}% Exceptional consistency! Keep dominating 🔥</span>
                         @endif
                     </p>
                 </div>
@@ -132,11 +173,14 @@
             <button id="dailyLogBtn" class="bg-blue-100 text-blue-800 font-semibold px-4 py-2 rounded-lg w-48 hover:bg-blue-200 hover:scale-105 transition duration-200 shadow">
                 Daily Exercise Log
             </button>
-            <button id="progressPhotosBtn" class="bg-yellow-100 text-yellow-800 font-semibold px-4 py-2 rounded-lg w-48 hover:bg-yellow-200 hover:scale-105 transition duration-200 shadow">
-                Progress Photos
-            </button>
             <button id="weeklyLogBtn" class="bg-green-100 text-green-800 font-semibold px-4 py-2 rounded-lg w-48 hover:bg-green-200 hover:scale-105 transition duration-200 shadow">
                 Weekly Workout Log
+            </button>
+            <button id="monthlyLogBtn" class="bg-purple-100 text-purple-800 font-semibold px-4 py-2 rounded-lg w-48 hover:bg-purple-300 hover:scale-105 transition duration-200 shadow">
+                Monthly workout Log
+            </button>
+            <button id="progressPhotosBtn" class="bg-yellow-100 text-yellow-800 font-semibold px-4 py-2 rounded-lg w-48 hover:bg-yellow-200 hover:scale-105 transition duration-200 shadow">
+                Progress Photos
             </button>
         </div>
     </div>
@@ -362,6 +406,49 @@
                 @endforeach
             </div>
         </div>
+
+        <div id="monthlyLogSection" class="hidden bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-center shadow-md mx-auto">
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+                <h2 class="text-xl text-gray-800 sm:text-2xl font-bold my-1">
+                    Monthly Workout Log ({{ $startOfMonth->format('M d, Y') }} - {{ $endOfMonth->format('M d, Y') }})
+                </h2>
+            </div>
+
+            <!-- Data Table -->
+            <div class="overflow-x-auto mt-6">
+                <table class="min-w-full bg-white shadow-md rounded-lg border text-base border-gray-200">
+                    <thead class="bg-gray-800 text-white">
+                        <tr>
+                            <th class="py-3 px-4 text-left border-b border-gray-300">No</th>
+                            <th class="py-3 px-4 text-left border-b border-gray-300">Date</th>
+                            <th class="py-3 px-4 text-left border-b border-gray-300">Total Exercises</th>
+                            <th class="py-3 px-4 text-left border-b border-gray-300">Completed Exercises</th>
+                            <th class="py-3 px-4 text-left border-b border-gray-300">Completion Percentage</th>
+                            <th class="py-3 px-4 text-left border-b border-gray-300">Workout Duration (minutes)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($monthlyLogs as $index => $log)
+                            <tr class="hover:bg-gray-100 transition duration-150">
+                                <td class="py-3 px-4 text-left border-b border-gray-200">{{ $index + 1 }}</td>
+                                <td class="py-3 px-4 text-left border-b border-gray-200">{{ \Carbon\Carbon::parse($log->log_date)->format('M d, Y') }}</td>
+                                <td class="py-3 px-4 text-left border-b border-gray-200">{{ $log->total_exercises }}</td>
+                                <td class="py-3 px-4 text-left border-b border-gray-200">{{ $log->completed_exercises }}</td>
+                                <td class="py-3 px-4 text-left border-b border-gray-200">{{ $log->completion_percentage }}%</td>
+                                <td class="py-3 px-4 text-left border-b border-gray-200">{{ $log->workout_duration }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="mt-4">
+                {{ $monthlyLogs->links() }}
+            </div>
+
+        </div>
     </div>
 
     @push('scripts')
@@ -395,19 +482,21 @@
                 const buttons = {
                     dailyLogBtn: 'daily',
                     weeklyLogBtn: 'weekly',
+                    monthlyLogBtn: 'monthly', 
                     progressPhotosBtn: 'progressPhotos',
-                    exerciseTrackBtn: 'exerciseTrack'
                 };
 
                 const progressSections = {
                     daily: document.getElementById('dailyProgressSection'),
                     weekly: document.getElementById('weeklyProgressSection'),
+                    monthly: document.getElementById('monthlyProgressSection'), 
                     progressPhotos: document.getElementById('PhotosTrackSection'),
                 };
 
                 const contentSections = {
                     daily: document.getElementById('dailyLogSection'),
                     weekly: document.getElementById('weeklyLogSection'),
+                    monthly: document.getElementById('monthlyLogSection'), 
                     progressPhotos: document.getElementById('progressPhotosSection'),
                 };
 
@@ -428,6 +517,7 @@
                     });
                 });
             });
+
 
             function openDailyLogModal() {
                 document.getElementById('dailyLogModal').classList.remove('hidden');

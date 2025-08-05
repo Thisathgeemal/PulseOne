@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\WorkoutPlan;
 use App\Models\WorkoutPlanExercise;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -100,26 +101,50 @@ class WorkoutPlanController extends Controller
             return redirect()->back()->with('error', 'No active workout plan found. Start a Workout Plan first.');
         }
 
+        // Daily Log Data
         $dailyData = $this->getDailyLogData($workoutPlan, $userId, $today);
 
+        // Weekly Log Data
         $weeklyLogs = $this->getWeeklyLogData($userId);
 
-        $photos = ProgressPhoto::where('user_id', $userId)->orderBy('photo_date', 'desc')->get();
+        // Monthly Log Data
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $endOfMonth   = Carbon::now()->endOfMonth();
+
+        $monthlyLogs = DailyWorkoutLog::where('member_id', $userId)
+            ->whereBetween('log_date', [$startOfMonth->toDateString(), $endOfMonth->toDateString()])
+            ->orderBy('log_date', 'asc')
+            ->paginate(10);
+
+        $monthlyProgress = $this->getMonthlyProgress($userId);
+
+        // Photos & Photo Progress
+        $photos = ProgressPhoto::where('user_id', $userId)
+            ->orderBy('photo_date', 'desc')
+            ->paginate(8);
 
         $photoProgress = $this->getPhotoProgressData($userId);
 
         return view('memberDashboard.workoutplanProgress', [
-            'workoutPlan'    => $workoutPlan,
-            'exercises'      => $dailyData['exercises'],
-            'todayLogs'      => $dailyData['todayLogs'],
-            'dailyProgress'  => $dailyData['dailyProgress'],
-            'weeklyLogs'     => $weeklyLogs['weeklyLogs'],
-            'startOfWeek'    => $weeklyLogs['startOfWeek'],
-            'endOfWeek'      => $weeklyLogs['endOfWeek'],
-            'weeklyProgress' => $weeklyLogs['weeklyProgress'],
-            'photos'         => $photos,
-            'photoProgress'  => $photoProgress,
+            'workoutPlan'         => $workoutPlan,
+            'exercises'           => $dailyData['exercises'],
+            'todayLogs'           => $dailyData['todayLogs'],
+            'dailyProgress'       => $dailyData['dailyProgress'],
+
+            'weeklyLogs'          => $weeklyLogs['weeklyLogs'],
+            'startOfWeek'         => $weeklyLogs['startOfWeek'],
+            'endOfWeek'           => $weeklyLogs['endOfWeek'],
+            'weeklyProgress'      => $weeklyLogs['weeklyProgress'],
+
+            'monthlyLogs'         => $monthlyLogs,
+            'startOfMonth'        => $startOfMonth,
+            'endOfMonth'          => $endOfMonth,
+            'monthlyProgressData' => $monthlyProgress,
+
+            'photos'              => $photos,
+            'photoProgress'       => $photoProgress,
         ]);
+
     }
 
     // Get daily log data
@@ -261,6 +286,64 @@ class WorkoutPlanController extends Controller
 
         return [
             'completed'  => $actualWorkoutDays,
+            'percentage' => round($percentage, 0),
+        ];
+    }
+
+    public function getMonthlyProgress($userId)
+    {
+        $availableDaysStr = DB::table('requests')
+            ->where('member_id', $userId)
+            ->value('available_days');
+
+        if (! $availableDaysStr) {
+            return [
+                'completed'  => 0,
+                'percentage' => 0,
+            ];
+        }
+
+        // Convert CSV string to array of 3-letter day abbreviations, trimming spaces
+        $preferredWeekdays = array_map('trim', explode(',', $availableDaysStr));
+
+        if (empty($preferredWeekdays)) {
+            return [
+                'completed'  => 0,
+                'percentage' => 0,
+            ];
+        }
+
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $endOfMonth   = Carbon::now()->endOfMonth();
+
+        $period = CarbonPeriod::create($startOfMonth, $endOfMonth);
+
+        $availableWorkoutDays = 0;
+
+        foreach ($period as $date) {
+            // Use 3-letter abbreviation here for matching
+            if (in_array($date->format('D'), $preferredWeekdays)) {
+                $availableWorkoutDays++;
+            }
+        }
+
+        if ($availableWorkoutDays === 0) {
+            return [
+                'completed'  => 0,
+                'percentage' => 0,
+            ];
+        }
+
+        $completedWorkoutDays = DB::table('daily_workout_logs')
+            ->where('member_id', $userId)
+            ->whereBetween('log_date', [$startOfMonth->toDateString(), $endOfMonth->toDateString()])
+            ->distinct()
+            ->count('log_date');
+
+        $percentage = ($completedWorkoutDays / $availableWorkoutDays) * 100;
+
+        return [
+            'completed'  => $completedWorkoutDays,
             'percentage' => round($percentage, 0),
         ];
     }
