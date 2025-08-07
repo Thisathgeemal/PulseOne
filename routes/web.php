@@ -19,6 +19,7 @@ use App\Http\Controllers\TrainerProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkoutPlanController;
 use App\Http\Controllers\WorkoutRequestController;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 
 // Public Pages

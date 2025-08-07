@@ -548,19 +548,31 @@ class WorkoutPlanController extends Controller
         $dailyProgress = $this->getDailyProgress($memberId, $id, $today);
         $weeklyLogData = $this->getWeeklyLogData($memberId);
         $photoProgress = $this->getPhotoProgressData($memberId);
-        $photos        = ProgressPhoto::where('user_id', $memberId)->orderBy('photo_date', 'desc')->get();
-        $member        = User::find($memberId);
+
+        // Monthly Log Data
+        $startOfMonth    = Carbon::now()->startOfMonth();
+        $endOfMonth      = Carbon::now()->endOfMonth();
+        $monthlyProgress = $this->getMonthlyProgress($memberId);
+
+        $photos = ProgressPhoto::where('user_id', $memberId)->orderBy('photo_date', 'desc')->get();
+        $member = User::find($memberId);
 
         return view('trainerDashboard.workoutplan_progress', [
-            'workoutPlan'    => $workoutPlan,
-            'member'         => $member,
-            'dailyProgress'  => $dailyProgress,
-            'weeklyProgress' => $weeklyLogData['weeklyProgress'],
-            'weeklyLogs'     => $weeklyLogData['weeklyLogs'],
-            'startOfWeek'    => $weeklyLogData['startOfWeek'],
-            'endOfWeek'      => $weeklyLogData['endOfWeek'],
-            'photos'         => $photos,
-            'photoProgress'  => $photoProgress,
+            'workoutPlan'         => $workoutPlan,
+            'member'              => $member,
+            'dailyProgress'       => $dailyProgress,
+
+            'weeklyProgress'      => $weeklyLogData['weeklyProgress'],
+            'weeklyLogs'          => $weeklyLogData['weeklyLogs'],
+            'startOfWeek'         => $weeklyLogData['startOfWeek'],
+            'endOfWeek'           => $weeklyLogData['endOfWeek'],
+
+            'startOfMonth'        => $startOfMonth,
+            'endOfMonth'          => $endOfMonth,
+            'monthlyProgressData' => $monthlyProgress,
+
+            'photos'              => $photos,
+            'photoProgress'       => $photoProgress,
         ]);
     }
 

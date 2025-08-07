@@ -9,6 +9,10 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+     <script src="https://kit.fontawesome.com/bc9b460555.js" crossorigin="anonymous"></script>
+
+    <!-- Font Awesome for icons -->
+    <script src="https://kit.fontawesome.com/bc9b460555.js" crossorigin="anonymous"></script>
 
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -30,28 +34,47 @@
 
     <!-- Main Content -->
     <section class="h-[calc(100vh-64px)] bg-cover bg-center flex items-center justify-center min-h-full" style="background-image: url('{{ url('images/gym-red.jpg') }}');">
-        <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+        <div class="w-full max-w-xl p-8 bg-white rounded-lg shadow-md">
             <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">Which dashboard would you like to access?</h2>
             @if(session('user_roles'))
-                <form action="{{ route('selectRole.submit') }}" method="POST" class="flex flex-col gap-4">
+                <form action="{{ route('selectRole.submit') }}" method="POST">
                     @csrf
-                    @foreach (session('user_roles') as $role)
-                        @php
-                            // Map role to color classes
-                            $roleColors = [
-                                'admin' => 'bg-red-600 hover:bg-red-500 focus:ring-red-500',
-                                'trainer' => 'bg-blue-600 hover:bg-blue-500 focus:ring-blue-500',
-                                'dietitian' => 'bg-green-600 hover:bg-green-500 focus:ring-green-500',
-                                'member' => 'bg-orange-500 hover:bg-orange-400 focus:ring-orange-600',
-                            ];
-                            $lowerRole = strtolower($role);
-                            $colorClass = $roleColors[$lowerRole] ?? 'bg-gray-600 hover:bg-gray-500 focus:ring-gray-500'; 
-                        @endphp
-                        <button type="submit" name="selected_role" value="{{ $role }}"
-                                class="w-full px-4 py-2 text-white rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 {{ $colorClass }}">
-                            {{ ucfirst($role) }}
-                        </button>
-                    @endforeach
+                    @php
+                        $icons = [
+                            'admin' => 'fa-solid fa-user-tie',
+                            'trainer' => 'fa-solid fa-dumbbell',
+                            'dietitian' => 'fa-solid fa-apple-whole',
+                            'member' => 'fa-solid fa-user',
+                        ];
+
+                        $labels = [
+                            'admin' => 'Admin',
+                            'trainer' => 'Trainer',
+                            'dietitian' => 'Dietitian',
+                            'member' => 'Member',
+                        ];
+
+                        $userRoles = session('user_roles') ?? [];
+                    @endphp
+
+                    <div class="flex justify-center gap-6 flex-wrap sm:flex-nowrap">
+                        @foreach ($userRoles as $role)
+                            @php
+                                $lowerRole = strtolower($role);
+                                $isActive = session('selected_role') == $role;
+                                $cardClasses = $isActive
+                                    ? 'bg-red-600 text-white scale-105'
+                                    : 'bg-white text-gray-800 border border-red-300 hover:bg-red-50 hover:scale-105';
+                            @endphp
+
+                            <button type="submit" name="selected_role" value="{{ $role }}"
+                                class="w-36 h-36 flex flex-col items-center justify-center gap-3 p-4 rounded-xl shadow-md transition-all duration-300 transform
+                                       focus:outline-none focus:ring-2 focus:ring-offset-2 {{ $cardClasses }}">
+                                <i class="{{ $icons[$lowerRole] ?? 'fa-solid fa-user' }} text-3xl"></i>
+                                <span class="text-sm font-semibold">{{ $labels[$lowerRole] ?? ucfirst($role) }}</span>
+                            </button>
+                        @endforeach
+                    </div>
                 </form>
             @else
                 <div class="text-red-600 text-center">
