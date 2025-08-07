@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Request as DietRequest;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -114,59 +115,23 @@ class DietPlanController extends Controller
             ->with('success', 'Diet plan request submitted successfully.');
     }
 
-    // // Get plan data
-    // public function myPlan()
-    // {
-    //     $user = Auth::user();
+    // Get plan data
+    public function myPlan()
+    {
+        $user = Auth::user();
 
-    //     WorkoutPlan::where('member_id', $user->id)
-    //         ->whereDate('start_date', now()->toDateString())
-    //         ->where('status', 'Pending') // <-- only Pending
-    //         ->update(['status' => 'Active']);
+        return view('memberDashboard.dietplanMyplan');
+    }
 
-    //     $plans = WorkoutPlan::with(['trainer', 'workoutPlanExercises'])
-    //         ->where('member_id', $user->id)
-    //         ->orderBy('start_date', 'desc')
-    //         ->get();
+    // Get Track data
+    public function progressTracking()
+    {
+        $userId = auth()->id();
+        $today  = Carbon::today();
 
-    //     return view('memberDashboard.workoutplanMyplan', compact('plans'));
-    // }
+        return view('memberDashboard.dietplanProgress');
 
-    // // Get Track data
-    // public function progressTracking()
-    // {
-    //     $userId = auth()->id();
-    //     $today  = Carbon::today();
-
-    //     $workoutPlan = WorkoutPlan::where('member_id', $userId)
-    //         ->where('status', 'Active')
-    //         ->first();
-
-    //     if (! $workoutPlan) {
-    //         return redirect()->back()->with('error', 'No active workout plan found. Start a Workout Plan first.');
-    //     }
-
-    //     $dailyData = $this->getDailyLogData($workoutPlan, $userId, $today);
-
-    //     $weeklyLogs = $this->getWeeklyLogData($userId);
-
-    //     $photos = ProgressPhoto::where('user_id', $userId)->orderBy('photo_date', 'desc')->get();
-
-    //     $photoProgress = $this->getPhotoProgressData($userId);
-
-    //     return view('memberDashboard.workoutplanProgress', [
-    //         'workoutPlan'    => $workoutPlan,
-    //         'exercises'      => $dailyData['exercises'],
-    //         'todayLogs'      => $dailyData['todayLogs'],
-    //         'dailyProgress'  => $dailyData['dailyProgress'],
-    //         'weeklyLogs'     => $weeklyLogs['weeklyLogs'],
-    //         'startOfWeek'    => $weeklyLogs['startOfWeek'],
-    //         'endOfWeek'      => $weeklyLogs['endOfWeek'],
-    //         'weeklyProgress' => $weeklyLogs['weeklyProgress'],
-    //         'photos'         => $photos,
-    //         'photoProgress'  => $photoProgress,
-    //     ]);
-    // }
+    }
 
     // -----------------------------Dietitian------------------------------
 }

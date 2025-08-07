@@ -13,6 +13,7 @@ use App\Http\Controllers\ExerciseLogController;
 use App\Http\Controllers\MemberProfileController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\MembershipTypeController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TrainerProfileController;
@@ -84,13 +85,6 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::post('/member/update', [UserController::class, 'updateMember'])->name('member.update');
     Route::post('/member/bulkAction', [UserController::class, 'handleMemberAction'])->name('member.bulkAction');
 
-    // Report Generation Route
-    Route::post('/user/report', [ReportController::class, 'generateUserReport'])->name('user.report');
-    Route::post('/role/report', [ReportController::class, 'generateRoleReport'])->name('role.report');
-    Route::post('/membership/report', [ReportController::class, 'generateMembershipReport'])->name('membership.report');
-    Route::post('/membertype/report', [ReportController::class, 'generateMembertypeReport'])->name('membertype.report');
-    Route::post('/attendance/report', [ReportController::class, 'generateAttendanceReport'])->name('attendance.report');
-
     // User roll Route
     Route::get('/role', [RoleController::class, 'getRoleData'])->name('admin.role');
     Route::post('/role', [RoleController::class, 'createRole'])->name('role.create');
@@ -119,9 +113,19 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/admin/qr-display', [AttendanceController::class, 'showQR'])->name('admin.qr.display');
     Route::get('/admin/search-users', [AttendanceController::class, 'searchUsers'])->name('admin.search.users');
 
+    // Payment Management
+    Route::get('/payment', [PaymentController::class, 'getPaymentData'])->name('admin.payment');
+
+    // Report Generation Route
+    Route::post('/user/report', [ReportController::class, 'generateUserReport'])->name('user.report');
+    Route::post('/role/report', [ReportController::class, 'generateRoleReport'])->name('role.report');
+    Route::post('/membership/report', [ReportController::class, 'generateMembershipReport'])->name('membership.report');
+    Route::post('/membertype/report', [ReportController::class, 'generateMembertypeReport'])->name('membertype.report');
+    Route::post('/attendance/report', [ReportController::class, 'generateAttendanceReport'])->name('attendance.report');
+    Route::post('/payment/report', [ReportController::class, 'generatePaymentReport'])->name('payment.report');
+
     // Static View Routes
     Route::view('/message', 'adminDashboard.message')->name('admin.message');
-    Route::view('/payment', 'adminDashboard.payment')->name('admin.payment');
     Route::view('/feedback', 'adminDashboard.feedback')->name('admin.feedback');
     Route::view('/report', 'adminDashboard.report')->name('admin.report');
 });

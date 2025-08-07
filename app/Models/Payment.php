@@ -34,4 +34,9 @@ class Payment extends Model
     {
         return $this->hasOne(Membership::class);
     }
+
+    public function membershipType()
+    {
+        return $this->belongsTo(MembershipType::class, 'type_id', 'type_id');
+    }
 }

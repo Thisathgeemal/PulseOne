@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Attendance;
 use App\Models\Membership;
 use App\Models\MembershipType;
+use App\Models\Payment;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\WorkoutPlan;
@@ -153,4 +154,26 @@ class ReportController extends Controller
         return $pdf->download("Attendance_Records_{$date}.pdf");
     }
 
+    // Payment report
+    public function generatePaymentReport(Request $request)
+    {
+        $datetimeInput = $request->input('datetime');
+
+        if (! $datetimeInput) {
+            abort(400, 'Missing required parameters.');
+        }
+
+        $datetime      = Carbon::parse($request->input('datetime'));
+        $formattedDate = $datetime->format('Y-m-d');
+
+        $payments = Payment::with(['user', 'membershipType'])
+            ->get();
+
+        $pdf = Pdf::loadView('report.paymentReport', [
+            'formattedDate' => $formattedDate,
+            'payments'      => $payments,
+        ]);
+
+        return $pdf->download("Payment_Report.pdf");
+    }
 }

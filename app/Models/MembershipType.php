@@ -26,4 +26,9 @@ class MembershipType extends Model
         return $this->hasMany(Membership::class, 'type_id', 'type_id');
     }
 
+    public function payments()
+    {
+        return $this->hasMany(Payment::class, 'type_id', 'type_id');
+    }
+
 }
