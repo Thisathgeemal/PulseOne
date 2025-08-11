@@ -98,7 +98,10 @@
                                 <td class="py-3 text-left px-4 border-b border-gray-200">{{ \Carbon\Carbon::parse($membership->start_date)->format('Y-m-d') }}</td>
                                 <td class="py-3 text-left px-4 border-b border-gray-200">{{ \Carbon\Carbon::parse($membership->end_date)->format('Y-m-d') }}</td>
                                 <td class="py-3 text-left px-4 border-b border-gray-200">
-                                    <span class="{{ $membership->status === 'Active' ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold' }}">
+                                    <span class="{{ 
+                                        $membership->status === 'Active' ? 'text-green-600 font-semibold' : 
+                                        ($membership->status === 'Pending' ? 'text-yellow-600 font-semibold' : 'text-red-600 font-semibold') 
+                                    }}">
                                         {{ $membership->status }}
                                     </span>
                                 </td>

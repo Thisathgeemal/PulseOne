@@ -7,6 +7,7 @@ use App\Models\Membership;
 use App\Models\MembershipType;
 use App\Models\Payment;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -76,31 +77,36 @@ class MembershipController extends Controller
                 return back()->with('error', 'The selected user is not assigned the Member role.');
             }
 
-            // Check for active membership
-            $hasActiveMembership = Membership::where('user_id', $member->id)
-                ->where('status', 'Active')
-                ->exists();
-
-            if ($hasActiveMembership) {
-                return back()->with('error', 'The user already has an active membership.');
-            }
-
             $membershipType = MembershipType::find($request->membership_type);
             if (! $membershipType) {
                 return back()->with('error', 'Invalid membership type selected.');
             }
 
-            DB::beginTransaction();
+            // Check for active membership
+            $activeMembership = Membership::where('user_id', $member->id)
+                ->where('status', 'Active')
+                ->orderByDesc('end_date')
+                ->first();
 
-            $startDate = now();
-            $endDate   = $startDate->copy()->addDays($membershipType->duration);
-            $method    = 'Cash';
+            if ($activeMembership) {
+                $startDate = $activeMembership->end_date;
+                $status    = 'Pending';
+            } else {
+                $startDate = now();
+                $status    = 'Active';
+            }
+
+            $endDate = Carbon::parse($startDate)->addDays($membershipType->duration);
+            $method  = 'Cash';
+
+            DB::beginTransaction();
 
             Membership::create([
                 'user_id'    => $member->id,
                 'type_id'    => $membershipType->type_id,
                 'start_date' => $startDate,
                 'end_date'   => $endDate,
+                'status'     => $status,
             ]);
 
             Payment::create([

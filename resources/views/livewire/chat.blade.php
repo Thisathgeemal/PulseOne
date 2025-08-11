@@ -79,9 +79,18 @@
                     class="flex items-center gap-3 p-4 cursor-pointer hover:bg-blue-100 transition rounded-r-lg
                     {{ $selectedUser && $selectedUser->id === $user->id ? 'bg-blue-50' : '' }}"
                 >
-                    <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 font-semibold text-lg select-none">
-                    {{ strtoupper(substr($user->first_name, 0, 1)) }}
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center select-none overflow-hidden">
+                        @if(!empty($user->profile_image)) 
+                            <!-- Show profile_image -->
+                            <img src="{{ asset($user->profile_image) }}?v={{ time() }}" alt="{{ $user->first_name }}" class="w-full h-full object-cover" />
+                        @else
+                            <!-- Show first letter fallback -->
+                            <div class="bg-gray-300 text-gray-600 font-semibold text-lg flex items-center justify-center w-full h-full">
+                                {{ strtoupper(substr($user->first_name, 0, 1)) }}
+                            </div>
+                        @endif
                     </div>
+
 
                     <div class="flex flex-col truncate">
                         <span class="text-gray-900 font-medium truncate text-left">

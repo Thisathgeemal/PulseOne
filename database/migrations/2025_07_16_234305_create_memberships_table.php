@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('type_id')->index();
             $table->date('start_date');
             $table->date('end_date')->nullable();
-            $table->enum('status', ['Active', 'Expired', 'Cancelled'])->default('Active');
+            $table->enum('status', ['Pending', 'Active', 'Expired', 'Cancelled'])->default('Active');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
