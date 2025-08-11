@@ -13,7 +13,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Alpine.js -->
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script> --}}
 
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
@@ -28,6 +28,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     {{-- <script src="https://cdn.tailwindcss.com"></script> --}}
+
+    @livewireStyles
 
 </head>
 <body class="bg-gray-100 text-gray-900">
@@ -44,16 +46,14 @@
             <!-- Page Content -->
             <main class="p-6">
                 @yield('content')
+                
             </main>
         </div>
     </div>
-    @stack('scripts')
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    </script>
+    @livewireScripts
+
+    @stack('scripts')
 
 </body>
 </html>

@@ -116,4 +116,13 @@ class User extends Authenticatable
         return $this->hasMany(DailyWorkoutLog::class, 'member_id');
     }
 
+    public function chatMessagesSent()
+    {
+        return $this->hasMany(ChatMessage::class, 'sender_id');
+    }
+
+    public function chatMessagesReceived()
+    {
+        return $this->hasMany(ChatMessage::class, 'receiver_id');
+    }
 }

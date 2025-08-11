@@ -12,8 +12,8 @@
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Alpine.js -->
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    {{-- <!-- Alpine.js -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script> --}}
 
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
@@ -53,6 +53,8 @@
     
     {{-- <script src="https://cdn.tailwindcss.com"></script> --}}
 
+    @livewireStyles
+
 </head>
 <body class="bg-gray-100 text-gray-900">
 
@@ -71,6 +73,8 @@
             </main>
         </div>
     </div>
+
+    @livewireScripts
     @stack('scripts')
 
     <script>

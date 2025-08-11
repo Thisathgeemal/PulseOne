@@ -106,6 +106,7 @@ class LoginController extends Controller
     protected function handleRoleRedirect(array $roles)
     {
         if (count($roles) == 1) {
+            session(['active_role' => $roles[0]]);
             return redirect()->route($roles[0] . '.dashboard');
         }
 
@@ -133,6 +134,7 @@ class LoginController extends Controller
             return back()->with(['error' => 'Selected role is not active.']);
         }
 
+        session(['active_role' => $selectedRole]);
         return redirect()->route($selectedRole . '.dashboard');
     }
 
