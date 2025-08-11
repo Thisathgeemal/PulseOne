@@ -124,8 +124,10 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::post('/attendance/report', [ReportController::class, 'generateAttendanceReport'])->name('attendance.report');
     Route::post('/payment/report', [ReportController::class, 'generatePaymentReport'])->name('payment.report');
 
-    // Static View Routes
+    // Chat Routes
     Route::view('/message', 'adminDashboard.message')->name('admin.message');
+
+    // Static View Routes
     Route::view('/feedback', 'adminDashboard.feedback')->name('admin.feedback');
     Route::view('/report', 'adminDashboard.report')->name('admin.report');
 });
@@ -157,6 +159,8 @@ Route::middleware(['auth'])->prefix('dietitian')->group(function () {
     Route::view('/dietplan', 'dietitianDashboard.dietplan')->name('dietitian.dietplan');
     Route::view('/meals', 'dietitianDashboard.meals')->name('dietitian.meals');
     Route::view('/feedback', 'dietitianDashboard.feedback')->name('dietitian.feedback');
+
+    // Chat Routes
     Route::view('/message', 'dietitianDashboard.message')->name('dietitian.message');
 
 });
@@ -194,9 +198,11 @@ Route::middleware(['auth'])->prefix('trainer')->group(function () {
     Route::post('/checkin', [AttendanceController::class, 'checkin'])->name('trainer.checkin');
     Route::get('/attendance', [AttendanceController::class, 'viewTrainerAttendance'])->name('trainer.attendance');
 
+    // Chat Routes
+    Route::view('/message', 'trainerDashboard.message')->name('trainer.message');
+
     // Static View Routes
     Route::view('/booking', 'trainerDashboard.booking')->name('trainer.booking');
-    Route::view('/message', 'trainerDashboard.message')->name('trainer.message');
     Route::view('/feedback', 'trainerDashboard.feedback')->name('trainer.feedback');
 
 });
@@ -231,17 +237,23 @@ Route::middleware(['auth'])->prefix('member')->group(function () {
         Route::get('progress', [DietPlanController::class, 'progressTracking'])->name('progress');
     });
 
+    // Attendance routes
     Route::get('/qr', [AttendanceController::class, 'showMemberScanner'])->name('member.qr');
     Route::post('/checkin', [AttendanceController::class, 'checkin'])->name('checkin');
     Route::get('/attendance', [AttendanceController::class, 'viewMemberAttendance'])->name('member.attendance');
     Route::post('/attendance/checkout/{id}', [AttendanceController::class, 'checkout'])->name('attendance.checkout');
 
+    // Payment Management
+    Route::get('/payment', [PaymentController::class, 'getMemberPaymentData'])->name('member.payment');
+    Route::post('/payment/report', [ReportController::class, 'generateMemberPaymentReport'])->name('member.payment.report');
+
+    // Chat Routes
+    Route::view('/message', 'memberDashboard.message')->name('member.message');
+
     // Static View Routes
     Route::view('/membership', 'memberDashboard.membership')->name('member.membership');
     Route::view('/booking', 'memberDashboard.booking')->name('member.booking');
-    Route::view('/payment', 'memberDashboard.payment')->name('member.payment');
     Route::view('/feedback', 'memberDashboard.feedback')->name('member.feedback');
-    Route::view('/message', 'memberDashboard.message')->name('member.message');
     Route::view('/report', 'memberDashboard.report')->name('member.report');
     Route::view('/leaderboard', 'memberDashboard.leaderboard')->name('member.leaderboard');
 

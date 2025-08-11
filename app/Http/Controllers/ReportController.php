@@ -176,4 +176,29 @@ class ReportController extends Controller
 
         return $pdf->download("Payment_Report.pdf");
     }
+
+    // Member payment report for logged-in user
+    public function generateMemberPaymentReport(Request $request)
+    {
+        $datetimeInput = $request->input('datetime');
+
+        if (! $datetimeInput) {
+            abort(400, 'Missing required parameters.');
+        }
+
+        $datetime      = Carbon::parse($request->input('datetime'));
+        $formattedDate = $datetime->format('Y-m-d');
+        $userId        = Auth::id();
+
+        $payments = Payment::with(['user', 'membershipType'])
+            ->where('user_id', $userId)
+            ->get();
+
+        $pdf = Pdf::loadView('report.memberPaymentReport', [
+            'formattedDate' => $formattedDate,
+            'payments'      => $payments,
+        ]);
+
+        return $pdf->download("Member_Payment_Report.pdf");
+    }
 }

@@ -3,10 +3,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Payment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
-    // display payment details
+    // display payment details for admin
     public function getPaymentData(Request $request)
     {
         $search = $request->input('search');
@@ -31,6 +32,31 @@ class PaymentController extends Controller
             ->paginate(10);
 
         return view('adminDashboard.payment', compact('payments'));
+    }
+
+    // display payment details for relevant member
+    public function getMemberPaymentData(Request $request)
+    {
+        $search = $request->input('search');
+        $date   = $request->input('date');
+        $userId = Auth::id();
+
+        $payments = Payment::with(['membershipType'])
+            ->where('user_id', $userId)
+            ->when($date, function ($query) use ($date) {
+                $query->whereDate('payment_date', $date);
+            })
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('payment_method', 'like', "%$search%")
+                        ->orWhereHas('membershipType', function ($subQ) use ($search) {
+                            $subQ->where('type_name', 'like', "%$search%");
+                        });
+                });
+            })
+            ->paginate(10);
+
+        return view('memberDashboard.payment', compact('payments'));
     }
 
 }
