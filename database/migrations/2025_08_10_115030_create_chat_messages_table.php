@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('sender_id');
             $table->unsignedBigInteger('receiver_id');
             $table->text('message');
+            $table->boolean('is_read')->default(false);
             $table->timestamp('deleted_by_sender_at')->nullable(); 
             $table->timestamp('deleted_by_receiver_at')->nullable();
             $table->timestamps();

@@ -21,6 +21,7 @@ class Chat extends Component
     public $searchResults = [];
     protected $listeners  = ['deleteMessage'];
     public $errorMessage;
+    public $unreadCounts = [];
 
     // user list
     public function mount()
@@ -71,6 +72,16 @@ class Chat extends Component
             $user->lastMessageTime = $lastMessage ? $lastMessage->created_at : null;
         }
 
+        $counts = DB::table('chat_messages')
+            ->select('sender_id', DB::raw('count(*) as unread_count'))
+            ->where('receiver_id', $loginId)
+            ->where('is_read', false)
+            ->groupBy('sender_id')
+            ->pluck('unread_count', 'sender_id')
+            ->toArray();
+
+        $this->unreadCounts = $counts;
+
         $this->users = $this->users->sortByDesc(function ($user) {
             return $user->lastMessageTime ?? now();
         })->values();
@@ -104,6 +115,13 @@ class Chat extends Component
     public function selectUser($userId)
     {
         $this->selectedUser = User::find($userId);
+
+        DB::table('chat_messages')
+            ->where('sender_id', $userId)
+            ->where('receiver_id', auth()->id())
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+
         $this->loadMessages();
         $this->showNewChat = false;
     }
@@ -144,6 +162,12 @@ class Chat extends Component
             'message'     => $this->newMessage,
         ]);
 
+        DB::table('chat_messages')
+            ->where('sender_id', $this->selectedUser->id)
+            ->where('receiver_id', auth()->id())
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+
         $this->messages->push($chatMessage);
         $this->newMessage   = '';
         $this->errorMessage = null;
@@ -161,6 +185,10 @@ class Chat extends Component
     // New chat message notification
     public function newChatMessageNotification($message)
     {
+        if (! $this->selectedUser || ! isset($message['sender_id'])) {
+            return;
+        }
+
         if ($message['sender_id'] === $this->selectedUser->id) {
             $messageObject = ChatMessage::find($message['id']);
             $this->messages->push($messageObject);

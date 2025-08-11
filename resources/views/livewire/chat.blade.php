@@ -82,6 +82,7 @@
                     <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 font-semibold text-lg select-none">
                     {{ strtoupper(substr($user->first_name, 0, 1)) }}
                     </div>
+
                     <div class="flex flex-col truncate">
                         <span class="text-gray-900 font-medium truncate text-left">
                             {{ $user->first_name }} {{ $user->last_name }}
@@ -90,6 +91,12 @@
                             {{ $user->lastMessageTime ? \Carbon\Carbon::parse($user->lastMessageTime)->format('h:i A') : '' }}
                         </span>
                     </div>
+                    
+                    @if(!empty($unreadCounts[$user->id]) && $unreadCounts[$user->id] > 0)
+                        <span class="ml-auto bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded-full select-none">
+                            {{ $unreadCounts[$user->id] }}
+                        </span>
+                    @endif
                 </div>
                 @endforeach
             </div>
@@ -156,7 +163,7 @@
             @endif
 
             <!-- Messages -->
-            <div id="messagesContainer" class="flex-1 w-full p-6 overflow-y-auto space-y-4 bg-gray-50" style="scroll-behavior: smooth;">
+            <div id="chatInbox" class="flex-1 w-full p-6 overflow-y-auto space-y-4 bg-gray-50" style="scroll-behavior: smooth;">
                 @foreach($messages as $message)
                     <div wire:poll.60s
                         class="flex {{ $message->sender_id === Auth::id() ? 'justify-end' : 'justify-start' }}" 

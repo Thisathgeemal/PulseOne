@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
                 'first_name'    => 'PulseOne',
                 'last_name'     => 'Admin',
                 'email'         => 'pulseone.app@gmail.com',
-                'password'      => Hash::make('PulseOne'),
+                'password'      => Hash::make('pulseone'),
                 'mobile_number' => '0812345678',
                 'is_active'     => true,
                 'created_at'    => now(),

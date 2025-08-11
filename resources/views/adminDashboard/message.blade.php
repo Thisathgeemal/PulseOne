@@ -27,4 +27,13 @@
         }
     </style>
 
+    @push('scripts')
+    <script>
+        document.addEventListener('livewire:update', function () {
+            const targetDiv = document.getElementById("chatInbox");
+            targetDiv.scrollTop = targetDiv.scrollHeight;
+        });
+    </script>
+    @endpush
+
 @endsection
