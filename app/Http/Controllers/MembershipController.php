@@ -82,6 +82,14 @@ class MembershipController extends Controller
                 return back()->with('error', 'Invalid membership type selected.');
             }
 
+            $pendingMembership = Membership::where('user_id', $user->id)
+                ->where('status', 'Pending')
+                ->first();
+
+            if ($pendingMembership) {
+                return back()->with('error', 'You already have a pending membership. Please wait until it becomes active.');
+            }
+
             // Check for active membership
             $activeMembership = Membership::where('user_id', $member->id)
                 ->where('status', 'Active')
@@ -202,6 +210,74 @@ class MembershipController extends Controller
     // buy membership
     public function buyMembership(Request $request)
     {
+        $request->validate([
+            'membership_type'  => 'required|exists:membership_types,type_id',
+            'membership_price' => 'required|numeric',
+            'card_type'        => 'required|string',
+            'card_name'        => 'required|string|max:255',
+            'card_number'      => 'required|digits:16',
+            'cvv'              => 'required|digits:3',
+            'expiry_month'     => 'required|digits:2',
+            'expiry_year'      => 'required|digits:4',
+        ]);
 
+        $user = auth()->user();
+
+        $membershipType = MembershipType::find($request->membership_type);
+        if (! $membershipType) {
+            return back()->with('error', 'Invalid membership type selected.');
+        }
+
+        $pendingMembership = Membership::where('user_id', $user->id)
+            ->where('status', 'Pending')
+            ->first();
+
+        if ($pendingMembership) {
+            return back()->with('error', 'You already have a pending membership. Please wait until it becomes active.');
+        }
+
+        // Check for existing active membership
+        $activeMembership = Membership::where('user_id', $user->id)
+            ->where('status', 'Active')
+            ->orderByDesc('end_date')
+            ->first();
+
+        if ($activeMembership) {
+            $startDate = $activeMembership->end_date;
+            $status    = 'Pending';
+        } else {
+            $startDate = now();
+            $status    = 'Active';
+        }
+
+        $endDate = Carbon::parse($startDate)->addDays($membershipType->duration);
+
+        DB::beginTransaction();
+
+        try {
+            $membership = Membership::create([
+                'user_id'    => $user->id,
+                'type_id'    => $membershipType->type_id,
+                'start_date' => $startDate,
+                'end_date'   => $endDate,
+                'status'     => $status,
+            ]);
+
+            Payment::create([
+                'user_id'        => $user->id,
+                'type_id'        => $membershipType->type_id,
+                'payment_method' => 'Card',
+                'amount'         => $membershipType->price,
+                'payment_date'   => now(),
+            ]);
+
+            Mail::to($user->email)->send(new MembershipConfirmationMail($user, $membershipType));
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Membership purchased successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'An error occurred while purchasing membership: ' . $e->getMessage());
+        }
     }
 }

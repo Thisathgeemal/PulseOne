@@ -20,7 +20,7 @@ class MembershipTypeController extends Controller
                 ->orWhere('discount', 'like', "%{$search}%")
                 ->orWhere('price', 'like', "%{$search}%");
         })
-            ->orderByDesc('created_at')
+            ->orderBy('price', 'asc')
             ->paginate(5);
 
         return view('adminDashboard.membertype', compact('membershipType'));
