@@ -18,8 +18,6 @@
                     <tr>
                         <th class="py-3 px-4 text-left border-b border-gray-300">Dietitian Name</th>
                         <th class="py-3 px-4 text-left border-b border-gray-300">Plan Description</th>
-                        <th class="py-3 px-4 text-left border-b border-gray-300">Weight</th>
-                        <th class="py-3 px-4 text-left border-b border-gray-300">Height</th>
                         <th class="py-3 px-4 text-left border-b border-gray-300">Target Weight</th>
                         <th class="py-3 px-4 text-left border-b border-gray-300">Preferred Start Date</th>
                         <th class="py-3 px-4 text-left border-b border-gray-300">Status</th>
@@ -36,12 +34,6 @@
                             </td>
                             <td class="py-3 px-4 text-left border-b border-gray-200">
                                 {{ $request->weight ?? '-' }}
-                            </td>
-                            <td class="py-3 px-4 text-left border-b border-gray-200">
-                                {{ $request->height ?? '-' }}
-                            </td>
-                            <td class="py-3 px-4 text-left border-b border-gray-200">
-                                {{ $request->target_weight ?? '-' }}
                             </td>
                              <td class="py-3 px-4 text-left border-b border-gray-200">
                                 {{ $request->preferred_start_date ? \Carbon\Carbon::parse($request->preferred_start_date)->format('d M Y') : '-' }}
@@ -100,20 +92,6 @@
                             required
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                         />
-                    </div>
-
-                    <!-- Height & Weight -->
-                    <div class="flex gap-3">
-                        <div class="w-1/2 text-left">
-                            <label class="block text-sm font-medium text-gray-700">Height (cm)</label>
-                            <input type="number" name="height" placeholder="e.g. 170"
-                                class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
-                        </div>
-                        <div class="w-1/2 text-left">
-                            <label class="block text-sm font-medium text-gray-700">Weight (kg)</label>
-                            <input type="number" name="weight" placeholder="e.g. 65"
-                                class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
-                        </div>
                     </div>
 
                     <!-- Target Weight -->

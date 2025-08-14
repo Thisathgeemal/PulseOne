@@ -174,7 +174,7 @@
             <!-- Messages -->
             <div id="chatInbox" class="flex-1 w-full p-6 overflow-y-auto space-y-4 bg-gray-50" style="scroll-behavior: smooth;">
                 @foreach($messages as $message)
-                    <div wire:poll.60s
+                    <div wire:poll.2s
                         class="flex {{ $message->sender_id === Auth::id() ? 'justify-end' : 'justify-start' }}" 
                         wire:key="message-{{ $message->id }}"
                         @if($message->sender_id === Auth::id())
@@ -184,9 +184,28 @@
                     >
                         <div class="max-w-[80%] px-5 py-2 rounded-3xl {{ $message->sender_id === Auth::id() ? 'bg-blue-600 text-white shadow-lg' : 'bg-gray-200 text-gray-800 shadow-sm' }}">
                             {{ $message->message }}
-                            <div class="text-xs mt-1 text-gray-400 {{ $message->sender_id === Auth::id() ? 'text-right' : 'text-left' }}">
-                                {{ $message->created_at->format('H:i') }}
-                            </div>
+                            
+                            {{-- Time + Tick container --}}
+                            @if($message->sender_id === Auth::id())
+                                <div class="flex justify-end items-center mt-1 space-x-1 text-xs">
+                                    <span>{{ $message->created_at->format('H:i') }}</span>
+                                    
+                                    <!-- Tick SVG always visible -->
+                                    <svg class="w-6 h-4 {{ $message->is_read ? 'text-white' : 'text-white/70' }}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 16 16">
+                                        <!-- First tick -->
+                                        <path d="M2 8l3 3 7-7" />
+                                        <!-- Second tick slightly offset -->
+                                        @if($message->is_read)
+                                            <path d="M8 8l3 3 7-7" />
+                                        @endif
+                                    </svg>
+                                </div>
+                            @else
+                                {{-- For received messages, just show time --}}
+                                <div class="text-xs mt-1 text-gray-400 text-left">
+                                    {{ $message->created_at->format('H:i') }}
+                                </div>
+                            @endif
                         </div>
                     </div>
                 @endforeach

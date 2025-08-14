@@ -16,7 +16,7 @@ class UpdateMembershipStatuses extends Command
 
         // Expire memberships
         Membership::where('status', 'Active')
-            ->whereDate('end_date', '<', $today)
+            ->whereDate('end_date', '<=', $today)
             ->update(['status' => 'Expired']);
 
         // Activate pending memberships

@@ -92,8 +92,6 @@ class DietPlanController extends Controller
         $request->validate([
             'dietitian_id'         => 'required|exists:users,id',
             'plan_dis'             => 'required|string|max:255',
-            'height'               => 'nullable|numeric|min:0',
-            'weight'               => 'nullable|numeric|min:0',
             'target_weight'        => 'nullable|numeric|min:0',
             'preferred_start_date' => 'nullable|date|after_or_equal:today',
         ]);
@@ -102,8 +100,6 @@ class DietPlanController extends Controller
             'member_id'            => Auth::id(),
             'dietitian_id'         => $request->dietitian_id,
             'description'          => $request->plan_dis,
-            'height'               => $request->height,
-            'weight'               => $request->weight,
             'target_weight'        => $request->target_weight,
             'preferred_start_date' => $request->preferred_start_date,
             'type'                 => 'Diet',

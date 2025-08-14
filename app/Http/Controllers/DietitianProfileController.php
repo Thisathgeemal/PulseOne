@@ -19,6 +19,8 @@ class DietitianProfileController extends Controller
             'mobile_number' => 'nullable|string|max:15',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'password'      => 'nullable|string|confirmed|min:6',
+            'address'       => 'nullable|string|max:255',
+            'dob'           => 'nullable|date',
         ]);
 
         // Upload new profile image
@@ -43,6 +45,8 @@ class DietitianProfileController extends Controller
         $user->first_name    = $request->first_name;
         $user->last_name     = $request->last_name;
         $user->mobile_number = $request->mobile_number;
+        $user->address       = $request->address;
+        $user->dob           = $request->dob;
 
         // Update password if provided
         if ($request->filled('password')) {

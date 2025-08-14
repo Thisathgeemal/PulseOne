@@ -250,8 +250,12 @@ Route::middleware(['auth'])->prefix('member')->group(function () {
     // Chat Routes
     Route::view('/message', 'memberDashboard.message')->name('member.message');
 
+    // Membership Route
+    Route::get('/membership', [MembershipController::class, 'getLoggedInMembershipData'])->name('member.membership');
+    Route::post('/membership', [MembershipController::class, 'buyMembership'])->name('member.membership.buy');
+    Route::post('/membership/report', [ReportController::class, 'generateMemberMembershipReport'])->name('member.membership.report');
+
     // Static View Routes
-    Route::view('/membership', 'memberDashboard.membership')->name('member.membership');
     Route::view('/booking', 'memberDashboard.booking')->name('member.booking');
     Route::view('/feedback', 'memberDashboard.feedback')->name('member.feedback');
     Route::view('/report', 'memberDashboard.report')->name('member.report');

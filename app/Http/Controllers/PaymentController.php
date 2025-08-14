@@ -29,7 +29,8 @@ class PaymentController extends Controller
                         });
                 });
             })
-            ->paginate(10);
+            ->orderBy('payment_date', 'desc')
+            ->paginate(7);
 
         return view('adminDashboard.payment', compact('payments'));
     }
@@ -54,7 +55,8 @@ class PaymentController extends Controller
                         });
                 });
             })
-            ->paginate(10);
+            ->orderBy('payment_date', 'desc')
+            ->paginate(7);
 
         return view('memberDashboard.payment', compact('payments'));
     }

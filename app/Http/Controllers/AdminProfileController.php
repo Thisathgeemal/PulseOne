@@ -19,6 +19,8 @@ class AdminProfileController extends Controller
             'mobile_number' => 'nullable|string|max:15',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'password'      => 'nullable|string|confirmed|min:6',
+            'address'       => 'nullable|string|max:255',
+            'dob'           => 'nullable|date',
         ]);
 
         // Upload new profile image
@@ -44,6 +46,8 @@ class AdminProfileController extends Controller
         $user->first_name    = $request->first_name;
         $user->last_name     = $request->last_name;
         $user->mobile_number = $request->mobile_number;
+        $user->address       = $request->address;
+        $user->dob           = $request->dob;
 
         // Update password if filled
         if ($request->filled('password')) {
@@ -57,7 +61,6 @@ class AdminProfileController extends Controller
     }
 
     // Remove the admin's profile image.
-
     public function removeImage()
     {
         $user = Auth::user();

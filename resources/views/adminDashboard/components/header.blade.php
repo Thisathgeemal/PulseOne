@@ -183,8 +183,21 @@
                     </div>
                 </div>
 
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Address</label>
+                        <input type="text" name="address" value="{{ Auth::user()->address }}"
+                            class="w-full mt-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-red-500 focus:border-red-500">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">DOB</label>
+                        <input type="date" name="dob" value="{{ Auth::user()->dob ? Auth::user()->dob->format('Y-m-d') : '' }}"
+                            class="w-full mt-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-red-500 focus:border-red-500">
+                    </div>
+                </div>
+
                 <!-- Password Update -->
-                <div class="pt-6">
+                <div class="pt-2">
                     <div class="flex justify-between items-center mb-1">
                         <label for="current_password" class="text-sm font-medium text-gray-700">Change Password</label>
                         <button type="button" id="verifyPasswordBtn" class="text-sm text-green-600 hover:underline">Verify</button>
@@ -212,7 +225,7 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-4 pt-2">
+                <div class="flex justify-end gap-4 pt-1">
                     <button type="submit" class="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600">Save</button>
                 </div>
             </form>

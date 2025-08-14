@@ -18,6 +18,8 @@ class TrainerProfileController extends Controller
             'mobile_number' => 'nullable|string|max:15',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'password'      => 'nullable|string|confirmed|min:6',
+            'address'       => 'nullable|string|max:255',
+            'dob'           => 'nullable|date',
         ]);
 
         if ($request->hasFile('profile_image')) {
@@ -43,6 +45,8 @@ class TrainerProfileController extends Controller
         $trainer->first_name    = $request->first_name;
         $trainer->last_name     = $request->last_name;
         $trainer->mobile_number = $request->mobile_number;
+        $trainer->address       = $request->address;
+        $trainer->dob           = $request->dob;
 
         if ($request->filled('password')) {
             $trainer->password = Hash::make($request->password);

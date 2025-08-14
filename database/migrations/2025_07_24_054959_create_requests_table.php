@@ -16,8 +16,6 @@ return new class extends Migration
             $table->unsignedBigInteger('dietitian_id')->nullable()->index();
             $table->string('description')->nullable();
             $table->enum('plan_type', ['Basic', 'Intermediate', 'Advanced']);
-            $table->float('height')->nullable();
-            $table->float('weight')->nullable();
             $table->float('target_weight')->nullable();
             $table->date('preferred_start_date')->nullable();
             $table->string('available_days')->nullable();

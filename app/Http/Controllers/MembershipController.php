@@ -114,6 +114,7 @@ class MembershipController extends Controller
                 'type_id'        => $membershipType->type_id,
                 'payment_method' => $method,
                 'amount'         => $membershipType->price,
+                'payment_date'   => now(),
             ]);
 
             Mail::to($member->email)->send(new MembershipConfirmationMail($member, $membershipType));
@@ -169,4 +170,38 @@ class MembershipController extends Controller
         }
     }
 
+    // get logged in membership data
+    public function getLoggedInMembershipData(Request $request)
+    {
+        $userId    = auth()->id(); // get the logged-in user's ID
+        $search    = $request->input('search');
+        $startDate = $request->input('start_date');
+        $endDate   = $request->input('end_date');
+
+        $memberships = Membership::with('membershipType')
+            ->where('user_id', $userId) // filter by logged-in user
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('membershipType', function ($typeQuery) use ($search) {
+                        $typeQuery->where('type_name', 'like', "%{$search}%");
+                    })->orWhere('status', 'like', "%{$search}%");
+                });
+            })
+            ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('start_date', [$startDate, $endDate])
+                    ->orWhereBetween('end_date', [$startDate, $endDate]);
+            })
+            ->orderByDesc('created_at')
+            ->paginate(5);
+
+        $membershipType = MembershipType::all();
+
+        return view('memberDashboard.membership', compact('memberships', 'membershipType'));
+    }
+
+    // buy membership
+    public function buyMembership(Request $request)
+    {
+
+    }
 }
