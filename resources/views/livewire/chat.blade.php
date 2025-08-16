@@ -117,8 +117,16 @@
             @if($selectedUser)
                 <div class="flex items-center justify-between p-3.5 border-b border-gray-200">
                     <div class="flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-semibold text-lg select-none">
-                        {{ strtoupper(substr($selectedUser->first_name, 0, 1)) }}
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center select-none overflow-hidden">
+                            @if(!empty($selectedUser->profile_image)) 
+                                <!-- Show profile_image -->
+                                <img src="{{ asset($selectedUser->profile_image) }}?v={{ time() }}" alt="{{ $selectedUser->first_name }}" class="w-full h-full object-cover" />
+                            @else
+                                <!-- Show first letter fallback -->
+                                <div class="bg-gray-300 text-gray-600 font-semibold text-lg flex items-center justify-center w-full h-full">
+                                    {{ strtoupper(substr($selectedUser->first_name, 0, 1)) }}
+                                </div>
+                            @endif
                         </div>
                         <div>
                         <h3 class="text-md text-left font-semibold text-gray-900">

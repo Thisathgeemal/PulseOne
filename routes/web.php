@@ -13,6 +13,7 @@ use App\Http\Controllers\ExerciseLogController;
 use App\Http\Controllers\MemberProfileController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\MembershipTypeController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
@@ -275,6 +276,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/2fa', [LoginController::class, 'verify2FA'])->name('2fa.verify');
     Route::post('/2fa/resend', [LoginController::class, 'resend2FA'])->name('2fa.resend');
     Route::post('/mfa-toggle', [SecuritySettingsController::class, 'toggleMfa'])->name('settings.mfa-toggle');
+
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'fetch'])->name('notifications');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 });
 
 // Redirect handler (if you're using it elsewhere)

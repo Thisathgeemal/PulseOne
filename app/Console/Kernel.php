@@ -21,13 +21,16 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // Run membership status updates daily at 05:00
-        $schedule->command('memberships:update-statuses')->dailyAt('05:00');
+        // Run membership status updates daily
+        $schedule->command('memberships:update-statuses')->daily();
 
-        // Run member role is_active updates daily at 05:05
-        $schedule->command('members:update-role-active-status')->dailyAt('05:05');
+        // Run member role is_active updates daily
+        $schedule->command('members:update-role-active-status')->daily();
 
-        // Run user is_active status sync daily at 05:10
-        $schedule->command('users:sync-is-active')->dailyAt('05:10');
+        // Run user is_active status sync daily
+        $schedule->command('users:sync-is-active')->daily();
+
+        // Delete old read notifications daily
+        $schedule->command('notifications:cleanup')->daily();
     }
 }

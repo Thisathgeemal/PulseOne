@@ -1,6 +1,7 @@
 <?php
 namespace App\Providers;
 
+use App\Models\Notification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
         //
     }
 
+    // Share user sessions and notifications with all views
     public function boot(): void
     {
         View::composer('*', function ($view) {
@@ -38,10 +40,18 @@ class AppServiceProvider extends ServiceProvider
                             'is_current'    => $session->id === $currentSessionId,
                         ];
                     });
+
+                $notifications = Notification::where('user_id', $userId)
+                    ->latest()
+                    ->get();
             } else {
-                $sessions = collect();
+                $sessions      = collect();
+                $notifications = collect();
             }
-            $view->with('sessions', $sessions);
+            $view->with([
+                'sessions'      => $sessions,
+                'notifications' => $notifications,
+            ]);
         });
     }
 

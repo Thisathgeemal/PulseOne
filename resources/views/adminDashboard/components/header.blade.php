@@ -2,19 +2,22 @@
     x-data="{
         showSettings: false,
         showProfile: false,
+        showNotifications: false,
+        showRead: false,
         lastScroll: 0,
         handleScroll() {
             const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
             if (currentScroll > this.lastScroll) {
-                // User is scrolling down
                 this.showSettings = false;
                 this.showProfile = false;
+                this.showNotifications = false;
             }
             this.lastScroll = currentScroll <= 0 ? 0 : currentScroll;
         }
     }"
     x-init="window.addEventListener('scroll', () => handleScroll())"
-    class="relative" >
+    class="relative"
+>
 
     <!-- Topbar -->
     <div class="flex items-center justify-between bg-[#1E1E1E] text-white px-6 py-3 shadow-sm">
@@ -29,18 +32,32 @@
         <!-- Right: Icons -->
         <div class="flex items-center gap-6">
             <!-- Settings -->
-            <button @click=" showSettings = !showSettings; if (showSettings) showProfile = false; ">
+            <button @click=" showSettings = !showSettings; if (showSettings) { showProfile = false; showNotifications = false } ">
                 <i class="fas fa-cog text-white text-xl cursor-pointer hover:text-yellow-400"></i>
             </button>               
 
             <!-- Notifications -->
-            <div class="relative cursor-pointer">
-                <i class="fas fa-bell text-white text-xl"></i>
-                <span class="absolute -top-1 -right-2 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">3</span>
-            </div>
+            @php
+                $unreadCount = $notifications->where('is_read', false)->count();
+            @endphp
+
+            <button class="relative cursor-pointer"
+                @click="
+                    showNotifications = !showNotifications;
+                    if(showNotifications) { showSettings = false; showProfile = false; }
+                ">
+                <i class="fas fa-bell text-white text-xl hover:text-yellow-400"></i>
+
+                <!-- Only show badge if there are unread notifications -->
+                @if($unreadCount > 0)
+                    <span id="unread-badge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                        {{ $unreadCount }}
+                    </span>
+                @endif
+            </button>
 
             <!-- Profile -->
-            <button @click="showProfile = !showProfile; if (showProfile) showSettings = false;">
+            <button @click="showProfile = !showProfile; if (showProfile) { showSettings = false; showNotifications = false }">
                 @if(Auth::user()->profile_image)
                     <img src="{{ asset(Auth::user()->profile_image) }}?v={{ time() }}"
                          alt="User Avatar"
@@ -116,6 +133,111 @@
                     </button>
                 </form>
             @endif
+        </div>
+    </div>
+
+    <!-- Notification Panel -->
+    <div 
+        x-show="showNotifications"
+        x-transition
+        @click.away="showNotifications = false"
+        class="fixed right-0 top-16 bottom-0 w-[400px] bg-white text-black shadow-lg z-100 overflow-y-auto rounded-md"
+     >
+        <div class="p-7">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-800">Notifications</h2>
+                <button @click="showNotifications = false" class="text-gray-500 hover:text-red-600 text-xl">&times;</button>
+            </div>
+
+            @php
+                $icons = [
+                    'Membership' => '🏷️',
+                    'Chat'       => '💬',
+                    'Payment'    => '💳',
+                    'Attendance' => '🗓️',
+                    'Feedback'   => '⭐',
+                    'Settings'   => '⚙️',
+                ];
+
+                $notificationsArray = $notifications->map(function($n) {
+                    return [
+                        'id' => $n->id,
+                        'type' => $n->type,
+                        'title' => $n->title,
+                        'message' => $n->message,
+                        'time' => $n->created_at->diffForHumans(),
+                        'is_read' => $n->is_read,
+                    ];
+                })->values(); 
+            @endphp
+
+            <div x-data="notificationPanel()">
+                <!-- Unread Notifications -->
+                <div class="space-y-4">
+                    <template x-for="notification in unreadNotifications" :key="notification.id">
+                        <div 
+                            x-data="{ offset: 0, start: 0 }"
+                            x-on:touchstart="start = $event.touches[0].clientX"
+                            x-on:touchmove="offset = $event.touches[0].clientX - start"
+                            x-on:touchend="handleSwipe(notification)"
+                            x-on:mousedown="start = $event.clientX"
+                            x-on:mousemove="if($event.buttons == 1) offset = $event.clientX - start"
+                            x-on:mouseup="handleSwipe(notification)"
+                            @click="markAsRead(notification)"
+                            class="border rounded-lg p-3 shadow-md hover:bg-gray-50 cursor-pointer transform transition-transform duration-200"
+                            :style="`translateX(${offset}px)`"
+                        >
+                            <div class="flex justify-between items-center mb-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-blue-500 text-lg" x-text="icons[notification.type] ?? '🔔'"></span>
+                                    <span class="text-sm font-semibold text-blue-600" x-text="notification.type"></span>
+                                </div>
+                                <span class="text-xs text-gray-500" x-text="notification.time"></span>
+                            </div>
+                            <div class="ml-6">
+                                <h3 class="text-sm font-bold text-gray-800" x-text="notification.title"></h3>
+                                <p class="text-sm text-gray-700" x-text="notification.message"></p>
+                            </div>
+                        </div>
+                    </template>
+                    <template x-if="unreadNotifications.length === 0 && readNotifications.length > 0">
+                        <p class="text-center text-gray-500">No unread notifications.</p>
+                    </template>
+                </div>
+
+                <!-- Show Read Notifications Button -->
+                <div class="text-right mt-4" x-show="readNotifications.length > 0">
+                    <button @click="showRead = !showRead" class="text-sm text-green-600 hover:underline">
+                        <span x-text="showRead ? 'Hide Read Notifications' : 'Show Read Notifications'"></span>
+                    </button>
+                </div>
+
+                <!-- Read Notifications -->
+                <div x-show="showRead" x-transition class="space-y-4 mt-4">
+                    <template x-if="readNotifications.length === 0">
+                        <p class="text-center text-gray-500">No read notifications yet.</p>
+                    </template>
+                    <template x-for="notification in readNotifications" :key="notification.id">
+                        <div class="border rounded-lg p-3 shadow-md bg-gray-50 cursor-pointer">
+                            <div class="flex justify-between items-center mb-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-blue-500 text-lg" x-text="icons[notification.type] ?? '🔔'"></span>
+                                    <span class="text-sm font-semibold text-blue-600" x-text="notification.type"></span>
+                                </div>
+                                <span class="text-xs text-gray-500" x-text="notification.time"></span>
+                            </div>
+                            <div class="ml-6">
+                                <h3 class="text-sm font-bold text-gray-800" x-text="notification.title"></h3>
+                                <p class="text-sm text-gray-700" x-text="notification.message"></p>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <template x-if="unreadNotifications.length === 0 && readNotifications.length === 0">
+                    <p class="text-center text-gray-500 mt-6">No notifications</p>
+                </template>
+            </div>
         </div>
     </div>
 
@@ -236,15 +358,15 @@
 
 @push('scripts')
     @if(session('success'))
-    <script>
-        Swal.fire({
-            icon: 'success',
-            title: 'Success!',
-            text: "{{ session('success') }}",
-            confirmButtonText: 'OK',
-            confirmButtonColor: '#d32f2f'
-        });
-    </script>
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: "{{ session('success') }}",
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#d32f2f'
+            });
+        </script>
     @endif
 
     @if (session('error') || $errors->any())
@@ -319,5 +441,98 @@
                 previewContainer.replaceChild(newImg, letterDiv);
             }
         });
+
+        function notificationPanel() {
+            return {
+                notifications: @json($notificationsArray),
+                icons: @json($icons),
+                showRead: false,
+                unreadNotifications: [],
+                readNotifications: [],
+
+                init() {
+                    this.unreadNotifications = this.notifications.filter(n => !n.is_read);
+                    this.readNotifications = this.notifications.filter(n => n.is_read);
+                    this.readNotifications.sort((a, b) => new Date(b.time) - new Date(a.time));
+                    this.startPolling();
+                },
+
+                markAsRead(notification) {
+                    fetch(`/notifications/${notification.id}/read`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                    }).then(response => {
+                        if (response.ok) {
+                            this.unreadNotifications = this.unreadNotifications.filter(n => n.id !== notification.id);
+                            notification.is_read = true;
+                            this.readNotifications.push(notification);
+                            this.readNotifications.sort((a, b) => new Date(b.time) - new Date(a.time));
+                            this.updateBadge();
+                        } else {
+                            console.error('Failed to mark as read');
+                        }
+                    }).catch(err => console.error(err));
+                },
+
+                handleSwipe(notification) {
+                    if (this.offset > 100) {
+                        this.markAsRead(notification);
+                    }
+                    this.offset = 0;
+                },
+
+                updateBadge() {
+                    const badge = document.getElementById('unread-badge');
+                    const newCount = this.unreadNotifications.length;
+                    if (badge) {
+                        if (newCount > 0) {
+                            badge.textContent = newCount;
+                        } else {
+                            badge.remove();
+                        }
+                    } else if (newCount > 0) {
+                        const bellButton = document.querySelector('button.relative.cursor-pointer');
+                        const newBadge = document.createElement('span');
+                        newBadge.id = 'unread-badge';
+                        newBadge.className = 'absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full';
+                        newBadge.textContent = newCount;
+                        bellButton.appendChild(newBadge);
+                    }
+                },
+
+                startPolling() {
+                    setInterval(async () => {
+                        try {
+                            const response = await fetch('/notifications', {
+                                method: 'GET',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                            });
+                            const newNotifications = await response.json();
+                            newNotifications.forEach(newNotif => {
+                                if (!this.notifications.some(n => n.id === newNotif.id)) {
+                                    this.notifications.push(newNotif);
+                                    if (!newNotif.is_read) {
+                                        this.unreadNotifications.push(newNotif);
+                                        this.unreadNotifications.sort((a, b) => new Date(b.time) - new Date(a.time));
+                                        this.updateBadge();
+                                    } else {
+                                        this.readNotifications.push(newNotif);
+                                        this.readNotifications.sort((a, b) => new Date(b.time) - new Date(a.time));
+                                    }
+                                }
+                            });
+                        } catch (err) {
+                            console.error('Error fetching notifications:', err);
+                        }
+                    }, 2000); 
+                }
+            }
+        }
     </script>
 @endpush

@@ -3,6 +3,7 @@ namespace App\Livewire;
 
 use App\Events\MessageSent;
 use App\Models\ChatMessage;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -167,6 +168,14 @@ class Chat extends Component
             ->where('receiver_id', auth()->id())
             ->where('is_read', false)
             ->update(['is_read' => true]);
+
+        Notification::create([
+            'user_id' => $this->selectedUser->id,
+            'title'   => 'New Message',
+            'message' => 'You received a new message from ' . Auth::user()->first_name,
+            'type'    => 'Chat',
+            'is_read' => false,
+        ]);
 
         $this->messages->push($chatMessage);
         $this->newMessage   = '';
