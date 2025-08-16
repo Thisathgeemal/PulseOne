@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
 use App\Models\Request as WorkoutRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -41,6 +42,14 @@ class WorkoutRequestController extends Controller
         $message = $request->status === 'Approved'
         ? 'Request approved successfully.'
         : 'Request rejected successfully.';
+
+        Notification::create([
+            'user_id' => $req->member_id,
+            'title'   => 'Workout Plan Request ' . $request->status,
+            'message' => 'Your workout plan request has been ' . strtolower($request->status) . '.',
+            'type'    => 'Request',
+            'is_read' => false,
+        ]);
 
         return back()->with('success', $message);
     }

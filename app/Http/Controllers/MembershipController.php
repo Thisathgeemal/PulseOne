@@ -5,6 +5,7 @@ use App\Mail\MembershipCancelledMail;
 use App\Mail\MembershipConfirmationMail;
 use App\Models\Membership;
 use App\Models\MembershipType;
+use App\Models\Notification;
 use App\Models\Payment;
 use App\Models\User;
 use Carbon\Carbon;
@@ -82,7 +83,7 @@ class MembershipController extends Controller
                 return back()->with('error', 'Invalid membership type selected.');
             }
 
-            $pendingMembership = Membership::where('user_id', $user->id)
+            $pendingMembership = Membership::where('user_id', $member->id)
                 ->where('status', 'Pending')
                 ->first();
 
@@ -123,6 +124,22 @@ class MembershipController extends Controller
                 'payment_method' => $method,
                 'amount'         => $membershipType->price,
                 'payment_date'   => now(),
+            ]);
+
+            Notification::create([
+                'user_id' => $member->id,
+                'title'   => 'Membership Purchased',
+                'message' => 'Your membership has been purchased successfully.',
+                'type'    => 'Membership',
+                'is_read' => false,
+            ]);
+
+            Notification::create([
+                'user_id' => $member->id,
+                'title'   => 'Payment Successful',
+                'message' => 'Your payment has been processed successfully.',
+                'type'    => 'Payment',
+                'is_read' => false,
             ]);
 
             Mail::to($member->email)->send(new MembershipConfirmationMail($member, $membershipType));
@@ -168,6 +185,13 @@ class MembershipController extends Controller
                                 $membership->end_date->format('Y-m-d')
                             )
                         );
+                        Notification::create([
+                            'user_id' => $membership->user->id,
+                            'title'   => 'Membership Cancelled',
+                            'message' => 'Your membership has been cancelled.',
+                            'type'    => 'Membership',
+                            'is_read' => false,
+                        ]);
                     }
                 }
             });
@@ -272,6 +296,23 @@ class MembershipController extends Controller
             ]);
 
             Mail::to($user->email)->send(new MembershipConfirmationMail($user, $membershipType));
+
+            Notification::create([
+                'user_id' => $user->id,
+                'title'   => 'Membership Purchased',
+                'message' => 'Your membership has been purchased successfully.',
+                'type'    => 'Membership',
+                'is_read' => false,
+            ]);
+
+            Notification::create([
+                'user_id' => $user->id,
+                'title'   => 'Payment Successful',
+                'message' => 'Your payment has been processed successfully.',
+                'type'    => 'Payment',
+                'is_read' => false,
+            ]);
+
             DB::commit();
 
             return redirect()->back()->with('success', 'Membership purchased successfully.');

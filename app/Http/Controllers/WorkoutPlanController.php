@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\DailyWorkoutLog;
 use App\Models\Exercise;
 use App\Models\ExerciseLog;
+use App\Models\Notification;
 use App\Models\ProgressPhoto;
 use App\Models\Request as WorkoutRequest;
 use App\Models\User;
@@ -62,6 +63,14 @@ class WorkoutPlanController extends Controller
             'preferred_start_date' => $request->preferred_start_date,
             'type'                 => 'Workout',
             'status'               => 'Pending',
+        ]);
+
+        Notification::create([
+            'user_id' => $request->trainer_id,
+            'title'   => 'Workout Plan Request',
+            'message' => 'You received a new workout plan request from ' . Auth::user()->first_name,
+            'type'    => 'Workout Plan',
+            'is_read' => false,
         ]);
 
         return redirect()
@@ -404,7 +413,7 @@ class WorkoutPlanController extends Controller
         return view('memberDashboard.workoutplan_view', compact('plan', 'groupedExercises'));
     }
 
-    // Cancel the membership
+    // Member cancel the workout plan
     public function cancelMemberPlan($id)
     {
         $plan = WorkoutPlan::where('member_id', auth()->id())
@@ -413,6 +422,14 @@ class WorkoutPlanController extends Controller
 
         $plan->status = 'Cancelled';
         $plan->save();
+
+        Notification::create([
+            'user_id' => $plan->member_id,
+            'title'   => 'Workout Plan Cancelled',
+            'message' => 'Your workout plan has been cancelled.',
+            'type'    => 'Workout Plan',
+            'is_read' => false,
+        ]);
 
         return redirect()->back()->with('success', 'Your workout plan has been cancelled successfully.');
     }
@@ -511,6 +528,14 @@ class WorkoutPlanController extends Controller
             }
         }
 
+        Notification::create([
+            'user_id' => $plan->member_id,
+            'title'   => 'New Workout Plan Created',
+            'message' => 'A new workout plan has been created for you.',
+            'type'    => 'Workout Plan',
+            'is_read' => false,
+        ]);
+
         return redirect()->route('trainer.workoutplan')->with('success', 'Workout plan created successfully!');
     }
 
@@ -531,7 +556,7 @@ class WorkoutPlanController extends Controller
         return view('trainerDashboard.workoutplan_view', compact('plan', 'groupedExercises'));
     }
 
-    // View Specific Workout Plann
+    // View Specific Workout progress
     public function viewProgress($id)
     {
         $workoutPlan = WorkoutPlan::where('workoutplan_id', $id)

@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\QrTokenHelper;
 use App\Models\Attendance;
+use App\Models\Notification;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -84,46 +85,20 @@ class AttendanceController extends Controller
                 return back()->with('error', 'Invalid or expired QR code.');
             }
 
-            $existing = Attendance::where('user_id', $user->id)
-                ->whereDate('created_at', now()->toDateString())
-                ->first();
-
-            if ($existing) {
-                return back()->with('error', 'You have already checked in today.');
-            }
-
             $role = $user->userRole->role->role_name;
 
-            if ($role === 'Trainer') {
-                $gymLat = 7.124814;
-                $gymLng = 80.568809;
-
-                $userLat = $request->latitude;
-                $userLng = $request->longitude;
-
-                if (! $userLat || ! $userLng) {
-                    return back()->with('error', 'Location access required for trainer check-in.');
-                }
-
-                $distance = $this->haversine($gymLat, $gymLng, $userLat, $userLng);
-                \Log::info("🔍 Trainer check-in distance: $distance km");
-
-                if ($distance > 0.005) {
-                    return back()->with('error', 'You are not near the gym area.');
-                }
-            }
-
-            $ip = $request->ip();
-
             Attendance::create([
-                'user_id'           => $user->id,
-                'check_in_time'     => now(),
-                'status'            => 'Present',
-                'qr_code'           => $request->qr_code,
-                'ip_address'        => $ip,
-                'latitude'          => $request->latitude,
-                'longitude'         => $request->longitude,
-                'token_valid_until' => now()->endOfDay(),
+                'user_id'       => $user->id,
+                'check_in_time' => now(),
+                'qr_code'       => $request->qr_code,
+            ]);
+
+            Notification::create([
+                'user_id' => $user->id,
+                'title'   => 'Check-in Successful',
+                'message' => 'You have successfully checked in.',
+                'type'    => 'Attendance',
+                'is_read' => false,
             ]);
 
             return back()->with('success', 'Check-in successful!');
@@ -225,6 +200,14 @@ class AttendanceController extends Controller
             'check_in_time'     => $checkInDateTime,
             'qr_code'           => null,
             'token_valid_until' => null,
+        ]);
+
+        Notification::create([
+            'user_id' => $request->user_id,
+            'title'   => 'Manual Attendance Recorded',
+            'message' => 'Your manual attendance has been recorded successfully.',
+            'type'    => 'Attendance',
+            'is_read' => false,
         ]);
 
         return back()->with('success', 'Manual attendance recorded.');

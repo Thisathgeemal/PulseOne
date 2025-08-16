@@ -12,6 +12,7 @@ use App\Mail\MemberUpdatedMail;
 use App\Mail\TrainerAccountDeleteMail;
 use App\Mail\TrainerRegistrationMail;
 use App\Mail\TrainerUpdatedMail;
+use App\Models\Notification;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserRole;
@@ -261,6 +262,14 @@ class UserController extends Controller
                 $trainer->save();
 
                 Mail::to($trainer->email)->send(new TrainerUpdatedMail($trainer, $defaultPassword, $loginUrl));
+
+                Notification::create([
+                    'user_id' => $trainer->id,
+                    'title'   => 'Profile Updated',
+                    'message' => 'Your profile has been updated successfully.',
+                    'type'    => 'Profile',
+                    'is_read' => false,
+                ]);
             });
 
             return redirect()->route('admin.trainer')->with('success', 'Trainer updated successfully!');
@@ -513,6 +522,14 @@ class UserController extends Controller
                 $admin->save();
 
                 Mail::to($admin->email)->send(new AdminUpdatedMail($admin, $defaultPassword, $loginUrl));
+
+                Notification::create([
+                    'user_id' => $admin->id,
+                    'title'   => 'Profile Updated',
+                    'message' => 'Your profile has been updated successfully.',
+                    'type'    => 'Profile',
+                    'is_read' => false,
+                ]);
             });
 
             return redirect()->route('admin.admin')->with('success', 'Admin updated successfully!');
@@ -765,6 +782,14 @@ class UserController extends Controller
                 $dietitian->save();
 
                 Mail::to($dietitian->email)->send(new DietitianUpdatedMail($dietitian, $defaultPassword, $loginUrl));
+
+                Notification::create([
+                    'user_id' => $dietitian->id,
+                    'title'   => 'Profile Updated',
+                    'message' => 'Your profile has been updated successfully.',
+                    'type'    => 'Profile',
+                    'is_read' => false,
+                ]);
             });
 
             return redirect()->route('admin.dietitian')->with('success', 'Dietitian updated successfully!');
@@ -1020,6 +1045,14 @@ class UserController extends Controller
                 $member->save();
 
                 Mail::to($member->email)->send(new MemberUpdatedMail($member, $defaultPassword, $loginUrl));
+
+                Notification::create([
+                    'user_id' => $member->id,
+                    'title'   => 'Profile Updated',
+                    'message' => 'Your profile has been updated successfully.',
+                    'type'    => 'Profile',
+                    'is_read' => false,
+                ]);
             });
 
             return redirect()->route('admin.member')->with('success', 'Member updated successfully!');

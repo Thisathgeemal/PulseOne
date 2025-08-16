@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -55,6 +56,14 @@ class DietitianProfileController extends Controller
 
         $user->save();
         Auth::setUser($user);
+
+        Notification::create([
+            'user_id' => $user->id,
+            'title'   => 'Profile Updated',
+            'message' => 'Your profile has been updated successfully.',
+            'type'    => 'Profile',
+            'is_read' => false,
+        ]);
 
         return back()->with('success', 'Profile updated successfully!');
     }

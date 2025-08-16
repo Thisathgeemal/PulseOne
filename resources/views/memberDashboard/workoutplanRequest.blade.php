@@ -126,13 +126,13 @@
                         <label class="block text-sm font-medium text-gray-700">Available Days</label>
                         
                         <!-- Day Buttons -->
-                        <div class="flex flex-wrap gap-2 mt-1">
+                        <div class="flex flex-wrap justify-around gap-2 mt-1">
                             <template x-for="day in ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']" :key="day">
                                 <button type="button" @click="toggleDay(day)"
                                     :class="days.includes(day) 
                                         ? 'bg-red-500 text-white border-red-600' 
                                         : 'bg-white text-gray-700 border-gray-300'"
-                                    class="px-3 py-1 border rounded-md text-sm shadow-sm hover:bg-red-100">
+                                    class="px-2.5 py-1 border rounded-md text-sm shadow-sm hover:bg-red-100">
                                     <span x-text="day"></span>
                                 </button>
                             </template>

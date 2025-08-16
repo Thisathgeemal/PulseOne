@@ -151,12 +151,17 @@
 
             @php
                 $icons = [
-                    'Membership' => '🏷️',
-                    'Chat'       => '💬',
-                    'Payment'    => '💳',
-                    'Attendance' => '🗓️',
-                    'Feedback'   => '⭐',
-                    'Settings'   => '⚙️',
+                    'Membership'   => '🏷️',
+                    'Chat'         => '💬',
+                    'Payment'      => '💳',
+                    'Attendance'   => '🗓️',
+                    'Feedback'     => '⭐',
+                    'Settings'     => '⚙️',
+                    'Profile'      => '👤',
+                    'Workout Plan' => '🏋️‍♂️',
+                    'Diet Plan'    => '🥗',
+                    'Request'      => '📩',
+
                 ];
 
                 $notificationsArray = $notifications->map(function($n) {
