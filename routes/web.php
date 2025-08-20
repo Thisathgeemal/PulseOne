@@ -211,13 +211,13 @@ Route::middleware(['auth'])->prefix('trainer')->group(function () {
 // Member role routing
 Route::middleware(['auth'])->prefix('member')->group(function () {
 
-    // Profile
+    // Profile Routes
     Route::get('/profile', [UserController::class, 'getMemberData'])->name('member.profile');
     Route::put('/member/profile', [MemberProfileController::class, 'update'])->name('member.profile.update');
     Route::delete('/member/profile/remove-image', [MemberProfileController::class, 'removeImage'])->name('member.profile.removeImage');
     Route::post('/member/profile/check-password', [MemberProfileController::class, 'checkPassword'])->name('member.profile.checkPassword');
 
-    // Workout Plan routes
+    // Workout Plan Routes
     Route::prefix('workoutplan')->name('member.workoutplan.')->group(function () {
         Route::get('request', [WorkoutPlanController::class, 'request'])->name('request');
         Route::post('request', [WorkoutPlanController::class, 'requestWorkout'])->name('request');
@@ -230,7 +230,7 @@ Route::middleware(['auth'])->prefix('member')->group(function () {
         Route::get('download/{id}', [ReportController::class, 'generateWorkoutReport'])->name('download');
     });
 
-    // Diet Plan routes
+    // Diet Plan Routes
     Route::prefix('dietplan')->name('member.dietplan.')->group(function () {
         Route::get('request', [DietPlanController::class, 'request'])->name('request');
         Route::post('request', [DietPlanController::class, 'requestDietPlan'])->name('request');
@@ -238,28 +238,40 @@ Route::middleware(['auth'])->prefix('member')->group(function () {
         Route::get('progress', [DietPlanController::class, 'progressTracking'])->name('progress');
     });
 
-    // Attendance routes
+    // Attendance Routes
     Route::get('/qr', [AttendanceController::class, 'showMemberScanner'])->name('member.qr');
     Route::post('/checkin', [AttendanceController::class, 'checkin'])->name('checkin');
     Route::get('/attendance', [AttendanceController::class, 'viewMemberAttendance'])->name('member.attendance');
     Route::post('/attendance/checkout/{id}', [AttendanceController::class, 'checkout'])->name('attendance.checkout');
 
-    // Payment Management
+    // Payment Management Routes
     Route::get('/payment', [PaymentController::class, 'getMemberPaymentData'])->name('member.payment');
     Route::post('/payment/report', [ReportController::class, 'generateMemberPaymentReport'])->name('member.payment.report');
 
     // Chat Routes
     Route::view('/message', 'memberDashboard.message')->name('member.message');
 
-    // Membership Route
+    // Membership Routes
     Route::get('/membership', [MembershipController::class, 'getLoggedInMembershipData'])->name('member.membership');
     Route::post('/membership', [MembershipController::class, 'buyMembership'])->name('member.membership.buy');
     Route::post('/membership/report', [ReportController::class, 'generateMemberMembershipReport'])->name('member.membership.report');
 
+    // Booking Routes
+    Route::get('/bookings', [MemberBookingController::class, 'index'])->name('member.bookings.index');
+    Route::post('/bookings', [MemberBookingController::class, 'store'])->name('member.bookings.store');
+    Route::post('/bookings/{booking}/cancel', [MemberBookingController::class, 'cancel'])
+        ->whereNumber('booking')
+        ->name('member.bookings.cancel');
+    Route::get('/bookings/slots', [MemberBookingController::class, 'slots'])->name('member.bookings.slots');
+    Route::get('/bookings/sessions', [MemberBookingController::class, 'sessions'])->name('member.bookings.sessions');
+
+    // Health Assessment Routes
+    Route::get('/health-assessment', [HealthAssessmentController::class, 'create'])->name('member.health-assessment');
+    Route::post('/health-assessment', [HealthAssessmentController::class, 'store'])->name('member.health-assessment.store');
+    Route::get('/health-assessment/status', [HealthAssessmentController::class, 'checkStatus'])->name('member.health-assessment.status');
+
     // Static View Routes
-    Route::view('/booking', 'memberDashboard.booking')->name('member.booking');
     Route::view('/feedback', 'memberDashboard.feedback')->name('member.feedback');
-    Route::view('/report', 'memberDashboard.report')->name('member.report');
     Route::view('/leaderboard', 'memberDashboard.leaderboard')->name('member.leaderboard');
 
 });
