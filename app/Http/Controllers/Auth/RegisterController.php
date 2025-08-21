@@ -67,6 +67,7 @@ class RegisterController extends Controller
         }
     }
 
+    // Handle payment registration
     public function registerPayment(Request $request)
     {
         try {

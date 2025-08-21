@@ -14,58 +14,66 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class AttendanceController extends Controller
 {
-    // Show the QR scanner page for Trainers
+    /**
+     * Show the QR scanner page for Trainers.
+     */
     public function showTrainerScanner()
     {
         return view('trainerDashboard.qr');
     }
 
-    // Show the QR scanner page for Members
+    /**
+     * Show the QR scanner page for Members.
+     */
     public function showMemberScanner()
     {
         return view('memberDashboard.qr');
     }
 
-    // Generate and display a QR code for today's check-in (admin only)
+    /**
+     * Generate and display a QR code for today's check-in (admin only).
+     */
     public function showQR()
     {
-        $date  = Carbon::now()->toDateString();
-        $token = Crypt::encryptString($date);
-        $url   = 'https://geethikaworks.com/checkin-token?token=' . $token;
-
+        $date   = Carbon::now()->toDateString();
+        $token  = Crypt::encryptString($date);
+        $url    = 'https://geethikaworks.com/checkin-token?token=' . $token;
         $qrCode = QrCode::size(250)->generate($url);
 
         return view('adminDashboard.qr_display', compact('qrCode', 'token', 'url'));
     }
 
-    // Handle token redirect after QR code scan and route users to their dashboard
+    /**
+     * Handle token redirect after QR code scan and route users to their dashboard.
+     */
     public function handleTokenRedirect(Request $request)
     {
         $token = $request->query('token');
 
         try {
             $decrypted = Crypt::decryptString($token);
-            $today     = now()->toDateString();
+            $today     = Carbon::now()->toDateString();
 
             if (! auth()->check()) {
                 return redirect()->route('login');
             }
 
-            // Get user role
-            $role          = auth()->user()->userRole->role->role_name;
+            $role          = $this->getUserRole(auth()->user());
             $redirectRoute = $role === 'Trainer' ? 'trainer.qr' : 'member.qr';
 
-            if ($decrypted === $today) {
-                return redirect()->route($redirectRoute)->with('checkin_token', $token);
-            } else {
+            if ($decrypted !== $today) {
                 return redirect()->route($redirectRoute)->with('error', 'QR code expired.');
             }
+
+            return redirect()->route($redirectRoute)->with('checkin_token', $token);
         } catch (\Exception $e) {
             return redirect()->route('member.qr')->with('error', 'Invalid QR code.');
         }
     }
 
-    // Handle the actual check-in process
+    /**
+     * Handle the actual check-in process.
+     */
     public function checkin(Request $request)
     {
         $request->validate([
@@ -85,11 +93,9 @@ class AttendanceController extends Controller
                 return back()->with('error', 'Invalid or expired QR code.');
             }
 
-            $role = $user->userRole->role->role_name;
-
             Attendance::create([
                 'user_id'       => $user->id,
-                'check_in_time' => now(),
+                'check_in_time' => Carbon::now(),
                 'qr_code'       => $request->qr_code,
             ]);
 
@@ -108,72 +114,28 @@ class AttendanceController extends Controller
         }
     }
 
-    // Member Attendance
+    /**
+     * Member Attendance.
+     */
     public function viewMemberAttendance(Request $request)
     {
-        $user = Auth::user();
-        $date = $request->input('date');
-
-        $query = Attendance::where('user_id', $user->id);
-
-        if ($date) {
-            $query->whereDate('check_in_time', $date);
-        }
-
-        $attendances = $query->latest()->paginate(10);
-
-        return view('memberDashboard.attendance', compact('attendances', 'date'));
+        return $this->viewUserAttendance($request, 'memberDashboard.attendance');
     }
-
-    // Trainer Attendance
+    /**
+     * Trainer Attendance.
+     */
     public function viewTrainerAttendance(Request $request)
     {
-        $user = Auth::user();
-        $date = $request->input('date');
-
-        $query = Attendance::where('user_id', $user->id);
-
-        if ($date) {
-            $query->whereDate('check_in_time', $date);
-        }
-
-        $attendances = $query->latest()->paginate(10);
-
-        return view('trainerDashboard.attendance', compact('attendances', 'date'));
+        return $this->viewUserAttendance($request, 'trainerDashboard.attendance');
     }
 
-    // View all attendance records with filters
+    /**
+     * View all attendance records with filters.
+     */
     public function viewAll(Request $request)
     {
-        $query = Attendance::with(['user.roles'])->latest();
+        $attendances = $this->attendanceQuery($request)->paginate(10)->appends($request->all());
 
-        // Filter by date
-        if ($request->filled('date')) {
-            $query->whereDate('check_in_time', $request->input('date'));
-        }
-
-        // Filter by member ID
-        if ($request->filled('member_id')) {
-            $query->where('user_id', $request->input('member_id'));
-        }
-
-        // Filter by role name (supports users with multiple roles)
-        if ($request->filled('role')) {
-            $role = $request->input('role');
-            $query->whereHas('user.roles', function ($q) use ($role) {
-                $q->where('role_name', $role);
-            });
-        } else {
-            // Only include attendances of users with role Member or Trainer
-            $query->whereHas('user.roles', function ($q) {
-                $q->whereIn('role_name', ['Member', 'Trainer']);
-            });
-        }
-
-        // Paginate and retain filters
-        $attendances = $query->paginate(10)->appends($request->all());
-
-        // Get only users with Member or Trainer roles
         $members = DB::table('users')
             ->join('user_roles', 'users.id', '=', 'user_roles.user_id')
             ->join('roles', 'user_roles.role_id', '=', 'roles.role_id')
@@ -184,7 +146,9 @@ class AttendanceController extends Controller
         return view('adminDashboard.attendance', compact('attendances', 'members'));
     }
 
-    // Manually store attendance for a user
+    /**
+     * Manually store attendance for a user.
+     */
     public function storeManual(Request $request)
     {
         $request->validate([
@@ -193,7 +157,7 @@ class AttendanceController extends Controller
             'time'    => 'required|date_format:H:i',
         ]);
 
-        $checkInDateTime = $request->date . ' ' . $request->time . ':00';
+        $checkInDateTime = Carbon::parse($request->date . ' ' . $request->time);
 
         Attendance::create([
             'user_id'           => $request->user_id,
@@ -213,20 +177,24 @@ class AttendanceController extends Controller
         return back()->with('success', 'Manual attendance recorded.');
     }
 
-    // Attendance checkout
+    /**
+     * Attendance checkout.
+     */
     public function checkout($id)
     {
         $attendance = Attendance::findOrFail($id);
 
         if (! $attendance->check_out_time) {
-            $attendance->check_out_time = now();
+            $attendance->check_out_time = Carbon::now();
             $attendance->save();
         }
 
         return redirect()->back()->with('success', 'Checked out successfully!');
     }
 
-    // Search members
+    /**
+     * Search members.
+     */
     public function searchUsers(Request $request)
     {
         $query = $request->input('q');
@@ -253,4 +221,59 @@ class AttendanceController extends Controller
         return response()->json($users);
     }
 
+    /**
+     * Get the user's primary role name.
+     */
+    private function getUserRole(User $user): string
+    {
+        return $user->userRole->role->role_name ?? '';
+    }
+
+    /**
+     * Build attendance query for admin filters.
+     */
+    private function attendanceQuery(Request $request)
+    {
+        $query = Attendance::with(['user.roles'])->latest();
+
+        if ($request->filled('date')) {
+            $query->whereDate('check_in_time', $request->input('date'));
+        }
+
+        if ($request->filled('member_id')) {
+            $query->where('user_id', $request->input('member_id'));
+        }
+
+        if ($request->filled('role')) {
+            $role = $request->input('role');
+            $query->whereHas('user.roles', function ($q) use ($role) {
+                $q->where('role_name', $role);
+            });
+        } else {
+            $query->whereHas('user.roles', function ($q) {
+                $q->whereIn('role_name', ['Member', 'Trainer']);
+            });
+        }
+
+        return $query;
+    }
+
+    /**
+     * Shared logic for member/trainer attendance views.
+     */
+    private function viewUserAttendance(Request $request, string $view)
+    {
+        $user = Auth::user();
+        $date = $request->input('date');
+
+        $query = Attendance::where('user_id', $user->id);
+
+        if ($date) {
+            $query->whereDate('check_in_time', $date);
+        }
+
+        $attendances = $query->latest()->paginate(10);
+
+        return view($view, compact('attendances', 'date'));
+    }
 }

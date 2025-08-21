@@ -74,6 +74,8 @@
                 <tr>
                     <th>Type Name</th>
                     <th>Duration (Days)</th>
+                    <th>Amount (LKR)</th>
+                    <th>Discount (%)</th>
                     <th>Price (LKR)</th>
                 </tr>
             </thead>
@@ -82,6 +84,8 @@
                 <tr>
                     <td>{{ $type->type_name }}</td>
                     <td>{{ $type->duration }}</td>
+                    <td>{{ number_format($type->amount) }}</td>
+                    <td>{{ $type->discount }}</td>
                     <td>{{ number_format($type->price) }}</td>
                 </tr>
                 @endforeach
