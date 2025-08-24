@@ -26,6 +26,7 @@
             'dietitian.request' => ['icon' => 'fas fa-paper-plane', 'label' => 'Request'],
             'dietitian.dietplan' => ['icon' => 'fas fa-apple-alt', 'label' => 'Diet Plan'],
             'dietitian.meals' => ['icon' => 'fas fa-utensils', 'label' => 'Meals'],
+            'dietitian.member.health-assessments' => ['icon' => 'fas fa-notes-medical', 'label' => 'Health Assessments'],
             'dietitian.message' => ['icon' => 'fas fa-comment-alt', 'label' => 'Message'],
             'dietitian.feedback' => ['icon' => 'fas fa-comment-dots', 'label' => 'Feedback'],
         ] as $route => $data)

@@ -130,4 +130,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Notification::class);
     }
+
+    public function healthAssessment()
+    {
+        return $this->hasOne(HealthAssessment::class, 'member_id');
+    }
+
+    public function trainerAvailabilities()
+    {
+        return $this->hasMany(TrainerAvailability::class, 'trainer_id');
+    }
 }

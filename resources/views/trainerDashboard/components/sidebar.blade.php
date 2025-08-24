@@ -1,6 +1,8 @@
 <!-- Sidebar -->
 <div class="bg-white min-h-screen w-64 border-r shadow-sm flex flex-col py-6" 
-    x-data="{ openUsers: {{ request()->routeIs('trainer.qr') || request()->routeIs('trainer.attendance') ? 'true' : 'false' }} }"
+    x-data="{ openUsers: {{ request()->routeIs('trainer.qr') || request()->routeIs('trainer.attendance') ? 'true' : 'false' }},
+            openBooking: {{ request()->routeIs('trainer.bookings.*') ? 'true' : 'false' }},
+             }"
     >
 
     <!-- Logo -->
@@ -28,7 +30,7 @@
                         {{ request()->routeIs('trainer.qr') || request()->routeIs('trainer.attendance') 
                             ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
                 <i class="fas fa-qrcode"></i> QR
-                
+            
                 <!-- Toggle icon -->
                 <i :class="openUsers ? 'fa fa-chevron-circle-up' : 'fa fa-chevron-circle-down'" class="ml-auto transition-all duration-300"></i>
             </button>
@@ -50,12 +52,39 @@
             </ul>
         </li>
 
+        <li @click.away="openBooking = false">
+            <button @click="openBooking = !openBooking"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded-lg focus:outline-none
+                {{ request()->routeIs('trainer.bookings.*') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                <i class="fas fa-calendar-check"></i> Booking
+                <i :class="openBooking ? 'fa fa-chevron-circle-up' : 'fa fa-chevron-circle-down'" class="ml-auto transition-all duration-300"></i>
+            </button>
+
+            <ul x-show="openBooking" x-transition x-cloak class="mt-2 space-y-1 pl-6">
+                <li>
+                    <a href="{{ route('trainer.bookings.requests') }}"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg
+                        {{ request()->routeIs('trainer.bookings.requests') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                        <i class="fas fa-paper-plane"></i> Requests
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('trainer.bookings.sessions') }}"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg
+                                {{ request()->routeIs('trainer.bookings.sessions') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                        <i class="fas fa-calendar-alt"></i> My Sessions
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+
         <!-- Other Links -->
         @foreach ([
             'trainer.request' => ['icon' => 'fas fa-paper-plane', 'label' => 'Request'],
             'trainer.workoutplan' => ['icon' => 'fas fa-dumbbell', 'label' => 'WorkOut Plan'],
             'trainer.exercises' => ['icon' => 'fas fa-running', 'label' => 'Exercises'],
-            'trainer.booking' => ['icon' => 'fas fa-calendar-check', 'label' => 'Booking'],
+            'trainer.member.health-assessments' => ['icon' => 'fas fa-notes-medical', 'label' => 'Health Assessments'],
             'trainer.message' => ['icon' => 'fas fa-comment-alt', 'label' => 'Message'],
             'trainer.feedback' => ['icon' => 'fas fa-comment-dots', 'label' => 'Feedback'],
         ] as $route => $data)

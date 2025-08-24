@@ -10,6 +10,7 @@ use App\Http\Controllers\DietPlanController;
 use App\Http\Controllers\DietRequestController;
 use App\Http\Controllers\ExerciseController;
 use App\Http\Controllers\ExerciseLogController;
+use App\Http\Controllers\HealthAssessmentController;
 use App\Http\Controllers\MemberProfileController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\MembershipTypeController;
@@ -156,6 +157,43 @@ Route::middleware(['auth'])->prefix('dietitian')->group(function () {
     Route::get('/request', [DietRequestController::class, 'index'])->name('dietitian.request');
     Route::post('/request/update-status/{id}', [DietRequestController::class, 'updateStatus'])->name('dietitian.request.update');
 
+    // // Meal Library Management
+    // Route::get('/meals', [MealController::class, 'index'])->name('dietitian.meals.index');
+    // Route::get('/meals/create', [MealController::class, 'create'])->name('dietitian.meals.create');
+    // Route::post('/meals', [MealController::class, 'store'])->name('dietitian.meals.store');
+    // Route::get('/meals/{meal}', [MealController::class, 'show'])->name('dietitian.meals.show');
+    // Route::get('/meals/{meal}/edit', [MealController::class, 'edit'])->name('dietitian.meals.edit');
+    // Route::put('/meals/{meal}', [MealController::class, 'update'])->name('dietitian.meals.update');
+    // Route::delete('/meals/{meal}', [MealController::class, 'destroy'])->name('dietitian.meals.destroy');
+
+    // // Nutrition API Integration Routes
+    // Route::post('/meals/calculate-nutrition', [MealController::class, 'calculateNutrition'])->name('meals.calculate-nutrition');
+    // Route::post('/meals/for-member', [MealController::class, 'getMealsForMember'])->name('meals.for-member');
+    // Route::post('/meals/suggest-plan', [MealController::class, 'suggestMealPlan'])->name('meals.suggest-plan');
+
+    // // Diet Plan Management
+    // Route::get('/diet-plans', [DietPlanController::class, 'index'])->name('dietitian.diet-plans.index');
+    // Route::get('/diet-plans/create/{request_id}', [DietPlanController::class, 'create'])->name('dietitian.diet-plans.create');
+    // Route::post('/diet-plans', [DietPlanController::class, 'store'])->name('dietitian.diet-plans.store');
+    // Route::get('/diet-plans/{dietPlan}', [DietPlanController::class, 'show'])->name('dietitian.diet-plans.show');
+    // Route::get('/diet-plans/{dietPlan}/track', [DietPlanController::class, 'track'])->name('dietitian.diet-plans.track');
+    // Route::get('/diet-plans/{dietPlan}/download', [DietPlanController::class, 'download'])->name('dietitian.diet-plans.download');
+    // Route::post('/diet-plans/{dietPlan}/activate', [DietPlanController::class, 'activate'])->name('dietitian.diet-plans.activate');
+    // Route::post('/diet-plans/{dietPlan}/complete', [DietPlanController::class, 'complete'])->name('dietitian.diet-plans.complete');
+    // Route::post('/diet-plans/{dietPlan}/cancel', [DietPlanController::class, 'cancel'])->name('dietitian.diet-plans.cancel');
+
+    // // Health Assessment Integration Routes
+    // Route::post('/diet-plans/meals-for-member', [DietPlanController::class, 'getMealsForMember'])->name('diet-plans.meals-for-member');
+    // Route::post('/diet-plans/suggest-plan', [DietPlanController::class, 'suggestMealPlan'])->name('diet-plans.suggest-plan');
+    // Route::post('/diet-plans/member-profile', [DietPlanController::class, 'getMemberProfile'])->name('diet-plans.member-profile');
+    // Route::get('/request', [DietRequestController::class, 'index'])->name('dietitian.request');
+    // Route::post('/request/update/{id}', [DietRequestController::class, 'updateStatus'])->name('dietitian.request.update');
+
+    // Health Assessment Routes (for dietitians to view member assessments)
+    Route::get('/member/{memberId}/health-assessment', [HealthAssessmentController::class, 'viewMemberAssessmentDietitian'])->name('dietitian.member.health-assessment');
+    Route::get('/member/{memberId}/health-assessment/pdf', [ReportController::class, 'generateMemberHealthReport'])->name('dietitian.member.health-assessment.pdf');
+    Route::get('/member-health-assessments', [HealthAssessmentController::class, 'dietitianHealthAssessments'])->name('dietitian.member.health-assessments');
+
     // Static View Routes
     Route::view('/dietplan', 'dietitianDashboard.dietplan')->name('dietitian.dietplan');
     Route::view('/meals', 'dietitianDashboard.meals')->name('dietitian.meals');
@@ -199,11 +237,21 @@ Route::middleware(['auth'])->prefix('trainer')->group(function () {
     Route::post('/checkin', [AttendanceController::class, 'checkin'])->name('trainer.checkin');
     Route::get('/attendance', [AttendanceController::class, 'viewTrainerAttendance'])->name('trainer.attendance');
 
+    // Health Assessment Routes (for trainers to view member assessments)
+    Route::get('/member/{memberId}/health-assessment', [HealthAssessmentController::class, 'viewMemberAssessmentTrainer'])->name('trainer.member.health-assessment');
+    Route::get('/member/{memberId}/health-assessment/pdf', [ReportController::class, 'generateMemberHealthReport'])->name('trainer.member.health-assessment.pdf');
+    Route::get('/member-health-assessments', [HealthAssessmentController::class, 'trainerHealthAssessments'])->name('trainer.member.health-assessments');
+
+    // Trainer Booking Routes
+    Route::get('/bookings/requests', [TrainerBookingController::class, 'index'])->name('trainer.bookings.requests');
+    Route::post('/bookings/{booking}/approve', [TrainerBookingController::class, 'approve'])->whereNumber('booking')->name('trainer.bookings.approve');
+    Route::post('/bookings/{booking}/decline', [TrainerBookingController::class, 'decline'])->whereNumber('booking')->name('trainer.bookings.decline');
+    Route::get('/bookings/sessions', [TrainerBookingController::class, 'sessions'])->name('trainer.bookings.sessions');
+
     // Chat Routes
     Route::view('/message', 'trainerDashboard.message')->name('trainer.message');
 
     // Static View Routes
-    Route::view('/booking', 'trainerDashboard.booking')->name('trainer.booking');
     Route::view('/feedback', 'trainerDashboard.feedback')->name('trainer.feedback');
 
 });

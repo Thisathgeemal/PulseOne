@@ -32,5 +32,8 @@ class Kernel extends ConsoleKernel
 
         // Delete old read notifications daily
         $schedule->command('notifications:cleanup')->daily();
+
+        // Send membership expiry notifications daily
+        $schedule->command('memberships:send-expiry-notifications')->daily();
     }
 }

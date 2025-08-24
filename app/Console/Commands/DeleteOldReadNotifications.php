@@ -1,10 +1,9 @@
 <?php
-
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Notification;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
 
 class DeleteOldReadNotifications extends Command
 {
@@ -26,9 +25,9 @@ class DeleteOldReadNotifications extends Command
      */
     public function handle()
     {
-        $cutoffDate = Carbon::now()->subDays(7);
+        $cutoffDate = Carbon::now()->subDays(5);
 
-        $deleted = Notification::where('is_read', true)   
+        $deleted = Notification::where('is_read', true)
             ->where('created_at', '<', $cutoffDate)
             ->delete();
 

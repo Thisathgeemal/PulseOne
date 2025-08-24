@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
+use App\Models\HealthAssessment;
 use App\Models\Membership;
 use App\Models\MembershipType;
 use App\Models\Payment;
@@ -180,4 +181,29 @@ class ReportController extends Controller
 
         return $pdf->download("Member_Membership_Report.pdf");
     }
+
+    // Generate member health report
+    public function generateMemberHealthReport($memberId)
+    {
+        $this->abortIfMissing([$memberId]);
+
+        // Retrieve completed health assessments for the given member
+        $assessment = HealthAssessment::where('member_id', $memberId)
+            ->with('member')
+            ->where('is_complete', true)
+            ->first();
+
+        if (! $assessment) {
+            abort(404, 'No completed health assessments found for this member');
+        }
+
+        // Generate the PDF
+        $pdf = Pdf::loadView('report.healthReport', compact('assessment'));
+
+        $member   = $assessment->member;
+        $fileName = 'Member_Health_Report_' . $member->first_name . '_' . $member->last_name . '_' . now()->format('Y-m-d') . '.pdf';
+
+        return $pdf->download($fileName);
+    }
+
 }
