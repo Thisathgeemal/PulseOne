@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\DailyWorkoutLog;
 use App\Models\Exercise;
 use App\Models\ExerciseLog;
+use App\Models\HealthAssessment;
 use App\Models\Notification;
 use App\Models\ProgressPhoto;
 use App\Models\Request as WorkoutRequest;
@@ -26,6 +27,17 @@ class WorkoutPlanController extends Controller
     public function request()
     {
         $user = Auth::user();
+
+        // Check if user has completed health assessment
+        $healthAssessment = HealthAssessment::where('member_id', $user->id)
+            ->where('is_complete', true)
+            ->first();
+
+        if (! $healthAssessment || $healthAssessment->needs_update) {
+            return redirect()
+                ->route('member.health-assessment')
+                ->with('error', 'You must complete your health assessment before requesting a workout plan.');
+        }
 
         // Fetch active trainers
         $trainers = User::whereHas('roles', function ($query) {
@@ -432,6 +444,18 @@ class WorkoutPlanController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Your workout plan has been cancelled successfully.');
+    }
+
+    // Check if member has workout plan (AJAX)
+    public function checkWorkoutPlan()
+    {
+        $user = Auth::user();
+
+        $hasWorkoutPlan = WorkoutPlan::where('member_id', $user->id)
+            ->whereIn('status', ['Active', 'Pending'])
+            ->exists();
+
+        return response()->json(['hasWorkoutPlan' => $hasWorkoutPlan]);
     }
 
     // -----------------------------Trainer------------------------------

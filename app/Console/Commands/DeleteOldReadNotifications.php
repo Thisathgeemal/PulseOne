@@ -25,7 +25,7 @@ class DeleteOldReadNotifications extends Command
      */
     public function handle()
     {
-        $cutoffDate = Carbon::now()->subDays(5);
+        $cutoffDate = Carbon::now()->subDays(3);
 
         $deleted = Notification::where('is_read', true)
             ->where('created_at', '<', $cutoffDate)

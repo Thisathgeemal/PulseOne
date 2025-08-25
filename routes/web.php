@@ -11,6 +11,7 @@ use App\Http\Controllers\DietRequestController;
 use App\Http\Controllers\ExerciseController;
 use App\Http\Controllers\ExerciseLogController;
 use App\Http\Controllers\HealthAssessmentController;
+use App\Http\Controllers\MemberBookingController;
 use App\Http\Controllers\MemberProfileController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\MembershipTypeController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\TrainerBookingController;
 use App\Http\Controllers\TrainerProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkoutPlanController;
@@ -247,6 +249,9 @@ Route::middleware(['auth'])->prefix('trainer')->group(function () {
     Route::post('/bookings/{booking}/approve', [TrainerBookingController::class, 'approve'])->whereNumber('booking')->name('trainer.bookings.approve');
     Route::post('/bookings/{booking}/decline', [TrainerBookingController::class, 'decline'])->whereNumber('booking')->name('trainer.bookings.decline');
     Route::get('/bookings/sessions', [TrainerBookingController::class, 'sessions'])->name('trainer.bookings.sessions');
+    Route::post('/bookings/{booking}/cancel', [TrainerBookingController::class, 'cancel'])
+        ->whereNumber('booking')
+        ->name('trainer.bookings.cancel');
 
     // Chat Routes
     Route::view('/message', 'trainerDashboard.message')->name('trainer.message');
@@ -276,6 +281,7 @@ Route::middleware(['auth'])->prefix('member')->group(function () {
         Route::get('view/{id}', [WorkoutPlanController::class, 'viewMemberPlan'])->name('view');
         Route::get('cancel/{id}', [WorkoutPlanController::class, 'cancelMemberPlan'])->name('cancel');
         Route::get('download/{id}', [ReportController::class, 'generateWorkoutReport'])->name('download');
+        Route::get('check', [WorkoutPlanController::class, 'checkWorkoutPlan'])->name('check');
     });
 
     // Diet Plan Routes
