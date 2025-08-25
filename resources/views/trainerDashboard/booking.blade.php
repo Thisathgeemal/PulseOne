@@ -132,7 +132,7 @@
                 </div>
             </div>
         @empty
-            <div class="bg-white rounded-xl shadow-sm p-6 text-gray-600">
+            <div class="bg-white rounded-xl shadow-sm text-center p-6 text-gray-600">
                 No pending requests.
             </div>
         @endforelse

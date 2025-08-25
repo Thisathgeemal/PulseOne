@@ -164,34 +164,6 @@
             </ul>
         </li>
 
-        <!-- Booking Dropdown -->
-        <li @click.away="openBooking = false">
-            <button @click="openBooking = !openBooking"
-                class="w-full flex items-center gap-3 px-3 py-2 rounded-lg focus:outline-none
-                {{ request()->routeIs('trainer.bookings.*') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
-                <i class="fas fa-calendar-check"></i> Booking
-                <i :class="openBooking ? 'fa fa-chevron-circle-up' : 'fa fa-chevron-circle-down'"
-                    class="ml-auto transition-all duration-300"></i>
-            </button>
-
-            <ul x-show="openBooking" x-transition x-cloak class="mt-2 space-y-1 pl-6">
-                <li>
-                    <a href="{{ route('trainer.bookings.requests') }}"
-                        class="flex items-center gap-3 px-3 py-2 rounded-lg
-                        {{ request()->routeIs('trainer.bookings.requests') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
-                        <i class="fas fa-paper-plane"></i> Requests
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('trainer.bookings.sessions') }}"
-                        class="flex items-center gap-3 px-3 py-2 rounded-lg
-                                {{ request()->routeIs('trainer.bookings.sessions') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
-                        <i class="fas fa-calendar-alt"></i> My Sessions
-                    </a>
-                </li>
-            </ul>
-        </li>
-
         <!-- Workout Plan Dropdown -->
         <li @click.away="openWorkoutPlan = false">
             <button @click="openWorkoutPlan = !openWorkoutPlan"
@@ -215,6 +187,34 @@
                         class="flex items-center gap-3 px-3 py-2 rounded-lg
                         {{ request()->routeIs('trainer.workoutplan') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
                         <i class="fas fa-dumbbell"></i> My Plans
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- Booking Dropdown -->
+        <li @click.away="openBooking = false">
+            <button @click="openBooking = !openBooking"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded-lg focus:outline-none
+                {{ request()->routeIs('trainer.bookings.*') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                <i class="fas fa-calendar-check"></i> Booking
+                <i :class="openBooking ? 'fa fa-chevron-circle-up' : 'fa fa-chevron-circle-down'"
+                    class="ml-auto transition-all duration-300"></i>
+            </button>
+
+            <ul x-show="openBooking" x-transition x-cloak class="mt-2 space-y-1 pl-6">
+                <li>
+                    <a href="{{ route('trainer.bookings.requests') }}"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg
+                        {{ request()->routeIs('trainer.bookings.requests') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                        <i class="fas fa-paper-plane"></i> Requests
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('trainer.bookings.sessions') }}"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg
+                                {{ request()->routeIs('trainer.bookings.sessions') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                        <i class="fas fa-calendar-alt"></i> My Sessions
                     </a>
                 </li>
             </ul>

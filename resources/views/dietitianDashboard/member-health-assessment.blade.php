@@ -3,7 +3,7 @@
 @section('content')
 <div class="p-6 max-w-4xl mx-auto">
     <!-- Header -->
-    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-6 mt-4">
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">Member Health Assessment</h1>

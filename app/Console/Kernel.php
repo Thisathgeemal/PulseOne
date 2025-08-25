@@ -22,18 +22,21 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // Run membership status updates daily
-        $schedule->command('memberships:update-statuses')->daily();
+        $schedule->command('memberships:update-statuses')->everyMinute();
 
         // Run member role is_active updates daily
-        $schedule->command('members:update-role-active-status')->daily();
+        $schedule->command('members:update-role-active-status')->everyMinute();
 
         // Run user is_active status sync daily
-        $schedule->command('users:sync-is-active')->daily();
+        $schedule->command('users:sync-is-active')->everyMinute();
 
         // Delete old read notifications daily
-        $schedule->command('notifications:cleanup')->daily();
+        $schedule->command('notifications:cleanup')->everyMinute();
 
         // Send membership expiry notifications daily
-        $schedule->command('memberships:send-expiry-notifications')->daily();
+        $schedule->command('memberships:send-expiry-notifications')->everyMinute();
+
+        // Update booking statuses every minute
+        $schedule->command('bookings:update-status')->everyMinute();
     }
 }

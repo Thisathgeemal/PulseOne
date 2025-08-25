@@ -176,41 +176,22 @@ class MemberBookingController extends Controller
     public function sessions()
     {
         $memberId = Auth::id();
+        $now      = now();
 
-        $approved = Booking::with('trainer')
-            ->forMember($memberId)
+        // Upcoming sessions: approved bookings in the future for this member
+        $upcoming = Booking::with('trainer')
+            ->where('member_id', $memberId)
             ->where('status', 'approved')
+            ->where('start_at', '>=', $now) // only future sessions
             ->orderBy('start_at')
-            ->orderBy('date')
-            ->orderBy('time')
             ->get();
 
-        $now = now();
-
-        // Split into upcoming and past with proper timezone handling
-        $upcoming = $approved->filter(function ($b) use ($now) {
-            if ($b->start_at) {
-                // Database stores UTC, but Laravel converts to app timezone automatically
-                // So we need to force it back to UTC then convert to local properly
-                $utc = Carbon::createFromFormat('Y-m-d H:i:s', $b->getRawOriginal('start_at'), 'UTC');
-                $dt  = $utc->setTimezone(config('app.timezone'));
-            } else {
-                $dt = Carbon::parse(($b->date ?: today())->toDateString() . ' ' . ($b->time ?: '00:00:00'), config('app.timezone'));
-            }
-            return $dt->gte($now);
-        });
-
-        $past = $approved->filter(function ($b) use ($now) {
-            if ($b->start_at) {
-                // Database stores UTC, but Laravel converts to app timezone automatically
-                // So we need to force it back to UTC then convert to local properly
-                $utc = Carbon::createFromFormat('Y-m-d H:i:s', $b->getRawOriginal('start_at'), 'UTC');
-                $dt  = $utc->setTimezone(config('app.timezone'));
-            } else {
-                $dt = Carbon::parse(($b->date ?: today())->toDateString() . ' ' . ($b->time ?: '00:00:00'), config('app.timezone'));
-            }
-            return $dt->lt($now);
-        });
+        // Past sessions: completed or expired bookings for this member
+        $past = Booking::with('trainer')
+            ->where('member_id', $memberId)
+            ->whereIn('status', ['completed', 'expired'])
+            ->orderByDesc('start_at')
+            ->get();
 
         return view('memberDashboard.booking-sessions', compact('upcoming', 'past'));
     }
