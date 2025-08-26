@@ -12,6 +12,7 @@ use App\Http\Controllers\ExerciseController;
 use App\Http\Controllers\ExerciseLogController;
 use App\Http\Controllers\HealthAssessmentController;
 use App\Http\Controllers\MealController;
+use App\Http\Controllers\MealLogController;
 use App\Http\Controllers\MemberBookingController;
 use App\Http\Controllers\MemberProfileController;
 use App\Http\Controllers\MembershipController;
@@ -283,12 +284,13 @@ Route::middleware(['auth'])->prefix('member')->group(function () {
         Route::get('request', [DietPlanController::class, 'request'])->name('request');
         Route::post('request', [DietPlanController::class, 'requestDietPlan'])->name('request');
         Route::get('myplan', [DietPlanController::class, 'myPlan'])->name('myplan');
-        Route::get('progress', [DietPlanController::class, 'progressTracking'])->name('progress');
+        Route::get('progress/{dietPlan?}', [DietPlanController::class, 'progressTracking'])->name('progress');
         Route::get('view/{dietPlan}', [DietPlanController::class, 'viewMemberPlan'])->name('view');
         Route::get('cancel/{dietPlan}', [DietPlanController::class, 'cancelMemberPlan'])->name('cancel');
         Route::get('download/{dietPlan}', [ReportController::class, 'generateDietReport'])->name('download');
-        Route::post('photo', [DietPlanController::class, 'storePhoto'])->name('photo');
-        Route::post('weight', [DietPlanController::class, 'storeWeightLog'])->name('weight.store');
+        Route::post('photo', [MealLogController::class, 'storeImage'])->name('photo');
+        Route::post('mealCompletion', [MealLogController::class, 'storeMealLog'])->name('mealCompletion.store');
+        Route::post('weight', [MealLogController::class, 'storeWeightLog'])->name('weight.store');
     });
 
     // Attendance Routes

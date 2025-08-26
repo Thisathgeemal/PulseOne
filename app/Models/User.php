@@ -148,7 +148,17 @@ class User extends Authenticatable
 
     public function dietProgressPhotos()
     {
-        return $this->hasMany(DietPlanProgressPhoto::class, 'member_id');
+        return $this->hasMany(DietProgressPhoto::class, 'member_id');
+    }
+
+    public function mealCompliances()
+    {
+        return $this->hasMany(MealCompliance::class, 'member_id');
+    }
+
+    public function weightLogs()
+    {
+        return $this->hasMany(WeightLog::class, 'member_id');
     }
 
 }

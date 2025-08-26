@@ -62,7 +62,7 @@
                             $plan->status === 'Active' &&
                                 \Carbon\Carbon::parse($plan->start_date)->isPast() &&
                                 \Carbon\Carbon::parse($plan->end_date)->isFuture())
-                            <a href="{{ route('member.dietplan.progress') }}"
+                            <a href="{{ route('member.dietplan.progress', $plan->dietplan_id) }}"
                                 class="w-[110px] px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition text-center">
                                 Start
                             </a>

@@ -1,6 +1,7 @@
 <?php
 namespace App\Providers;
 
+use App\Models\DietPlan;
 use App\Models\Notification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -44,13 +45,19 @@ class AppServiceProvider extends ServiceProvider
                 $notifications = Notification::where('user_id', $userId)
                     ->latest()
                     ->get();
+
+                $activeDietPlan = DietPlan::where('member_id', $userId)
+                    ->where('status', 'active')
+                    ->first();
             } else {
-                $sessions      = collect();
-                $notifications = collect();
+                $sessions       = collect();
+                $notifications  = collect();
+                $activeDietPlan = null;
             }
             $view->with([
-                'sessions'      => $sessions,
-                'notifications' => $notifications,
+                'sessions'       => $sessions,
+                'notifications'  => $notifications,
+                'activeDietPlan' => $activeDietPlan,
             ]);
         });
     }

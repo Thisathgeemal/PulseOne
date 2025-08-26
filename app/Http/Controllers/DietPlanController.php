@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\DietPlan;
 use App\Models\DietPlanMeal;
+use App\Models\DietProgressPhoto;
 use App\Models\HealthAssessment;
 use App\Models\Meal;
+use App\Models\MealCompliance;
 use App\Models\Notification;
 use App\Models\Request as DietRequest;
 use App\Models\User;
+use App\Models\WeightLog;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -166,69 +169,122 @@ class DietPlanController extends Controller
         return view('memberDashboard.dietplanMyplan', compact('plans'));
     }
 
-    // Get Track data
-    public function progressTracking()
+    // Show diet progress dashboard
+    public function progressTracking($dietPlan = null)
     {
-        $userId = auth()->id();
-
-        $dietPlan = DietPlan::where('member_id', $userId)
-            ->where('status', 'Active')
-            ->first();
+        // Get the diet plan
+        $dietPlan = $dietPlan
+        ? DietPlan::findOrFail($dietPlan)
+        : DietPlan::where('member_id', Auth::id())->latest()->first();
 
         if (! $dietPlan) {
-            return redirect()->back()->with('error', 'No active diet plan found. Start a Diet Plan first.');
+            abort(404, 'No diet plan found.');
         }
 
-        // Daily Progress (adherence)
-        $totalDays = $dietPlan->start_date && $dietPlan->end_date
-        ? \Carbon\Carbon::parse($dietPlan->start_date)->diffInDays(\Carbon\Carbon::parse($dietPlan->end_date)) + 1
-        : 0;
-        // Adherence logs removed — treat as zero/empty
-        $completedDays = 0;
-        $dailyProgress = [
-            'completed'  => $completedDays,
-            'total'      => $totalDays,
-            'percentage' => $totalDays ? round(($completedDays / $totalDays) * 100, 1) : 0,
-        ];
+        $memberId = $dietPlan->member_id;
 
-        // Weekly Progress
-        $totalWeeks = $dietPlan->start_date && $dietPlan->end_date
-        ? ceil(\Carbon\Carbon::parse($dietPlan->start_date)->diffInWeeks(\Carbon\Carbon::parse($dietPlan->end_date)) + 1)
-        : 0;
-        // No adherence logs table; assume no completed weeks
-        $completedWeeks = 0;
-        $weeklyProgress = [
-            'completed'  => $completedWeeks,
-            'total'      => $totalWeeks,
-            'percentage' => $totalWeeks ? round(($completedWeeks / $totalWeeks) * 100, 1) : 0,
-        ];
+        // Daily Meal Compliance
+        $dailyData = $this->getDailyMealCompliance($dietPlan->dietplan_id);
 
-        // Monthly Progress
-        $totalMonths = $dietPlan->start_date && $dietPlan->end_date
-        ? ceil(\Carbon\Carbon::parse($dietPlan->start_date)->diffInMonths(\Carbon\Carbon::parse($dietPlan->end_date)) + 1)
-        : 0;
-        // No adherence logs table; assume no completed months
-        $completedMonths = 0;
-        $monthlyProgress = [
-            'completed'  => $completedMonths,
-            'total'      => $totalMonths,
-            'percentage' => $totalMonths ? round(($completedMonths / $totalMonths) * 100, 1) : 0,
-        ];
+        // Weekly Weight Tracking
+        $weeklyWeightData = $this->getWeeklyWeight($memberId);
 
         // Progress Photos
-        $photos        = $dietPlan->progress_photos()->orderBy('photo_date', 'desc')->get();
-        $photoProgress = [
-            'monthlyCount'     => $dietPlan->progress_photos()->whereRaw('MONTH(photo_date) = MONTH(NOW())')->count(),
-            'weeklyPhotoCount' => $dietPlan->progress_photos()->whereRaw('WEEK(photo_date) = WEEK(NOW())')->count(),
-        ];
+        $photosData = $this->getProgressPhotos($memberId);
 
-        $isMember = true;
-        return view('memberDashboard.dietplanProgress', compact(
-            'dietPlan',
-            'photos',
-            'photoProgress',
-            'isMember',
+        // Add Photo Progress Data (weekly and monthly percentage)
+        $photoProgressData = $this->getPhotoProgressData($memberId);
+
+        return view('memberdashboard.dietplanProgress', array_merge(
+            compact('dietPlan', 'photoProgressData'),
+            $dailyData,
+            $weeklyWeightData,
+            $photosData,
         ));
+    }
+
+    // Get Daily Meal Compliance
+    private function getDailyMealCompliance($dietplanId)
+    {
+        $today           = Carbon::today();
+        $dailyCompliance = MealCompliance::where('dietplan_id', $dietplanId)
+            ->where('log_date', $today)
+            ->first();
+
+        $dailyMeals = $dailyCompliance
+        ? $dailyCompliance->meals_completed
+        : array_fill_keys(['breakfast', 'lunch', 'dinner', 'snacks'], false);
+
+        $dailyCompliancePercentage = round((count(array_filter($dailyMeals)) / count($dailyMeals)) * 100);
+
+        return compact('dailyMeals', 'dailyCompliancePercentage');
+    }
+
+    // Get Weekly Weight
+    private function getWeeklyWeight($memberId)
+    {
+        $startOfWeek = Carbon::now()->startOfWeek();
+        $endOfWeek   = Carbon::now()->endOfWeek();
+
+        $weightLogs = WeightLog::where('member_id', $memberId)
+            ->whereBetween('log_date', [$startOfWeek, $endOfWeek])
+            ->orderBy('log_date')
+            ->get();
+
+        $currentWeight = $weightLogs->last()->weight ?? 0;
+        $targetWeight  = Auth::user()->target_weight ?? $currentWeight;
+
+        $weeklyWeightPercentage = $targetWeight != 0 ? round(($currentWeight / $targetWeight) * 100) : 0;
+
+        return compact('weightLogs', 'currentWeight', 'targetWeight', 'weeklyWeightPercentage', 'startOfWeek', 'endOfWeek');
+    }
+
+    // Get Progress Photos
+    private function getProgressPhotos($memberId)
+    {
+        $photos = DietProgressPhoto::where('user_id', $memberId)
+            ->whereMonth('photo_date', Carbon::now()->month)
+            ->orderBy('photo_date', 'desc')
+            ->get();
+
+        return compact('photos');
+    }
+
+    // Get Photo Progress Data
+    protected function getPhotoProgressData($userId)
+    {
+        $startOfWeek = Carbon::now()->startOfWeek();
+        $endOfWeek   = Carbon::now()->endOfWeek();
+
+        // Weekly
+        $weeklyPhotoCount = DietProgressPhoto::where('user_id', $userId)
+            ->whereBetween('photo_date', [$startOfWeek, $endOfWeek])
+            ->count();
+
+        $weeklyTarget   = 2;
+        $weeklyProgress = $weeklyTarget > 0
+        ? min(round(($weeklyPhotoCount / $weeklyTarget) * 100), 100) // cap at 100%
+        : 0;
+
+        // Monthly
+        $photoCountThisMonth = DietProgressPhoto::where('user_id', $userId)
+            ->whereMonth('photo_date', now()->month)
+            ->whereYear('photo_date', now()->year)
+            ->count();
+
+        $monthlyTarget   = 8;
+        $monthlyProgress = $monthlyTarget > 0
+        ? min(round(($photoCountThisMonth / $monthlyTarget) * 100), 100) // cap at 100%
+        : 0;
+
+        return [
+            'weeklyPhotoCount'       => $weeklyPhotoCount,
+            'weeklyTarget'           => $weeklyTarget,
+            'weeklyPhotoPercentage'  => $weeklyProgress, // pass to frontend
+            'monthlyPhotoCount'      => $photoCountThisMonth,
+            'monthlyTarget'          => $monthlyTarget,
+            'monthlyPhotoPercentage' => $monthlyProgress, // pass to frontend
+        ];
     }
 
     // Member View of a Specific Diet Plan
