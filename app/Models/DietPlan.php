@@ -15,20 +15,24 @@ class DietPlan extends Model
         'member_id',
         'request_id',
         'plan_name',
+        'daily_calories_target',
+        'daily_protein_target',
+        'daily_carbs_target',
+        'daily_fats_target',
+        'meals_per_day',
+        'plan_description',
+        'dietitian_instructions',
+        'weekly_schedule',
         'start_date',
         'end_date',
         'status',
     ];
 
     protected $casts = [
-        'start_date' => 'date',
-        'end_date'   => 'date',
+        'start_date'      => 'date',
+        'end_date'        => 'date',
+        'weekly_schedule' => 'array',
     ];
-
-    public function dietplanMeals()
-    {
-        return $this->hasMany(DietPlanMeal::class, 'meal_id');
-    }
 
     public function dietitian()
     {

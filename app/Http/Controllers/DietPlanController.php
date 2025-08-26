@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\DietPlan;
 use App\Models\HealthAssessment;
+use App\Models\Notification;
 use App\Models\Request as DietRequest;
 use App\Models\User;
 use Carbon\Carbon;
@@ -111,7 +112,7 @@ class DietPlanController extends Controller
         $request->validate([
             'dietitian_id'         => 'required|exists:users,id',
             'goal'                 => 'required|string|max:255',
-            'timeframe'            => 'required|in:1_month,3_months,6_months,1_year',
+            'timeframe'            => 'required|in:1 month,3 months,6 months,1 year',
             'current_weight'       => 'required|numeric|min:1|max:500',
             'target_weight'        => 'nullable|numeric|min:1|max:500',
             'special_requirements' => 'nullable|string|max:1000',
@@ -170,4 +171,144 @@ class DietPlanController extends Controller
     }
 
     // -----------------------------Dietitian------------------------------
+
+    // Show assigned diet plans
+    public function index()
+    {
+        $user = Auth::user();
+
+        DietPlan::where('dietitian_id', $user->id)
+            ->whereDate('start_date', now()->toDateString())
+            ->whereNotIn('status', ['Active', 'Completed', 'Cancelled'])
+            ->update(['status' => 'Active']);
+
+        // Update expired plans to completed
+        DietPlan::where('dietitian_id', $user->id)
+            ->where('end_date', '<', now())
+            ->whereNotIn('status', ['Completed'])
+            ->update(['status' => 'Completed']);
+
+        $plans = DietPlan::with('member')
+            ->where('dietitian_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('dietitianDashboard.dietPlan', compact('plans'));
+    }
+
+    // Show diet plan creation form
+    public function create($request_id)
+    {
+        $request = DietRequest::with('member')
+            ->where('request_id', $request_id)
+            ->where('type', 'Diet')
+            ->where('status', 'Approved')
+            ->firstOrFail();
+
+        // Get member's health assessment for pre-filling nutrition targets
+        $healthAssessment = HealthAssessment::where('member_id', $request->member_id)
+            ->where('is_complete', true)
+            ->first();
+
+        // Calculate recommended daily nutrition based on health assessment
+        $nutritionTargets = $this->calculateNutritionTargets($request, $healthAssessment);
+
+        // Get available meals for selection
+        $meals = Meal::where('is_active', true)
+            ->orderBy('description')
+            ->get();
+
+        return view('dietitianDashboard.dietplan_create_working', compact('request', 'meals', 'healthAssessment', 'nutritionTargets'));
+    }
+
+    // Store new diet plan
+    public function store(Request $request)
+    {
+        $request->validate([
+            'request_id'             => 'required|exists:diet_requests,id',
+            'plan_name'              => 'required|string|max:255',
+            'description'            => 'nullable|string|max:1000',
+            'start_date'             => 'required|date|after_or_equal:today',
+            'end_date'               => 'required|date|after:start_date',
+            'total_calories_per_day' => 'required|numeric|min:800|max:5000',
+            'total_protein_per_day'  => 'required|numeric|min:0',
+            'total_carbs_per_day'    => 'required|numeric|min:0',
+            'total_fat_per_day'      => 'required|numeric|min:0',
+            'selected_meals'         => 'nullable|string', // JSON string of selected meals
+            'notes'                  => 'nullable|string|max:1000',
+        ]);
+
+        $req = DietRequest::findOrFail($request->request_id);
+
+        // Get the latest Active or Pending diet plan for the member
+        $latestPlan = DietPlan::where('member_id', $req->member_id)
+            ->where('status', 'Active')
+            ->orderBy('end_date', 'desc')
+            ->first();
+
+        // Determine the status and start date for the new diet plan
+        if ($latestPlan) {
+            // There is an active plan, so this plan should be pending
+            $status    = 'Pending';
+            $startDate = Carbon::parse($latestPlan->end_date)->addDay()->format('Y-m-d'); // Start after the existing plan
+            $endDate   = Carbon::parse($startDate)->addDays(Carbon::parse($request->end_date)->diffInDays(Carbon::parse($request->start_date)))->format('Y-m-d');
+        } else {
+            // No active plan, plan can be active immediately
+            $status    = 'Active';
+            $startDate = $request->start_date;
+            $endDate   = $request->end_date;
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Parse selected meals
+            $selectedMeals = [];
+            if ($request->selected_meals) {
+                $selectedMeals = json_decode($request->selected_meals, true) ?? [];
+            }
+
+            // Create diet plan
+            $dietPlan = DietPlan::create([
+                'dietitian_id'           => Auth::id(),
+                'member_id'              => $req->member_id,
+                'request_id'             => $req->request_id,
+                'plan_name'              => $request->plan_name,
+                'plan_description'       => $request->description,
+                'start_date'             => $startDate,
+                'end_date'               => $endDate,
+                'daily_calories_target'  => $request->total_calories_per_day,
+                'daily_protein_target'   => $request->total_protein_per_day,
+                'daily_carbs_target'     => $request->total_carbs_per_day,
+                'daily_fats_target'      => $request->total_fat_per_day,
+                'meals_per_day'          => 3, // Default value
+                'dietitian_instructions' => $request->notes,
+                'weekly_schedule'        => $this->convertMealsToSchedule($selectedMeals),
+                'status'                 => $status,
+            ]);
+
+            // Create DietPlanMeal entries for each selected meal
+            $this->createDietPlanMeals($dietPlan->dietplan_id, $selectedMeals);
+
+            // Update the diet request status to completed
+            $req->update(['status' => 'Completed']);
+
+            DB::commit();
+
+            return redirect()->route('dietitian.dietplan')
+                ->with('success', 'Diet plan "' . $request->plan_name . '" created successfully for ' . $req->member->first_name . ' ' . $req->member->last_name . '! The plan includes ' . $this->countTotalMeals($selectedMeals) . ' meals and will be visible to both the member and trainer.');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Log::error('Diet Plan Creation Error: ' . $e->getMessage(), [
+                'request_data' => $request->all(),
+                'user_id'      => Auth::id(),
+                'stack_trace'  => $e->getTraceAsString(),
+            ]);
+            return redirect()->back()
+                ->withErrors(['error' => 'Failed to create diet plan: ' . $e->getMessage()])
+                ->withInput();
+        }
+    }
+
 }

@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             MembershipTypeSeeder::class,
             ExerciseSeeder::class,
             TrainerAvailabilitySeeder::class,
+            MealSeeder::class,
         ]);
     }
 }

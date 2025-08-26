@@ -84,14 +84,6 @@ class MemberBookingController extends Controller
         ]);
 
         Notification::create([
-            'user_id' => $memberId,
-            'title'   => 'New Booking Request',
-            'message' => 'Your booking request has been submitted successfully.',
-            'type'    => 'Booking',
-            'is_read' => false,
-        ]);
-
-        Notification::create([
             'user_id' => $trainerId,
             'title'   => 'New Booking Request',
             'message' => 'You have a new booking request from ' . Auth::user()->first_name,
@@ -157,14 +149,6 @@ class MemberBookingController extends Controller
             'user_id' => $booking->trainer_id,
             'title'   => 'Booking Cancelled',
             'message' => 'A booking scheduled on ' . $booking->date->format('F j, Y') . ' ' . $booking->time . ' has been cancelled by the member.',
-            'type'    => 'Booking',
-            'is_read' => false,
-        ]);
-
-        Notification::create([
-            'user_id' => $booking->member_id,
-            'title'   => 'Booking Cancelled',
-            'message' => 'Your booking scheduled on ' . $booking->date->format('F j, Y') . ' ' . $booking->time . ' has been cancelled.',
             'type'    => 'Booking',
             'is_read' => false,
         ]);

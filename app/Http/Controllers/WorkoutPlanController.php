@@ -552,6 +552,8 @@ class WorkoutPlanController extends Controller
             }
         }
 
+        $req->update(['status' => 'Completed']);
+
         Notification::create([
             'user_id' => $plan->member_id,
             'title'   => 'New Workout Plan Created',

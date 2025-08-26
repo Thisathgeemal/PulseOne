@@ -140,4 +140,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(TrainerAvailability::class, 'trainer_id');
     }
+
+    public function meals()
+    {
+        return $this->hasMany(Meal::class, 'created_by_dietitian_id');
+    }
 }

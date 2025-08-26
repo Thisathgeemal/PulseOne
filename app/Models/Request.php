@@ -14,15 +14,17 @@ class Request extends Model
         'member_id',
         'trainer_id',
         'dietitian_id',
-        'description',
-        'type',
-        'status',
         'plan_type',
-        'height',
-        'weight',
-        'target_weight',
         'preferred_start_date',
         'available_days',
+        'goal',
+        'current_weight',
+        'target_weight',
+        'timeframe',
+        'meals_per_day',
+        'type',
+        'description',
+        'status',
 
     ];
 

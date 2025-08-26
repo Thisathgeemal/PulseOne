@@ -25,6 +25,28 @@ class DietRequestController extends Controller
         return view('dietitianDashboard.request', compact('requests'));
     }
 
+    // Show Diet Request
+    public function show(DietRequest $dietRequest)
+    {
+        if (! Auth::user()->hasRole('Dietitian')) {
+            abort(403);
+        }
+
+        return view('dietitianDashboard.dietRequest_view', compact('dietRequest'));
+    }
+
+    // Assign Diet Request
+    public function assign(DietRequest $dietRequest)
+    {
+        if (! Auth::user()->hasRole('Dietitian')) {
+            abort(403);
+        }
+
+        $dietRequest->assignToDietitian(Auth::id());
+
+        return redirect()->back()->with('success', 'Diet request assigned successfully.');
+    }
+
     // Approve or Reject
     public function updateStatus(Request $request, $id)
     {
@@ -44,9 +66,9 @@ class DietRequestController extends Controller
         : 'Request rejected successfully.';
 
         Notification::create([
-            'user_id' => Auth::id(),
+            'user_id' => $req->member_id,
             'title'   => 'Diet Request ' . $request->status,
-            'message' => 'Your diet request has been ' . strtolower($request->status) . '.',
+            'message' => 'Your diet plan request has been ' . strtolower($request->status) . '.',
             'type'    => 'Request',
             'is_read' => false,
         ]);

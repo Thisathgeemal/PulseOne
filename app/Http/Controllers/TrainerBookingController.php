@@ -150,14 +150,6 @@ class TrainerBookingController extends Controller
             ]);
 
             Notification::create([
-                'user_id' => $booking->trainer_id,
-                'title'   => 'Booking Request Approved',
-                'message' => 'A booking scheduled on ' . $booking->date->format('F j, Y') . ' ' . $booking->time . ' has been approved.',
-                'type'    => 'Booking',
-                'is_read' => false,
-            ]);
-
-            Notification::create([
                 'user_id' => $booking->member_id,
                 'title'   => 'Booking Request Approved',
                 'message' => 'Your booking scheduled on ' . $booking->date->format('F j, Y') . ' ' . $booking->time . ' has been approved.',
@@ -187,14 +179,6 @@ class TrainerBookingController extends Controller
         $booking->update([
             'status'         => 'declined',
             'decline_reason' => $data['reason'],
-        ]);
-
-        Notification::create([
-            'user_id' => $booking->trainer_id,
-            'title'   => 'Booking Request Declined',
-            'message' => 'A booking scheduled on ' . $booking->date->format('F j, Y') . ' ' . $booking->time . ' has been declined.',
-            'type'    => 'Booking',
-            'is_read' => false,
         ]);
 
         Notification::create([
@@ -232,14 +216,6 @@ class TrainerBookingController extends Controller
         }
 
         $booking->update(['status' => 'cancelled']);
-
-        Notification::create([
-            'user_id' => $booking->trainer_id,
-            'title'   => 'Booking Cancelled',
-            'message' => 'A booking scheduled on ' . $booking->date->format('F j, Y') . ' ' . $booking->time . ' has been cancelled.',
-            'type'    => 'Booking',
-            'is_read' => false,
-        ]);
 
         Notification::create([
             'user_id' => $booking->member_id,

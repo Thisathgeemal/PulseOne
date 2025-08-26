@@ -11,10 +11,31 @@ return new class extends Migration
     {
         Schema::create('meals', function (Blueprint $table) {
             $table->bigIncrements('meal_id');
-            $table->string('name');
-            $table->string('type');
-            $table->string('meal_category')->nullable();
+            $table->string('meal_name');
             $table->string('description')->nullable();
+
+            $table->decimal('calories_per_serving', 8, 2)->default(0);
+            $table->decimal('protein_grams', 8, 2)->default(0);
+            $table->decimal('carbs_grams', 8, 2)->default(0);
+            $table->decimal('fats_grams', 8, 2)->default(0);
+            $table->decimal('fiber_grams', 8, 2)->default(0);
+            $table->decimal('sugar_grams', 8, 2)->default(0);
+            $table->decimal('sodium_mg', 8, 2)->default(0);
+
+            $table->decimal('serving_size', 8, 2)->default(1);
+            $table->string('serving_unit')->default('serving');
+
+            $table->text('dietary_tags')->nullable();
+            $table->text('ingredients')->nullable();
+            $table->text('preparation_method')->nullable();
+
+            $table->integer('prep_time_minutes')->nullable();
+            $table->integer('cook_time_minutes')->nullable();
+            $table->integer('total_time_minutes')->nullable();
+            $table->string('difficulty_level')->default('easy');
+            $table->boolean('is_active')->default(true);
+            $table->foreignId('created_by_dietitian_id')->nullable()->constrained('users')->onDelete('cascade');
+
             $table->timestamps();
         });
     }

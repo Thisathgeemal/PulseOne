@@ -24,7 +24,7 @@
                         <th class="py-3 px-4 text-left border-b border-gray-300">Current Weight</th>
                         <th class="py-3 px-4 text-left border-b border-gray-300">Target Weight</th>
                         <th class="py-3 px-4 text-left border-b border-gray-300">Timeframe</th>
-                        <th class="py-3 px-4 text-left border-b border-gray-300">Special Requirements</th>
+                        <th class="py-3 px-4 text-left border-b border-gray-300">Description</th>
                         <th class="py-3 px-4 text-left border-b border-gray-300">Status</th>
                     </tr>
                 </thead>
@@ -34,7 +34,7 @@
                             <td class="py-3 px-4 text-left border-b border-gray-200">
                                 {{ $request->dietitian ? $request->dietitian->first_name . ' ' . $request->dietitian->last_name : 'N/A' }}
                             </td>
-                            <td class="py-3 px-4 text-left border-b border-gray-200">
+                            <td class="py-3 px-4 text-left border-b border-gray-200 max-w-[14rem] break-words">
                                 {{ $request->goal ?? '-' }}
                             </td>
                             <td class="py-3 px-4 text-left border-b border-gray-200">
@@ -55,7 +55,7 @@
                                         ? 'text-green-600 font-semibold'
                                         : ($request->status === 'Rejected'
                                             ? 'text-red-600 font-semibold'
-                                            : ($request->status === 'In Progress'
+                                            : ($request->status === 'Completed'
                                                 ? 'text-blue-600 font-semibold'
                                                 : 'text-yellow-600 font-semibold')) }}">
                                     {{ $request->status }}
@@ -153,10 +153,10 @@
                         <select id="timeframe" name="timeframe" required
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm">
                             <option value="" disabled selected>Select Timeframe</option>
-                            <option value="1_month">1 Month</option>
-                            <option value="3_months">3 Months</option>
-                            <option value="6_months">6 Months</option>
-                            <option value="1_year">1 Year</option>
+                            <option value="1 month">1 Month</option>
+                            <option value="3 months">3 Months</option>
+                            <option value="6 months">6 Months</option>
+                            <option value="1 year">1 Year</option>
                         </select>
                     </div>
 

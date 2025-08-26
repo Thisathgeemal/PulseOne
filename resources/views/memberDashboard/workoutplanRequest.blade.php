@@ -41,7 +41,7 @@
                             </td>
                             <td class="py-3 px-4 text-left border-b border-gray-200">
                                 <span
-                                    class="{{ $request->status === 'Approved' ? 'text-green-600 font-semibold' : ($request->status === 'Rejected' ? 'text-red-600 font-semibold' : 'text-yellow-600 font-semibold') }}">
+                                    class="{{ $request->status === 'Approved' ? 'text-green-600 font-semibold' : ($request->status === 'Rejected' ? 'text-red-600 font-semibold' : ($request->status === 'Pending' ? 'text-yellow-600 font-semibold' : 'text-blue-600 font-semibold')) }}">
                                     {{ $request->status }}
                                 </span>
                             </td>

@@ -27,7 +27,7 @@ return new class extends Migration
 
             $table->string('description')->nullable();
             $table->enum('type', ['Workout', 'Diet']);
-            $table->enum('status', ['Pending', 'In Progress', 'Approved', 'Rejected'])->default('Pending');
+            $table->enum('status', ['Pending', 'Completed', 'Approved', 'Rejected'])->default('Pending');
             $table->timestamps();
 
             $table->foreign('member_id')->references('id')->on('users')->onDelete('cascade');
