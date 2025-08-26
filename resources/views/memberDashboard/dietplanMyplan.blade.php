@@ -7,7 +7,7 @@
         <p class="text-sm text-gray-300 mt-1">Assigned by your personal dietitian.</p>
     </div>
 
-    {{-- @if ($plans->count())
+    @if ($plans->count())
         <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1">
             @foreach ($plans as $plan)
                 <div
@@ -54,19 +54,26 @@
 
                     <!-- Action Buttons -->
                     <div class="mt-1 flex gap-3 justify-end opacity-100 transition-opacity duration-300">
-                        <a href="{{ route('member.dietplan.view', $plan->id) }}"
+                        <a href="{{ route('member.dietplan.view', $plan->dietplan_id) }}"
                             class="w-[110px] px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition text-center">
                             View
                         </a>
-                        @if ($plan->status === 'Active')
+                        @if (
+                            $plan->status === 'Active' &&
+                                \Carbon\Carbon::parse($plan->start_date)->isPast() &&
+                                \Carbon\Carbon::parse($plan->end_date)->isFuture())
                             <a href="{{ route('member.dietplan.progress') }}"
                                 class="w-[110px] px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition text-center">
-                                Progress
+                                Start
                             </a>
                         @endif
-                        <a href="{{ route('member.dietplan.cancel', $plan->id) }}"
+                        <a href="{{ route('member.dietplan.cancel', $plan->dietplan_id) }}"
                             class="w-[110px] px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition text-center">
                             Cancel
+                        </a>
+                        <a href="{{ route('member.dietplan.download', $plan->dietplan_id) }}"
+                            class="w-[110px] px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-medium rounded-lg transition text-center">
+                            Download
                         </a>
                     </div>
                 </div>
@@ -76,7 +83,7 @@
         <div class="bg-white rounded-xl border border-gray-200 shadow-md p-6 mt-8 text-center">
             <h2 class="text-xl font-semibold text-gray-600">No diet plans have been created yet.</h2>
         </div>
-    @endif --}}
+    @endif
 
     @push('scripts')
         @if (session('success'))

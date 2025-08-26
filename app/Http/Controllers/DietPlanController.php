@@ -3,13 +3,16 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\DietPlan;
+use App\Models\DietPlanMeal;
 use App\Models\HealthAssessment;
+use App\Models\Meal;
 use App\Models\Notification;
 use App\Models\Request as DietRequest;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DietPlanController extends Controller
 {
@@ -149,14 +152,24 @@ class DietPlanController extends Controller
     {
         $user = Auth::user();
 
-        return view('memberDashboard.dietplanMyplan');
+        // Update status for plans that should be active today
+        DietPlan::where('member_id', $user->id)
+            ->whereDate('start_date', now()->toDateString())
+            ->where('status', 'Pending')
+            ->update(['status' => 'Active']);
+
+        $plans = DietPlan::with(['dietitian'])
+            ->where('member_id', $user->id)
+            ->orderBy('start_date', 'desc')
+            ->get();
+
+        return view('memberDashboard.dietplanMyplan', compact('plans'));
     }
 
     // Get Track data
     public function progressTracking()
     {
         $userId = auth()->id();
-        $today  = Carbon::today();
 
         $dietPlan = DietPlan::where('member_id', $userId)
             ->where('status', 'Active')
@@ -166,8 +179,88 @@ class DietPlanController extends Controller
             return redirect()->back()->with('error', 'No active diet plan found. Start a Diet Plan first.');
         }
 
-        return view('memberDashboard.dietplanProgress');
+        // Daily Progress (adherence)
+        $totalDays = $dietPlan->start_date && $dietPlan->end_date
+        ? \Carbon\Carbon::parse($dietPlan->start_date)->diffInDays(\Carbon\Carbon::parse($dietPlan->end_date)) + 1
+        : 0;
+        // Adherence logs removed — treat as zero/empty
+        $completedDays = 0;
+        $dailyProgress = [
+            'completed'  => $completedDays,
+            'total'      => $totalDays,
+            'percentage' => $totalDays ? round(($completedDays / $totalDays) * 100, 1) : 0,
+        ];
 
+        // Weekly Progress
+        $totalWeeks = $dietPlan->start_date && $dietPlan->end_date
+        ? ceil(\Carbon\Carbon::parse($dietPlan->start_date)->diffInWeeks(\Carbon\Carbon::parse($dietPlan->end_date)) + 1)
+        : 0;
+        // No adherence logs table; assume no completed weeks
+        $completedWeeks = 0;
+        $weeklyProgress = [
+            'completed'  => $completedWeeks,
+            'total'      => $totalWeeks,
+            'percentage' => $totalWeeks ? round(($completedWeeks / $totalWeeks) * 100, 1) : 0,
+        ];
+
+        // Monthly Progress
+        $totalMonths = $dietPlan->start_date && $dietPlan->end_date
+        ? ceil(\Carbon\Carbon::parse($dietPlan->start_date)->diffInMonths(\Carbon\Carbon::parse($dietPlan->end_date)) + 1)
+        : 0;
+        // No adherence logs table; assume no completed months
+        $completedMonths = 0;
+        $monthlyProgress = [
+            'completed'  => $completedMonths,
+            'total'      => $totalMonths,
+            'percentage' => $totalMonths ? round(($completedMonths / $totalMonths) * 100, 1) : 0,
+        ];
+
+        // Progress Photos
+        $photos        = $dietPlan->progress_photos()->orderBy('photo_date', 'desc')->get();
+        $photoProgress = [
+            'monthlyCount'     => $dietPlan->progress_photos()->whereRaw('MONTH(photo_date) = MONTH(NOW())')->count(),
+            'weeklyPhotoCount' => $dietPlan->progress_photos()->whereRaw('WEEK(photo_date) = WEEK(NOW())')->count(),
+        ];
+
+        $isMember = true;
+        return view('memberDashboard.dietplanProgress', compact(
+            'dietPlan',
+            'photos',
+            'photoProgress',
+            'isMember',
+        ));
+    }
+
+    // Member View of a Specific Diet Plan
+    public function viewMemberPlan(DietPlan $dietPlan)
+    {
+        // Ensure member can only view their own plans
+        if ($dietPlan->member_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $dietPlan->load([
+            'dietitian',
+            'dietPlanMeals.meal',
+        ]);
+
+        // Pass both variables for template compatibility
+        $plan = $dietPlan;
+        return view('memberDashboard.dietplan_view', compact('plan', 'dietPlan'));
+    }
+
+    // Cancel the diet plan
+    public function cancelMemberPlan(DietPlan $dietPlan)
+    {
+        // Ensure member can only cancel their own plans
+        if ($dietPlan->member_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $dietPlan->status = 'Cancelled';
+        $dietPlan->save();
+
+        return redirect()->back()->with('success', 'Your diet plan has been cancelled successfully.');
     }
 
     // -----------------------------Dietitian------------------------------
@@ -213,19 +306,22 @@ class DietPlanController extends Controller
         // Calculate recommended daily nutrition based on health assessment
         $nutritionTargets = $this->calculateNutritionTargets($request, $healthAssessment);
 
+        // Calculate suggested start and end dates based on timeframe
+        $suggestedDates = $this->calculateDatesFromTimeframe($request->timeframe);
+
         // Get available meals for selection
         $meals = Meal::where('is_active', true)
-            ->orderBy('description')
+            ->orderBy('calories_per_serving', 'asc')
             ->get();
 
-        return view('dietitianDashboard.dietplan_create_working', compact('request', 'meals', 'healthAssessment', 'nutritionTargets'));
+        return view('dietitianDashboard.dietplanCreate', compact('request', 'meals', 'healthAssessment', 'nutritionTargets', 'suggestedDates'));
     }
 
     // Store new diet plan
     public function store(Request $request)
     {
         $request->validate([
-            'request_id'             => 'required|exists:diet_requests,id',
+            'request_id'             => 'required|exists:requests,request_id',
             'plan_name'              => 'required|string|max:255',
             'description'            => 'nullable|string|max:1000',
             'start_date'             => 'required|date|after_or_equal:today',
@@ -234,7 +330,7 @@ class DietPlanController extends Controller
             'total_protein_per_day'  => 'required|numeric|min:0',
             'total_carbs_per_day'    => 'required|numeric|min:0',
             'total_fat_per_day'      => 'required|numeric|min:0',
-            'selected_meals'         => 'nullable|string', // JSON string of selected meals
+            'selected_meals'         => 'nullable|string',
             'notes'                  => 'nullable|string|max:1000',
         ]);
 
@@ -250,8 +346,14 @@ class DietPlanController extends Controller
         if ($latestPlan) {
             // There is an active plan, so this plan should be pending
             $status    = 'Pending';
-            $startDate = Carbon::parse($latestPlan->end_date)->addDay()->format('Y-m-d'); // Start after the existing plan
-            $endDate   = Carbon::parse($startDate)->addDays(Carbon::parse($request->end_date)->diffInDays(Carbon::parse($request->start_date)))->format('Y-m-d');
+            $startDate = Carbon::parse($latestPlan->end_date)->addDay();
+
+            // Duration in days based on original request
+            $durationDays = Carbon::parse($request->start_date)
+                ->diffInDays(Carbon::parse($request->end_date));
+
+            // Apply that duration to the new start date
+            $endDate = $startDate->copy()->addDays($durationDays);
         } else {
             // No active plan, plan can be active immediately
             $status    = 'Active';
@@ -293,10 +395,18 @@ class DietPlanController extends Controller
             // Update the diet request status to completed
             $req->update(['status' => 'Completed']);
 
+            Notification::create([
+                'user_id' => $req->member_id,
+                'title'   => 'Diet Plan Created',
+                'message' => 'You received a new diet plan from ' . Auth::user()->first_name,
+                'type'    => 'Diet Plan',
+                'is_read' => false,
+            ]);
+
             DB::commit();
 
             return redirect()->route('dietitian.dietplan')
-                ->with('success', 'Diet plan "' . $request->plan_name . '" created successfully for ' . $req->member->first_name . ' ' . $req->member->last_name . '! The plan includes ' . $this->countTotalMeals($selectedMeals) . ' meals and will be visible to both the member and trainer.');
+                ->with('success', 'Diet plan ' . $request->plan_name . ' created successfully for ' . $req->member->first_name . ' ' . $req->member->last_name . '! The plan includes ' . $this->countTotalMeals($selectedMeals) . ' meals and will be visible to both the member and trainer.');
 
         } catch (\Exception $e) {
             DB::rollback();
@@ -311,4 +421,212 @@ class DietPlanController extends Controller
         }
     }
 
+    // Calculate nutrition targets based on health assessment and goals
+    private function calculateNutritionTargets($request, $healthAssessment)
+    {
+        $defaults = [
+            'calories' => 2000,
+            'protein'  => 150,
+            'carbs'    => 250,
+            'fat'      => 67,
+        ];
+
+        if (! $healthAssessment) {
+            return $defaults;
+        }
+
+        // Calculate BMR using Mifflin-St Jeor Equation
+        $age    = $healthAssessment->age ?? 30;
+        $weight = $healthAssessment->weight_kg ?? 70;
+        $height = $healthAssessment->height_cm ?? 170;
+        $gender = $healthAssessment->gender ?? 'male';
+
+        if ($gender === 'male') {
+            $bmr = (10 * $weight) + (6.25 * $height) - (5 * $age) + 5;
+        } else {
+            $bmr = (10 * $weight) + (6.25 * $height) - (5 * $age) - 161;
+        }
+
+        // Activity level multiplier
+        $activityMultipliers = [
+            'sedentary'         => 1.2,
+            'lightly_active'    => 1.375,
+            'moderately_active' => 1.55,
+            'very_active'       => 1.725,
+            'extra_active'      => 1.9,
+        ];
+
+        $activityLevel = $healthAssessment->activity_level ?? 'moderately_active';
+        $tdee          = $bmr * ($activityMultipliers[$activityLevel] ?? 1.55);
+
+        // Adjust based on goals
+        $goal = $request->goal ?? 'maintenance';
+        switch ($goal) {
+            case 'weight_loss':
+                $calories     = $tdee - 500; // 500 cal deficit for 1lb/week loss
+                $proteinRatio = 0.3;         // Higher protein for weight loss
+                $carbRatio    = 0.35;
+                $fatRatio     = 0.35;
+                break;
+            case 'muscle_gain':
+                $calories     = $tdee + 300; // 300 cal surplus for muscle gain
+                $proteinRatio = 0.25;
+                $carbRatio    = 0.45; // Higher carbs for training
+                $fatRatio     = 0.3;
+                break;
+            case 'athletic_performance':
+                $calories     = $tdee + 200;
+                $proteinRatio = 0.25;
+                $carbRatio    = 0.5; // High carbs for performance
+                $fatRatio     = 0.25;
+                break;
+            default: // maintenance
+                $calories     = $tdee;
+                $proteinRatio = 0.25;
+                $carbRatio    = 0.4;
+                $fatRatio     = 0.35;
+        }
+
+                                                           // Calculate macros
+        $protein = round(($calories * $proteinRatio) / 4); // 4 cal per gram
+        $carbs   = round(($calories * $carbRatio) / 4);    // 4 cal per gram
+        $fat     = round(($calories * $fatRatio) / 9);     // 9 cal per gram
+
+        return [
+            'calories'         => round($calories),
+            'protein'          => $protein,
+            'carbs'            => $carbs,
+            'fat'              => $fat,
+            'bmr'              => round($bmr),
+            'tdee'             => round($tdee),
+            'goal_explanation' => $this->getGoalExplanation($goal),
+        ];
+    }
+
+    // Calculate start and end dates based on the selected timeframe
+    private function calculateDatesFromTimeframe($timeframe)
+    {
+        $startDate = now()->addDays(1);
+
+        $endDate = match ($timeframe) {
+            '1 month' => $startDate->copy()->addMonths(1),
+            '3 months' => $startDate->copy()->addMonths(3),
+            '6 months' => $startDate->copy()->addMonths(6),
+            '1 year' => $startDate->copy()->addYear(),
+            default => $startDate->copy()->addMonths(3)
+        };
+
+        return [
+            'start_date'        => $startDate->format('Y-m-d'),
+            'end_date'          => $endDate->format('Y-m-d'),
+            'timeframe_display' => match ($timeframe) {
+                '1 month'           => '1 Month',
+                '3 months'          => '3 Months',
+                '6 months'          => '6 Months',
+                '1 year'            => '1 Year',
+                default             => '3 Months'
+            },
+        ];
+    }
+
+    // Get explanation for diet goals
+    private function getGoalExplanation($goal)
+    {
+        return match ($goal) {
+            'weight_loss' => 'Caloric deficit with higher protein to preserve muscle mass',
+            'muscle_gain' => 'Caloric surplus with balanced macros to support muscle growth',
+            'athletic_performance' => 'Higher carbohydrates to fuel training and performance',
+            default => 'Balanced macronutrient distribution for maintaining current weight'
+        };
+    }
+
+    // Convert selected meals to a schedule
+    private function convertMealsToSchedule(array $selectedMeals): array
+    {
+        $schedule = [];
+
+        if (isset($selectedMeals['breakfast']) && count($selectedMeals['breakfast']) > 0) {
+            $schedule['breakfast'] = '08:00';
+        }
+        if (isset($selectedMeals['lunch']) && count($selectedMeals['lunch']) > 0) {
+            $schedule['lunch'] = '12:00';
+        }
+        if (isset($selectedMeals['dinner']) && count($selectedMeals['dinner']) > 0) {
+            $schedule['dinner'] = '19:00';
+        }
+        if (isset($selectedMeals['snack']) && count($selectedMeals['snack']) > 0) {
+            $schedule['snack'] = '15:00';
+        }
+
+        return $schedule;
+    }
+
+    // Create diet plan meals
+    private function createDietPlanMeals(int $dietPlanId, array $selectedMeals): void
+    {
+        $timeSlots = [
+            'breakfast' => '08:00:00',
+            'lunch'     => '12:00:00',
+            'dinner'    => '19:00:00',
+            'snack'     => '15:00:00',
+        ];
+
+        foreach ($selectedMeals as $mealType => $meals) {
+            foreach ($meals as $meal) {
+                DietPlanMeal::create([
+                    'dietplan_id' => $dietPlanId,
+                    'meal_id'     => $meal['id'] ?? null,
+                    'day'         => 1,
+                    'time'        => $timeSlots[$mealType] ?? '12:00:00',
+                    'quantity'    => 1.0,
+                    'calories'    => intval($meal['calories'] ?? 0),
+                    'protein'     => intval($meal['protein'] ?? 0),
+                    'carbs'       => intval($meal['carbs'] ?? 0),
+                    'fat'         => intval($meal['fat'] ?? 0),
+                    'notes'       => 'Added via meal plan builder - ' . ($meal['name'] ?? 'Custom meal'),
+                ]);
+            }
+        }
+    }
+
+    // Count total meals
+    private function countTotalMeals(array $selectedMeals): int
+    {
+        $total = 0;
+        foreach ($selectedMeals as $mealType => $meals) {
+            $total += count($meals);
+        }
+        return $total;
+    }
+
+    // Show diet plan details
+    public function show(DietPlan $dietPlan)
+    {
+        // Ensure dietitian can only view their own plans
+        if ($dietPlan->dietitian_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $dietPlan->load(['member', 'dietitian', 'dietPlanMeals.meal']);
+
+        return view('dietitianDashboard.dietplan_view', compact('dietPlan'));
+    }
+
+    // Track diet plan progress
+    public function track(DietPlan $dietPlan)
+    {
+        $dietPlan->load(['member', 'dietitian']);
+        // Adherence model removed; provide empty collection for the view
+        $adherenceLogs = collect([]);
+        $isMember      = false;
+
+        // Photos
+        $photos        = $dietPlan->progress_photos()->orderBy('photo_date', 'desc')->get();
+        $photoProgress = [
+            'monthlyCount'     => $dietPlan->progress_photos()->whereRaw('MONTH(photo_date) = MONTH(NOW())')->count(),
+            'weeklyPhotoCount' => $dietPlan->progress_photos()->whereRaw('WEEK(photo_date) = WEEK(NOW())')->count(),
+        ];
+
+        return view('dietitianDashboard.dietplan_progress', compact('dietPlan', 'adherenceLogs', 'isMember', 'photos', 'photoProgress'));
+    }
 }

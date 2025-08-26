@@ -145,4 +145,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Meal::class, 'created_by_dietitian_id');
     }
+
+    public function dietProgressPhotos()
+    {
+        return $this->hasMany(DietPlanProgressPhoto::class, 'member_id');
+    }
+
 }

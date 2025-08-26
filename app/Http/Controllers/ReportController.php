@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
+use App\Models\DietPlan;
 use App\Models\HealthAssessment;
 use App\Models\Membership;
 use App\Models\MembershipType;
@@ -204,6 +205,27 @@ class ReportController extends Controller
         $fileName = 'Member_Health_Report_' . $member->first_name . '_' . $member->last_name . '_' . now()->format('Y-m-d') . '.pdf';
 
         return $pdf->download($fileName);
+    }
+
+    // Diet plan report
+    public function generateDietReport(DietPlan $dietPlan)
+    {
+        $this->abortIfMissing([$dietPlan]);
+
+        $dietPlan->load([
+            'member',
+            'dietitian',
+            'dietPlanMeals.meal',
+        ]);
+
+        $date = Carbon::now()->format('Y-m-d');
+
+        $pdf = Pdf::loadView('report.dietplanReport', [
+            'plan' => $dietPlan,
+            'date' => $date,
+        ]);
+
+        return $pdf->download("DietPlan_Report_{$dietPlan->plan_name}.pdf");
     }
 
 }

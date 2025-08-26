@@ -149,8 +149,8 @@ Route::middleware(['auth'])->prefix('dietitian')->group(function () {
     // Diet Request Management
     Route::get('/request', [DietRequestController::class, 'index'])->name('dietitian.request');
     Route::post('/request/update-status/{id}', [DietRequestController::class, 'updateStatus'])->name('dietitian.request.update');
-    Route::get('/requests/{dietRequest}', [DietRequestController::class, 'show'])->name('dietitian.requests.show');
-    Route::post('/requests/{dietRequest}/assign', [DietRequestController::class, 'assign'])->name('dietitian.requests.assign');
+    // Route::get('/requests/{dietRequest}', [DietRequestController::class, 'show'])->name('dietitian.requests.show');
+    // Route::post('/requests/{dietRequest}/assign', [DietRequestController::class, 'assign'])->name('dietitian.requests.assign');
 
     // Meal Library Management
     Route::get('/meals', [MealController::class, 'index'])->name('dietitian.meals');
@@ -167,15 +167,13 @@ Route::middleware(['auth'])->prefix('dietitian')->group(function () {
     Route::post('/meals/suggest-plan', [MealController::class, 'suggestMealPlan'])->name('meals.suggest-plan');
 
     // Diet Plan Management
-    Route::get('/diet-plans', [DietPlanController::class, 'index'])->name('dietitian.diet-plans.index');
-    Route::get('/diet-plans/create/{request_id}', [DietPlanController::class, 'create'])->name('dietitian.dietplan.create');
-    Route::post('/diet-plans', [DietPlanController::class, 'store'])->name('dietitian.diet-plans.store');
-    Route::get('/diet-plans/{dietPlan}', [DietPlanController::class, 'show'])->name('dietitian.diet-plans.show');
-    Route::get('/diet-plans/{dietPlan}/track', [DietPlanController::class, 'track'])->name('dietitian.diet-plans.track');
-    Route::get('/diet-plans/{dietPlan}/download', [DietPlanController::class, 'download'])->name('dietitian.diet-plans.download');
-    Route::post('/diet-plans/{dietPlan}/activate', [DietPlanController::class, 'activate'])->name('dietitian.diet-plans.activate');
-    Route::post('/diet-plans/{dietPlan}/complete', [DietPlanController::class, 'complete'])->name('dietitian.diet-plans.complete');
-    Route::post('/diet-plans/{dietPlan}/cancel', [DietPlanController::class, 'cancel'])->name('dietitian.diet-plans.cancel');
+    Route::get('/dietplan', [DietPlanController::class, 'index'])->name('dietitian.dietplan');
+    Route::get('/dietplan/create/{request_id}', [DietPlanController::class, 'create'])->name('dietitian.dietplan.create');
+    Route::post('/dietplan', [DietPlanController::class, 'store'])->name('dietitian.dietplan.store');
+    Route::get('/dietplan/{dietPlan}', [DietPlanController::class, 'show'])->name('dietitian.dietplan.show');
+    Route::get('/dietplan/{dietPlan}/track', [DietPlanController::class, 'track'])->name('dietitian.dietplan.track');
+    Route::get('/dietplan/{dietPlan}/download', [ReportController::class, 'generateDietReport'])->name('dietitian.dietplan.download');
+    Route::post('/dietplan/{dietPlan}/cancel', [DietPlanController::class, 'cancel'])->name('dietitian.dietplan.cancel');
 
     // // Diet Plan Download
     // Route::get('/dietplan/view/{id}', [DietPlanController::class, 'viewPlan'])->name('dietitian.dietplan.view');
@@ -194,12 +192,11 @@ Route::middleware(['auth'])->prefix('dietitian')->group(function () {
     Route::get('/member/{memberId}/health-assessment/pdf', [ReportController::class, 'generateMemberHealthReport'])->name('dietitian.member.health-assessment.pdf');
     Route::get('/member-health-assessments', [HealthAssessmentController::class, 'dietitianHealthAssessments'])->name('dietitian.member.health-assessments');
 
-    // Static View Routes
-    Route::get('/dietplan', [DietPlanController::class, 'index'])->name('dietitian.dietplan');
-    Route::view('/feedback', 'dietitianDashboard.feedback')->name('dietitian.feedback');
-
     // Chat Routes
     Route::view('/message', 'dietitianDashboard.message')->name('dietitian.message');
+
+    // Static View Routes
+    Route::view('/feedback', 'dietitianDashboard.feedback')->name('dietitian.feedback');
 
 });
 
@@ -287,6 +284,11 @@ Route::middleware(['auth'])->prefix('member')->group(function () {
         Route::post('request', [DietPlanController::class, 'requestDietPlan'])->name('request');
         Route::get('myplan', [DietPlanController::class, 'myPlan'])->name('myplan');
         Route::get('progress', [DietPlanController::class, 'progressTracking'])->name('progress');
+        Route::get('view/{dietPlan}', [DietPlanController::class, 'viewMemberPlan'])->name('view');
+        Route::get('cancel/{dietPlan}', [DietPlanController::class, 'cancelMemberPlan'])->name('cancel');
+        Route::get('download/{dietPlan}', [ReportController::class, 'generateDietReport'])->name('download');
+        Route::post('photo', [DietPlanController::class, 'storePhoto'])->name('photo');
+        Route::post('weight', [DietPlanController::class, 'storeWeightLog'])->name('weight.store');
     });
 
     // Attendance Routes

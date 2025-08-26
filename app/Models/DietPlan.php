@@ -48,4 +48,19 @@ class DietPlan extends Model
     {
         return $this->belongsTo(Request::class, 'request_id');
     }
+
+    public function progress_photos()
+    {
+        return $this->hasMany(DietPlanProgressPhoto::class, 'dietplan_id', 'dietplan_id');
+    }
+
+    public function weight_logs()
+    {
+        return $this->hasMany(DietPlanWeightLog::class, 'dietplan_id', 'dietplan_id');
+    }
+
+    public function dietPlanMeals()
+    {
+        return $this->hasMany(DietPlanMeal::class, 'dietplan_id', 'dietplan_id');
+    }
 }
