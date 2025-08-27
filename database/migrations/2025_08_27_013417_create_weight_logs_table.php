@@ -14,11 +14,14 @@ return new class extends Migration
         Schema::create('weight_logs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('member_id')->index();
+            $table->unsignedBigInteger('dietplan_id')->index();
             $table->decimal('weight', 5, 2);
             $table->date('log_date');
+            $table->string('notes')->nullable();
             $table->timestamps();
 
             $table->foreign('member_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('dietplan_id')->references('dietplan_id')->on('diet_plans')->onDelete('cascade');
         });
     }
 

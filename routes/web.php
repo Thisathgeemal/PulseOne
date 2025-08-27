@@ -150,8 +150,8 @@ Route::middleware(['auth'])->prefix('dietitian')->group(function () {
     // Diet Request Management
     Route::get('/request', [DietRequestController::class, 'index'])->name('dietitian.request');
     Route::post('/request/update-status/{id}', [DietRequestController::class, 'updateStatus'])->name('dietitian.request.update');
-    // Route::get('/requests/{dietRequest}', [DietRequestController::class, 'show'])->name('dietitian.requests.show');
-    // Route::post('/requests/{dietRequest}/assign', [DietRequestController::class, 'assign'])->name('dietitian.requests.assign');
+    Route::get('/requests/{dietRequest}', [DietRequestController::class, 'show'])->name('dietitian.requests.show');
+    Route::post('/requests/{dietRequest}/assign', [DietRequestController::class, 'assign'])->name('dietitian.requests.assign');
 
     // Meal Library Management
     Route::get('/meals', [MealController::class, 'index'])->name('dietitian.meals');
@@ -175,11 +175,6 @@ Route::middleware(['auth'])->prefix('dietitian')->group(function () {
     Route::get('/dietplan/{dietPlan}/track', [DietPlanController::class, 'track'])->name('dietitian.dietplan.track');
     Route::get('/dietplan/{dietPlan}/download', [ReportController::class, 'generateDietReport'])->name('dietitian.dietplan.download');
     Route::post('/dietplan/{dietPlan}/cancel', [DietPlanController::class, 'cancel'])->name('dietitian.dietplan.cancel');
-
-    // // Diet Plan Download
-    // Route::get('/dietplan/view/{id}', [DietPlanController::class, 'viewPlan'])->name('dietitian.dietplan.view');
-    // Route::get('/dietplan/progress/{id}', [DietPlanController::class, 'viewProgress'])->name('dietitian.dietplan.progress');
-    // Route::get('/dietplan/download/{id}', [ReportController::class, 'generateWorkoutReport'])->name('diet.report');
 
     // Health Assessment Integration Routes
     Route::post('/diet-plans/meals-for-member', [DietPlanController::class, 'getMealsForMember'])->name('diet-plans.meals-for-member');
@@ -377,3 +372,6 @@ Route::get('/checkin-token', function (Request $request) {
 
 // Check-in submission (shared for member/trainer)
 Route::post('/checkin-token', [AttendanceController::class, 'checkin'])->name('checkin-token');
+
+// chart api
+Route::get('/api/weight-chart/{dietPlanId}', [DietPlanController::class, 'getWeightChartData']);

@@ -187,7 +187,7 @@ class DietPlanController extends Controller
         $dailyData = $this->getDailyMealCompliance($dietPlan->dietplan_id);
 
         // Weekly Weight Tracking
-        $weeklyWeightData = $this->getWeeklyWeight($memberId);
+        $weeklyWeightData = $this->getWeeklyWeight($dietPlan->dietplan_id);
 
         // Progress Photos
         $photosData = $this->getProgressPhotos($memberId);
@@ -204,39 +204,100 @@ class DietPlanController extends Controller
     }
 
     // Get Daily Meal Compliance
-    private function getDailyMealCompliance($dietplanId)
+    private function getDailyMealCompliance($dietPlanId)
     {
-        $today           = Carbon::today();
-        $dailyCompliance = MealCompliance::where('dietplan_id', $dietplanId)
-            ->where('log_date', $today)
+        $userId   = Auth::id();
+        $dietPlan = DietPlan::findOrFail($dietPlanId);
+
+        $defaultMeals = ['breakfast', 'lunch', 'dinner', 'snacks']; // Or from diet plan
+        $record       = MealCompliance::where('member_id', $userId)
+            ->where('dietplan_id', $dietPlanId)
+            ->whereDate('log_date', now())
             ->first();
 
-        $dailyMeals = $dailyCompliance
-        ? $dailyCompliance->meals_completed
-        : array_fill_keys(['breakfast', 'lunch', 'dinner', 'snacks'], false);
+        $dailyMeals = [];
+        foreach ($defaultMeals as $meal) {
+            // Make sure value is 1 (completed) or 0 (skipped)
+            $dailyMeals[$meal] = $record && ! empty($record->meals_completed[$meal]) ? 1 : 0;
+        }
 
-        $dailyCompliancePercentage = round((count(array_filter($dailyMeals)) / count($dailyMeals)) * 100);
+        $completedCount = array_sum($dailyMeals); // sum of 1's = completed meals
 
-        return compact('dailyMeals', 'dailyCompliancePercentage');
+        // Calculate percentage
+        $percentage = count($dailyMeals) > 0
+        ? round(($completedCount / count($dailyMeals)) * 100)
+        : 0;
+
+        return [
+            'dailyMeals'                => $dailyMeals,
+            'dailyCompliancePercentage' => $percentage,
+        ];
     }
 
     // Get Weekly Weight
-    private function getWeeklyWeight($memberId)
+    private function getWeeklyWeight($dietPlanId)
     {
+        $memberId  = Auth::id();
+        $dietPlan  = DietPlan::findOrFail($dietPlanId);
+        $requestId = $dietPlan->request_id;
+
+        // Access the Request table to get target and starting/current weight
+        $request        = DietRequest::find($requestId);
+        $targetWeight   = $request->target_weight ?? 0;
+        $startingWeight = $request->current_weight ?? 0; // starting weight from request
+
+        // Get start and end of the week
         $startOfWeek = Carbon::now()->startOfWeek();
         $endOfWeek   = Carbon::now()->endOfWeek();
 
+        // Get all weight logs for this member this week
         $weightLogs = WeightLog::where('member_id', $memberId)
             ->whereBetween('log_date', [$startOfWeek, $endOfWeek])
             ->orderBy('log_date')
             ->get();
 
-        $currentWeight = $weightLogs->last()->weight ?? 0;
-        $targetWeight  = Auth::user()->target_weight ?? $currentWeight;
+        // Current weight is the last logged weight; fallback to starting weight if none
+        $currentWeight = $weightLogs->last()->weight ?? $startingWeight;
 
-        $weeklyWeightPercentage = $targetWeight != 0 ? round(($currentWeight / $targetWeight) * 100) : 0;
+        // Calculate progress percentage with overshoot handling
+        if ($startingWeight > $targetWeight) {
+            // Weight loss goal
+            if ($currentWeight >= $targetWeight) {
+                // Normal progress toward target
+                $progressPercentage = ($startingWeight - $currentWeight) / ($startingWeight - $targetWeight) * 100;
+            } else {
+                // Overshoot: progress decreases after target
+                $progressPercentage = 100 - (($targetWeight - $currentWeight) / ($startingWeight - $targetWeight) * 100);
+            }
+        } else {
+            // Weight gain goal
+            if ($currentWeight <= $targetWeight) {
+                // Normal progress toward target
+                $progressPercentage = ($currentWeight - $startingWeight) / ($targetWeight - $startingWeight) * 100;
+            } else {
+                // Overshoot: progress decreases after target
+                $progressPercentage = 100 - (($currentWeight - $targetWeight) / ($targetWeight - $startingWeight) * 100);
+            }
+        }
 
-        return compact('weightLogs', 'currentWeight', 'targetWeight', 'weeklyWeightPercentage', 'startOfWeek', 'endOfWeek');
+        // Prevent invalid values
+        if (! is_finite($progressPercentage)) {
+            $progressPercentage = 0;
+        }
+
+        // Progress bar capped at 0% - 100%
+        $progressBarPercentage = min(max(round($progressPercentage), 0), 100);
+
+        return compact(
+            'weightLogs',
+            'currentWeight',
+            'startingWeight',
+            'targetWeight',
+            'progressPercentage',    // Actual number (can exceed 100 or go below 0)
+            'progressBarPercentage', // Capped for visual bar
+            'startOfWeek',
+            'endOfWeek'
+        );
     }
 
     // Get Progress Photos
@@ -285,6 +346,42 @@ class DietPlanController extends Controller
             'monthlyTarget'          => $monthlyTarget,
             'monthlyPhotoPercentage' => $monthlyProgress, // pass to frontend
         ];
+    }
+
+    // Get Weight Chart Data
+    public function getWeightChartData($dietPlanId)
+    {
+        $dietPlan = DietPlan::findOrFail($dietPlanId);
+        $memberId = $dietPlan->member_id;
+        $request  = DietRequest::find($dietPlan->request_id);
+
+        $startingWeight = $request->current_weight ?? 0;
+        $targetWeight   = $request->target_weight ?? 0;
+
+        $startOfWeek = now()->startOfWeek(); // Monday
+        $endOfWeek   = now()->endOfWeek();   // Sunday
+
+        // Filter weight logs for current week
+        $weightLogs = WeightLog::where('member_id', $memberId)
+            ->where('dietplan_id', $dietPlanId)
+            ->whereBetween('log_date', [$startOfWeek, $endOfWeek])
+            ->orderBy('log_date')
+            ->get();
+
+        $labels = []; // dates
+        $data   = []; // weight values
+
+        foreach ($weightLogs as $log) {
+            $labels[] = \Carbon\Carbon::parse($log->log_date)->format('d M'); // e.g., 27 Aug
+            $data[]   = $log->weight;
+        }
+
+        return response()->json([
+            'labels'         => $labels,
+            'data'           => $data,
+            'startingWeight' => $startingWeight,
+            'targetWeight'   => $targetWeight,
+        ]);
     }
 
     // Member View of a Specific Diet Plan
@@ -671,18 +768,99 @@ class DietPlanController extends Controller
     // Track diet plan progress
     public function track(DietPlan $dietPlan)
     {
-        $dietPlan->load(['member', 'dietitian']);
-        // Adherence model removed; provide empty collection for the view
-        $adherenceLogs = collect([]);
-        $isMember      = false;
+        $memberId = $dietPlan->member_id;
 
-        // Photos
-        $photos        = $dietPlan->progress_photos()->orderBy('photo_date', 'desc')->get();
-        $photoProgress = [
-            'monthlyCount'     => $dietPlan->progress_photos()->whereRaw('MONTH(photo_date) = MONTH(NOW())')->count(),
-            'weeklyPhotoCount' => $dietPlan->progress_photos()->whereRaw('WEEK(photo_date) = WEEK(NOW())')->count(),
+        // --- Daily Meal Compliance ---
+        $defaultMeals = ['breakfast', 'lunch', 'dinner', 'snacks'];
+        $record       = MealCompliance::where('member_id', $memberId)
+            ->where('dietplan_id', $dietPlan->dietplan_id)
+            ->whereDate('log_date', now())
+            ->first();
+
+        $dailyMeals = [];
+        foreach ($defaultMeals as $meal) {
+            $dailyMeals[$meal] = $record && ! empty($record->meals_completed[$meal]) ? 1 : 0;
+        }
+        $dailyCompliancePercentage = count($dailyMeals) > 0
+        ? round(array_sum($dailyMeals) / count($dailyMeals) * 100)
+        : 0;
+
+        // --- Weekly Weight Tracking ---
+        $request        = DietRequest::find($dietPlan->request_id);
+        $startingWeight = $request->current_weight ?? 0;
+        $targetWeight   = $request->target_weight ?? 0;
+
+        $startOfWeek = now()->startOfWeek();
+        $endOfWeek   = now()->endOfWeek();
+
+        $weightLogs = WeightLog::where('member_id', $memberId)
+            ->where('dietplan_id', $dietPlan->dietplan_id)
+            ->whereBetween('log_date', [$startOfWeek, $endOfWeek])
+            ->orderBy('log_date')
+            ->get();
+
+        $currentWeight = $weightLogs->last()->weight ?? $startingWeight;
+
+        // Progress bar calculation
+        if ($startingWeight > $targetWeight) {
+            $progressPercentage = $currentWeight >= $targetWeight
+            ? ($startingWeight - $currentWeight) / ($startingWeight - $targetWeight) * 100
+            : 100 - (($targetWeight - $currentWeight) / ($startingWeight - $targetWeight) * 100);
+        } else {
+            $progressPercentage = $currentWeight <= $targetWeight
+            ? ($currentWeight - $startingWeight) / ($targetWeight - $startingWeight) * 100
+            : 100 - (($currentWeight - $targetWeight) / ($targetWeight - $startingWeight) * 100);
+        }
+        $progressBarPercentage = min(max(round($progressPercentage), 0), 100);
+
+        // --- Progress Photos ---
+        $photos = DietProgressPhoto::where('user_id', $memberId)
+            ->whereMonth('photo_date', now()->month)
+            ->orderBy('photo_date', 'desc')
+            ->get();
+
+        // Weekly and monthly photo progress
+        $weeklyPhotoCount = DietProgressPhoto::where('user_id', $memberId)
+            ->whereBetween('photo_date', [$startOfWeek, $endOfWeek])
+            ->count();
+        $weeklyTarget          = 2;
+        $weeklyPhotoPercentage = $weeklyTarget > 0
+        ? min(round(($weeklyPhotoCount / $weeklyTarget) * 100), 100)
+        : 0;
+
+        $monthlyPhotoCount = DietProgressPhoto::where('user_id', $memberId)
+            ->whereMonth('photo_date', now()->month)
+            ->whereYear('photo_date', now()->year)
+            ->count();
+        $monthlyTarget          = 8;
+        $monthlyPhotoPercentage = $monthlyTarget > 0
+        ? min(round(($monthlyPhotoCount / $monthlyTarget) * 100), 100)
+        : 0;
+
+        $photoProgressData = [
+            'weeklyPhotoCount'       => $weeklyPhotoCount,
+            'weeklyTarget'           => $weeklyTarget,
+            'weeklyPhotoPercentage'  => $weeklyPhotoPercentage,
+            'monthlyPhotoCount'      => $monthlyPhotoCount,
+            'monthlyTarget'          => $monthlyTarget,
+            'monthlyPhotoPercentage' => $monthlyPhotoPercentage,
         ];
 
-        return view('dietitianDashboard.dietplan_progress', compact('dietPlan', 'adherenceLogs', 'isMember', 'photos', 'photoProgress'));
+        return view('dietitianDashboard.dietplan_progress', compact(
+            'dietPlan',
+            'dailyMeals',
+            'dailyCompliancePercentage',
+            'weightLogs',
+            'currentWeight',
+            'startingWeight',
+            'targetWeight',
+            'progressPercentage',
+            'progressBarPercentage',
+            'startOfWeek',
+            'endOfWeek',
+            'photos',
+            'photoProgressData'
+        ));
     }
+
 }

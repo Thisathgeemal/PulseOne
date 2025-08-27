@@ -63,4 +63,9 @@ class DietPlan extends Model
     {
         return $this->hasMany(MealCompliance::class, 'dietplan_id', 'dietplan_id');
     }
+
+    public function weightLogs()
+    {
+        return $this->hasMany(WeightLog::class, 'dietplan_id', 'dietplan_id');
+    }
 }

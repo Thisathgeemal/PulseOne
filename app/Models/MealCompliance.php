@@ -8,6 +8,8 @@ class MealCompliance extends Model
 {
     use HasFactory;
 
+    protected $table = 'meal_compliances';
+
     protected $fillable = [
         'dietplan_id',
         'member_id',
@@ -16,7 +18,6 @@ class MealCompliance extends Model
     ];
 
     protected $casts = [
-        'meals_completed' => 'array',
         'meals_completed' => 'array',
     ];
 

@@ -2,8 +2,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\DietProgressPhoto;
+use App\Models\MealCompliance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use \App\Models\WeightLog;
 
 class MealLogController extends Controller
 {
@@ -37,12 +39,46 @@ class MealLogController extends Controller
     // Store meal log
     public function storeMealLog(Request $request)
     {
+        $request->validate([
+            'dietplan_id' => 'required|exists:diet_plans,dietplan_id',
+            'meals'       => 'required|array',
+        ]);
 
+        $userId         = Auth::id();
+        $dietPlanId     = $request->input('dietplan_id');
+        $mealsCompleted = $request->input('meals');
+
+        MealCompliance::updateOrCreate(
+            [
+                'member_id'   => $userId,
+                'dietplan_id' => $dietPlanId,
+                'log_date'    => now()->toDateString(),
+            ],
+            [
+                'meals_completed' => $mealsCompleted,
+            ]
+        );
+
+        return redirect()->back()->with('success', 'Daily meal view updated successfully!');
     }
 
     // Store weight log
     public function storeWeightLog(Request $request)
     {
+        $request->validate([
+            'dietplan_id' => 'required|exists:diet_plans,dietplan_id',
+            'weight'      => 'required|numeric|min:0',
+            'weightNote'  => 'nullable|string|max:255',
+        ]);
 
+        $weightLog = WeightLog::create([
+            'member_id'   => Auth::id(),
+            'dietplan_id' => $request->dietplan_id,
+            'weight'      => $request->weight,
+            'log_date'    => now()->toDateString(),
+            'notes'       => $request->weightNote,
+        ]);
+
+        return redirect()->back()->with('success', 'Weight log added successfully!');
     }
 }
