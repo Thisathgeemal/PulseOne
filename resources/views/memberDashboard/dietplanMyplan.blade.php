@@ -63,7 +63,7 @@
                                 \Carbon\Carbon::parse($plan->start_date)->isPast() &&
                                 \Carbon\Carbon::parse($plan->end_date)->isFuture())
                             <a href="{{ route('member.dietplan.progress', $plan->dietplan_id) }}"
-                                class="w-[110px] px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition text-center">
+                                class="w-[110px] px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-medium rounded-lg transition text-center">
                                 Start
                             </a>
                         @endif
@@ -72,7 +72,10 @@
                             Cancel
                         </a>
                         <a href="{{ route('member.dietplan.download', $plan->dietplan_id) }}"
-                            class="w-[110px] px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-medium rounded-lg transition text-center">
+                            class="w-[110px] px-4 py-2 text-white text-sm font-medium rounded-lg transition text-center" 
+                            style="background-color: #16a34a !important;" 
+                            onmouseover="this.style.backgroundColor='#15803d !important'" 
+                            onmouseout="this.style.backgroundColor='#16a34a !important'">
                             Download
                         </a>
                     </div>

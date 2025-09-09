@@ -110,37 +110,9 @@
     color: white !important;
 }
 
-/* Keep Start buttons (yellow) and Cancel buttons (red) with fixed colors */
-.bg-green-600, .bg-green-700,
-a[href*="progress"].bg-green-600,
-a[href*="progress"].bg-green-700 {
-    background-color: #eab308 !important; /* Fixed yellow */
-    color: white !important;
-}
-
-.bg-green-600:hover, .bg-green-700:hover,
-a[href*="progress"].bg-green-600:hover,
-a[href*="progress"].bg-green-700:hover {
-    background-color: #ca8a04 !important; /* Fixed darker yellow on hover */
-    color: white !important;
-}
-
-a[href*="cancel"].bg-red-600,
-a[href*="cancel"].bg-red-700,
-.cancel-btn {
-    background-color: #dc2626 !important; /* Keep red */
-    color: white !important;
-}
-
-a[href*="cancel"].bg-red-600:hover,
-a[href*="cancel"].bg-red-700:hover,
-.cancel-btn:hover {
-    background-color: #b91c1c !important; /* Keep darker red on hover */
-    color: white !important;
-}
-
 /* Prevent other colored buttons from changing when they shouldn't */
 .bg-blue-500:hover, .bg-blue-600:hover,
+.bg-green-500:hover, .bg-green-600:hover,
 .bg-yellow-500:hover, .bg-yellow-600:hover,
 .bg-purple-500:hover, .bg-purple-600:hover,
 .bg-orange-500:hover, .bg-orange-600:hover {
@@ -645,19 +617,21 @@ a[href*="cancel"].bg-red-700:hover,
             }
         }
 
-        // Theme control functions (Global definitions)
-        window.setThemeMode = function(mode) {
+        // Theme control functions
+        function setThemeMode(mode) {
             const lightBtn = document.getElementById('lightBtn');
             const darkBtn = document.getElementById('darkBtn');
             
             if (mode === 'light') {
                 document.documentElement.classList.remove('theme-dark');
+                // Don't save to localStorage immediately - only when Save Theme Settings is clicked
                 
                 // Update button styles
                 lightBtn.className = 'flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all duration-200 bg-white text-gray-900 shadow-sm';
                 darkBtn.className = 'flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all duration-200 text-gray-600 hover:text-gray-900';
             } else if (mode === 'dark') {
                 document.documentElement.classList.add('theme-dark');
+                // Don't save to localStorage immediately - only when Save Theme Settings is clicked
                 
                 // Update button styles
                 darkBtn.className = 'flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all duration-200 bg-gray-800 text-white shadow-sm';
@@ -666,13 +640,20 @@ a[href*="cancel"].bg-red-700:hover,
             
             // Store temporarily for saving later
             window.tempThemeMode = mode;
-        };
+        }
 
-        window.changeAccentColor = function(color) {
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedColor = localStorage.getItem('accentColor') || '#ef4444';
+            changeAccentColor(savedColor);
+        });
+
+        function changeAccentColor(color) {
             document.documentElement.style.setProperty('--accent-color', color);
             document.documentElement.style.setProperty('--lb-accent', color);
+            // Don't save to localStorage immediately - only when Save Theme Settings is clicked
             
-            // Update elements that should change with accent color
+            // Update elements that should change with accent color (excluding radio/checkbox)
             const accentElements = document.querySelectorAll('.accent-bg, .accent-text, .accent-border, .btn-primary, #unread-badge, .accent-text-color');
             accentElements.forEach(el => {
                 // Skip profile-related elements
@@ -696,10 +677,10 @@ a[href*="cancel"].bg-red-700:hover,
                 }
             });
 
-            // Update red buttons to use accent color BUT exclude Start/Cancel buttons
+            // Update red buttons to use accent color (both background and hover)
             const redButtons = document.querySelectorAll('.bg-red-500, .bg-red-600');
             redButtons.forEach(el => {
-                // Skip profile-related elements
+                // Skip if this is a profile image container, leaderboard avatar, or contains an image
                 if (el.classList.contains('lb-member-avatar') || 
                     el.classList.contains('lb-podium-avatar') ||
                     el.querySelector('img') || 
@@ -711,35 +692,21 @@ a[href*="cancel"].bg-red-700:hover,
                     return;
                 }
                 
-                // Skip Cancel buttons and Start buttons
-                if (el.classList.contains('cancel-btn') ||
-                    (el.href && el.href.includes('cancel')) ||
-                    (el.href && el.href.includes('progress'))) {
-                    return;
-                }
-                
                 el.style.backgroundColor = color;
                 el.style.color = 'white';
+                
+                // Remove any existing hover listeners and add new ones
                 el.style.transition = 'all 0.3s ease';
-                
-                // Remove existing listeners to prevent duplicates
-                el.removeEventListener('mouseenter', el._accentHoverIn);
-                el.removeEventListener('mouseleave', el._accentHoverOut);
-                
-                // Create new listeners
-                el._accentHoverIn = function() {
+                el.addEventListener('mouseenter', function() {
                     this.style.backgroundColor = color;
                     this.style.filter = 'brightness(0.9)';
                     this.style.color = 'white';
-                };
-                el._accentHoverOut = function() {
+                });
+                el.addEventListener('mouseleave', function() {
                     this.style.backgroundColor = color;
                     this.style.filter = 'brightness(1)';
                     this.style.color = 'white';
-                };
-                
-                el.addEventListener('mouseenter', el._accentHoverIn);
-                el.addEventListener('mouseleave', el._accentHoverOut);
+                });
             });
 
             // Update accent color picker selection
@@ -758,9 +725,56 @@ a[href*="cancel"].bg-red-700:hover,
             
             // Store temporarily for saving later
             window.tempAccentColor = color;
-        };
+        }
 
-        window.saveThemeSettings = function() {
+            // Update red buttons to use accent color (both background and hover)
+            const redButtons = document.querySelectorAll('.bg-red-500, .bg-red-600');
+            redButtons.forEach(el => {
+                // Skip if this is a profile image container, leaderboard avatar, or contains an image
+                if (el.classList.contains('lb-member-avatar') || 
+                    el.classList.contains('lb-podium-avatar') ||
+                    el.querySelector('img') || 
+                    el.closest('.lb-member-avatar') ||
+                    el.closest('.lb-podium-avatar') ||
+                    el.closest('.lb-ring-1') ||
+                    el.closest('.lb-ring-2') ||
+                    el.closest('.lb-champion-avatar')) {
+                    return;
+                }
+                
+                el.style.backgroundColor = color;
+                el.style.color = 'white';
+                
+                // Remove any existing hover listeners and add new ones
+                el.style.transition = 'all 0.3s ease';
+                el.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = color;
+                    this.style.filter = 'brightness(0.9)';
+                    this.style.color = 'white';
+                });
+                el.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = color;
+                    this.style.filter = 'brightness(1)';
+                    this.style.color = 'white';
+                });
+            });
+
+            // Update accent color picker selection
+            document.querySelectorAll('.accent-color-btn').forEach(btn => {
+                const icon = btn.querySelector('i');
+                if (btn.dataset.color === color) {
+                    icon.style.opacity = '1';
+                    btn.style.borderColor = '#374151';
+                    btn.style.borderWidth = '3px';
+                } else {
+                    icon.style.opacity = '0';
+                    btn.style.borderColor = 'transparent';
+                    btn.style.borderWidth = '3px';
+                }
+            });
+        }
+
+        function saveThemeSettings() {
             // Save the temporarily stored settings to localStorage
             if (window.tempThemeMode) {
                 localStorage.setItem('themeMode', window.tempThemeMode);
@@ -778,7 +792,22 @@ a[href*="cancel"].bg-red-700:hover,
             setTimeout(() => {
                 notification.remove();
             }, 3000);
-        };
+        }
+
+        // Load saved settings on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load theme mode
+            const savedTheme = localStorage.getItem('themeMode') || 'light';
+            setThemeMode(savedTheme);
+            // Set saved theme as the current temp value (so it's not lost)
+            window.tempThemeMode = savedTheme;
+            
+            // Load accent color
+            const savedColor = localStorage.getItem('accentColor') || '#ef4444';
+            changeAccentColor(savedColor);
+            // Set saved color as the current temp value (so it's not lost)
+            window.tempAccentColor = savedColor;
+        });
 
         // Profile form functionality
         document.getElementById('verifyPasswordBtn')?.addEventListener('click', async () => {
@@ -835,16 +864,142 @@ a[href*="cancel"].bg-red-700:hover,
             }
         });
 
-        // Initialize saved settings and other functionality on page load
+        // Make theme functions globally accessible
+        window.setThemeMode = function(mode) {
+            const lightBtn = document.getElementById('lightBtn');
+            const darkBtn = document.getElementById('darkBtn');
+            
+            if (mode === 'light') {
+                document.documentElement.classList.remove('theme-dark');
+                // Don't save to localStorage immediately - only when Save Theme Settings is clicked
+                
+                // Update button styles
+                lightBtn.className = 'flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all duration-200 bg-white text-gray-900 shadow-sm';
+                darkBtn.className = 'flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all duration-200 text-gray-600 hover:text-gray-900';
+            } else if (mode === 'dark') {
+                document.documentElement.classList.add('theme-dark');
+                // Don't save to localStorage immediately - only when Save Theme Settings is clicked
+                
+                // Update button styles
+                darkBtn.className = 'flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all duration-200 bg-gray-800 text-white shadow-sm';
+                lightBtn.className = 'flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all duration-200 text-gray-600 hover:text-gray-900';
+            }
+            
+            // Store temporarily for saving later
+            window.tempThemeMode = mode;
+        };
+
+        window.changeAccentColor = function(color) {
+            document.documentElement.style.setProperty('--accent-color', color);
+            document.documentElement.style.setProperty('--lb-accent', color);
+            // Don't save to localStorage immediately - only when Save Theme Settings is clicked
+            
+            // Update elements that should change with accent color (excluding radio/checkbox)
+            const accentElements = document.querySelectorAll('.accent-bg, .accent-text, .accent-border, .btn-primary, #unread-badge, .accent-text-color');
+            accentElements.forEach(el => {
+                // Skip profile-related elements
+                if (el.closest('.lb-member-avatar') || 
+                    el.closest('.lb-podium-avatar') ||
+                    el.closest('.lb-ring-1') ||
+                    el.closest('.lb-ring-2') ||
+                    el.closest('.lb-champion-avatar')) {
+                    return;
+                }
+                
+                if (el.classList.contains('accent-bg') || el.classList.contains('btn-primary') || el.id === 'unread-badge') {
+                    el.style.backgroundColor = color;
+                    el.style.color = 'white';
+                }
+                if (el.classList.contains('accent-text') || el.classList.contains('accent-text-color')) {
+                    el.style.color = color;
+                }
+                if (el.classList.contains('accent-border')) {
+                    el.style.borderColor = color;
+                }
+            });
+
+            // Update red buttons to use accent color (both background and hover)
+            const redButtons = document.querySelectorAll('.bg-red-500, .bg-red-600');
+            redButtons.forEach(el => {
+                // Skip if this is a profile image container, leaderboard avatar, or contains an image
+                if (el.classList.contains('lb-member-avatar') || 
+                    el.classList.contains('lb-podium-avatar') ||
+                    el.querySelector('img') || 
+                    el.closest('.lb-member-avatar') ||
+                    el.closest('.lb-podium-avatar') ||
+                    el.closest('.lb-ring-1') ||
+                    el.closest('.lb-ring-2') ||
+                    el.closest('.lb-champion-avatar')) {
+                    return;
+                }
+                
+                el.style.backgroundColor = color;
+                el.style.color = 'white';
+                
+                // Remove any existing hover listeners and add new ones
+                el.style.transition = 'all 0.3s ease';
+                el.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = color;
+                    this.style.filter = 'brightness(0.9)';
+                    this.style.color = 'white';
+                });
+                el.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = color;
+                    this.style.filter = 'brightness(1)';
+                    this.style.color = 'white';
+                });
+            });
+
+            // Update accent color picker selection
+            document.querySelectorAll('.accent-color-btn').forEach(btn => {
+                const icon = btn.querySelector('i');
+                if (btn.dataset.color === color) {
+                    icon.style.opacity = '1';
+                    btn.style.borderColor = '#374151';
+                    btn.style.borderWidth = '3px';
+                } else {
+                    icon.style.opacity = '0';
+                    btn.style.borderColor = 'transparent';
+                    btn.style.borderWidth = '3px';
+                }
+            });
+            
+            // Store temporarily for saving later
+            window.tempAccentColor = color;
+        };
+
+        window.saveThemeSettings = function() {
+            // Save the temporarily stored settings to localStorage
+            if (window.tempThemeMode) {
+                localStorage.setItem('themeMode', window.tempThemeMode);
+            }
+            if (window.tempAccentColor) {
+                localStorage.setItem('accentColor', window.tempAccentColor);
+            }
+            
+            // Show success message
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            notification.textContent = 'Theme settings saved successfully!';
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        };
+
+        // Load saved settings on page load
         document.addEventListener('DOMContentLoaded', function() {
             // Load theme mode
             const savedTheme = localStorage.getItem('themeMode') || 'light';
             window.setThemeMode(savedTheme);
+            // Set saved theme as the current temp value (so it's not lost)
             window.tempThemeMode = savedTheme;
             
             // Load accent color
             const savedColor = localStorage.getItem('accentColor') || '#ef4444';
             window.changeAccentColor(savedColor);
+            // Set saved color as the current temp value (so it's not lost)
             window.tempAccentColor = savedColor;
         });
     </script>

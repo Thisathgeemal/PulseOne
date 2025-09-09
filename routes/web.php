@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminProfileController;
+use App\Http\Controllers\Api\UserPreferenceController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\TrainerBookingController;
 use App\Http\Controllers\TrainerProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkoutPlanController;
+use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\WorkoutRequestController;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
@@ -322,7 +324,11 @@ Route::middleware(['auth'])->prefix('member')->group(function () {
 
     // Static View Routes
     Route::view('/feedback', 'memberDashboard.feedback')->name('member.feedback');
-    Route::view('/leaderboard', 'memberDashboard.leaderboard')->name('member.leaderboard');
+    Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('member.leaderboard');
+    Route::get('/leaderboard/monthly', [LeaderboardController::class, 'monthly'])->name('member.leaderboard.monthly');
+    
+    // Appearance Settings
+    Route::view('/appearance', 'memberDashboard.appearance')->name('member.appearance');
 });
 
 // Security route
@@ -375,3 +381,14 @@ Route::post('/checkin-token', [AttendanceController::class, 'checkin'])->name('c
 
 // chart api
 Route::get('/api/weight-chart/{dietPlanId}', [DietPlanController::class, 'getWeightChartData']);
+
+// User Preferences API Routes
+Route::middleware('auth')->group(function () {
+    Route::prefix('api/user/preferences')->group(function () {
+        Route::get('{key}', [UserPreferenceController::class, 'show'])->name('api.preferences.show');
+        Route::put('{key}', [UserPreferenceController::class, 'update'])->name('api.preferences.update');
+        Route::delete('{key}/reset', [UserPreferenceController::class, 'reset'])->name('api.preferences.reset');
+        Route::get('export/all', [UserPreferenceController::class, 'export'])->name('api.preferences.export');
+        Route::post('import/all', [UserPreferenceController::class, 'import'])->name('api.preferences.import');
+    });
+});
