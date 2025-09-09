@@ -798,9 +798,4 @@
 /* Champion gets slightly thicker border even on hover */
 .lb-champion-avatar.lb-ring-1:hover { border-width: 8px !important; }
 
-/* Make leaderboard table member name text black for visibility */
-.lb-table-row .font-bold.text-gray-900.text-lg {
-	color: #000 !important;
-}
-
 </style>

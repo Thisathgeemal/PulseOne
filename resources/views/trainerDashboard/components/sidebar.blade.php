@@ -108,6 +108,17 @@
             </form>
         </li>
     </ul>
+
+    <!-- Quick Theme Swatches -->
+    <div class="px-4 mt-4">
+        <div class="text-xs text-gray-500 mb-2">Quick Themes</div>
+        <div class="flex items-center gap-2">
+            <button onclick="(function(){document.documentElement.classList.remove('theme-dark'); localStorage.setItem('themeMode','light')})()" title="Light" class="w-6 h-6 rounded bg-white border"></button>
+            <button onclick="(function(){document.documentElement.classList.add('theme-dark'); localStorage.setItem('themeMode','dark')})()" title="Dark" class="w-6 h-6 rounded bg-black border"></button>
+            <button onclick="(function(){document.documentElement.style.setProperty('--accent-color','#ef4444'); localStorage.setItem('accentColor','#ef4444')})()" title="Red" class="w-6 h-6 rounded" style="background:#ef4444"></button>
+            <button onclick="(function(){document.documentElement.style.setProperty('--accent-color','#3b82f6'); localStorage.setItem('accentColor','#3b82f6')})()" title="Blue" class="w-6 h-6 rounded" style="background:#3b82f6"></button>
+        </div>
+    </div>
 </div> --}}
 
 <!-- Sidebar -->

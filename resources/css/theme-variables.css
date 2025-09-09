@@ -1,0 +1,302 @@
+/* Theme Variables & Dark Mode Support */
+:root {
+  /* Default Light Theme Colors */
+  --accent-color: #ef4444;
+  --accent-hover: #dc2626;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border-color: #e5e7eb;
+  --border-light: #f3f4f6;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --sidebar-bg: #ffffff;
+  --sidebar-text: #374151;
+  --sidebar-hover: #f3f4f6;
+  --sidebar-active: var(--accent-color);
+  --header-bg: #1e1e1e;
+  --header-text: #ffffff;
+}
+
+/* Dark Theme Override */
+.theme-dark,
+html.theme-dark {
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --bg-tertiary: #374151;
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-muted: #9ca3af;
+  --border-color: #374151;
+  --border-light: #4b5563;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+  --sidebar-bg: #1f2937;
+  --sidebar-text: #e5e7eb;
+  --sidebar-hover: #374151;
+  --sidebar-active: var(--accent-color);
+  --header-bg: #111827;
+  --header-text: #f9fafb;
+}
+
+/* Sidebar Position & Compact Variants */
+[data-sidebar-pos="right"] .sidebar {
+  order: 2;
+}
+
+[data-sidebar-pos="right"] .main-content {
+  order: 1;
+}
+
+.sidebar-compact .sidebar {
+  width: 4rem;
+}
+
+.sidebar-compact .sidebar .nav-text {
+  display: none;
+}
+
+.sidebar-compact .sidebar .nav-icon {
+  margin: 0 auto;
+}
+
+/* Base Theme Application */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.bg-white {
+  background-color: var(--bg-primary) !important;
+}
+
+.bg-gray-50 {
+  background-color: var(--bg-secondary) !important;
+}
+
+/* Minor fix + utility remaps for dark mode compatibility */
+.bg-gray-100 {
+  background-color: var(--bg-tertiary) !important;
+}
+
+.text-gray-900,
+.text-gray-800,
+.text-black { /* ensure no hard black text in dark mode */
+  color: var(--text-primary) !important;
+}
+
+.text-gray-700 { /* common label color */
+  color: var(--text-secondary) !important;
+}
+
+.text-gray-600 {
+  color: var(--text-secondary) !important;
+}
+
+.text-gray-500 {
+  color: var(--text-muted) !important;
+}
+
+.border-gray-200 {
+  border-color: var(--border-color) !important;
+}
+
+.border-gray-300 {
+  border-color: var(--border-light) !important;
+}
+
+/* Accent Color Usage */
+/* Ensure we don't force a background on text-only utilities */
+.bg-red-500 {
+  background-color: var(--accent-color) !important;
+  color: white !important;
+  border-color: var(--accent-color) !important;
+}
+
+.text-red-600 {
+  color: var(--accent-color) !important;
+}
+
+.border-red-600 {
+  border-color: var(--accent-color) !important;
+}
+
+.hover\:bg-red-600:hover {
+  background-color: var(--accent-hover) !important;
+}
+
+/* Avoid white hover surfaces in dark mode (sidebar, tables, rows, etc.) */
+.theme-dark .hover\:bg-gray-50:hover,
+.theme-dark .hover\:bg-gray-100:hover,
+.theme-dark .hover\:bg-white:hover {
+  background-color: var(--sidebar-hover) !important;
+  color: var(--text-primary) !important;
+}
+/* Group hover variants commonly used in cards/lists */
+.theme-dark .group:hover .group-hover\:bg-gray-50,
+.theme-dark .group:hover .group-hover\:bg-gray-100,
+.theme-dark .group:hover .group-hover\:bg-white {
+  background-color: var(--sidebar-hover) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Sidebar Theming */
+.sidebar {
+  background-color: var(--sidebar-bg) !important;
+  color: var(--sidebar-text) !important;
+  border-color: var(--border-color) !important;
+}
+
+.sidebar a {
+  color: var(--sidebar-text) !important;
+  transition: all 0.2s ease;
+}
+
+.sidebar a:hover {
+  background-color: var(--sidebar-hover) !important;
+}
+
+.sidebar a.active,
+.sidebar .bg-red-500 {
+  background-color: var(--sidebar-active) !important;
+  color: white !important;
+}
+
+/* Professional Toggle Styles */
+.theme-toggle-group {
+  display: flex;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.theme-toggle-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.theme-toggle-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+}
+
+.theme-toggle-btn.active {
+  background: var(--accent-color);
+  color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.accent-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.accent-swatch:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.accent-swatch.active {
+  border-color: var(--text-primary);
+  box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--accent-color);
+}
+
+.accent-swatch.active::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+/* Settings Panel Styling */
+.settings-section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.settings-section h3 {
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.settings-label {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.theme-animate {
+  animation: slideIn 0.3s ease;
+}
+
+/* Quick Swatch Improvements */
+.quick-theme-swatches {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border-top: 1px solid var(--border-color);
+}
+
+.quick-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quick-swatch:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
