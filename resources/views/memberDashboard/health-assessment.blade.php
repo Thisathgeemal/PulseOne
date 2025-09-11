@@ -36,7 +36,7 @@
                         </p>
                     </div>
                     <div class="hidden md:block">
-                        <i class="fas fa-heartbeat text-4xl text-red-500"></i>
+                        <i class="fas fa-heartbeat text-4xl accent-text"></i>
                     </div>
                 </div>
                 
@@ -59,7 +59,7 @@
                     <span x-text="`${Math.round(progress)}% Complete`"></span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2">
-                    <div class="bg-red-500 h-2 rounded-full transition-all duration-500" 
+                    <div class="accent-bg h-2 rounded-full transition-all duration-500" 
                         :style="`width: ${progress}%`"></div>
                 </div>
             </div>
@@ -71,7 +71,7 @@
                 <!-- Section 1: Basic Information -->
                 <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-user mr-2 text-red-500"></i>
+                        <i class="fas fa-user mr-2 accent-text"></i>
                         Basic Information
                     </h2>
 
@@ -79,7 +79,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Date of Birth *</label>
                             <input type="date" name="date_of_birth"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-red-500 focus:border-red-500"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 accent-border"
                                 value="{{ old('date_of_birth', $assessment?->date_of_birth?->format('Y-m-d')) }}"
                                 max="{{ now()->subYears(13)->format('Y-m-d') }}">
                             @error('date_of_birth')
@@ -90,7 +90,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Gender *</label>
                             <select name="gender"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-red-500 focus:border-red-500">
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 accent-border">
                                 <option value="">Select Gender</option>
                                 @foreach(['male' => 'Male', 'female' => 'Female', 'other' => 'Other', 'prefer_not_to_say' => 'Prefer not to say'] as $key => $label)
                                     <option value="{{ $key }}" @selected(old('gender', $assessment?->gender) == $key)>
@@ -130,7 +130,7 @@
                 <!-- Section 2: Activity Level & Goals -->
                 <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-bullseye mr-2 text-red-500"></i>
+                        <i class="fas fa-bullseye mr-2 accent-text"></i>
                         Activity Level & Fitness Goals
                     </h2>
 
@@ -148,7 +148,7 @@
                                     <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
                                         <input type="radio" name="activity_level" value="{{ $key }}" required
                                             @checked(old('activity_level', $assessment?->activity_level) == $key)
-                                            class="text-red-500 focus:ring-red-500">
+                                            class="text-blue-500 focus:ring-blue-500">
                                         <span class="ml-3 text-sm">{{ $label }}</span>
                                     </label>
                                 @endforeach
@@ -174,7 +174,7 @@
                                     <label class="flex items-center p-2 border border-gray-300 rounded hover:bg-gray-50 cursor-pointer">
                                         <input type="checkbox" name="fitness_goals[]" value="{{ $key }}"
                                             @checked(in_array($key, old('fitness_goals', $assessment?->fitness_goals ?? [])))
-                                            class="text-red-500 focus:ring-red-500">
+                                            class="text-blue-500 focus:ring-blue-500">
                                         <span class="ml-2 text-sm">{{ $label }}</span>
                                     </label>
                                 @endforeach
@@ -223,7 +223,7 @@
                 <!-- Section 3: Medical Information -->
                 <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-heartbeat mr-2 text-red-500"></i>
+                        <i class="fas fa-heartbeat mr-2 accent-text"></i>
                         Medical Information
                     </h2>
 
@@ -244,13 +244,13 @@
                                             class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-red-500 focus:border-red-500">
                                         <button type="button" @click="removeItem(index)"
                                                 x-show="items.length > 1"
-                                                class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                                                class="px-3 py-2 btn-primary rounded-lg">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
                                 </template>
                                 <button type="button" @click="addItem()"
-                                        class="flex items-center text-red-500 hover:text-red-600 text-sm">
+                                        class="flex items-center accent-text-color accent-text-hover text-sm">
                                     <i class="fas fa-plus mr-1"></i> Add Medical Condition
                                 </button>
                             </div>
@@ -272,13 +272,13 @@
                                             class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-red-500 focus:border-red-500">
                                         <button type="button" @click="removeItem(index)"
                                                 x-show="items.length > 1"
-                                                class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                                                class="px-3 py-2 btn-primary rounded-lg">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
                                 </template>
                                 <button type="button" @click="addItem()"
-                                        class="flex items-center text-red-500 hover:text-red-600 text-sm">
+                                        class="flex items-center accent-text-color accent-text-hover text-sm">
                                     <i class="fas fa-plus mr-1"></i> Add Medication
                                 </button>
                             </div>
@@ -300,13 +300,13 @@
                                             class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-red-500 focus:border-red-500">
                                         <button type="button" @click="removeItem(index)"
                                                 x-show="items.length > 1"
-                                                class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                                                class="px-3 py-2 btn-primary rounded-lg">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
                                 </template>
                                 <button type="button" @click="addItem()"
-                                        class="flex items-center text-red-500 hover:text-red-600 text-sm">
+                                        class="flex items-center accent-text-color accent-text-hover text-sm">
                                     <i class="fas fa-plus mr-1"></i> Add Injury/Surgery
                                 </button>
                             </div>
@@ -335,7 +335,7 @@
                                     <label class="flex items-center p-2 border border-gray-300 rounded hover:bg-gray-50 cursor-pointer">
                                         <input type="checkbox" name="allergies[]" value="{{ $key }}"
                                             @checked(in_array($key, old('allergies', $assessment?->allergies ?? [])))
-                                            class="text-red-500 focus:ring-red-500">
+                                            class="text-blue-500 focus:ring-blue-500">
                                         <span class="ml-2 text-sm">{{ $label }}</span>
                                     </label>
                                 @endforeach
@@ -375,7 +375,7 @@
                                         </div>
                                     </template>
                                     <button type="button" @click="addItem()"
-                                            class="flex items-center text-red-500 hover:text-red-600 text-sm">
+                                            class="flex items-center accent-text-color accent-text-hover text-sm">
                                         <i class="fas fa-plus mr-1"></i> Add Other Allergy
                                     </button>
                                 </div>
@@ -418,7 +418,7 @@
                                     <label class="flex items-center p-2 border border-gray-300 rounded hover:bg-gray-50 cursor-pointer">
                                         <input type="checkbox" name="dietary_restrictions[]" value="{{ $key }}"
                                             @checked(in_array($key, old('dietary_restrictions', $assessment?->dietary_restrictions ?? [])))
-                                            class="text-red-500 focus:ring-red-500">
+                                            class="text-blue-500 focus:ring-blue-500">
                                         <span class="ml-2 text-sm">{{ $label }}</span>
                                     </label>
                                 @endforeach
@@ -458,7 +458,7 @@
                                         </div>
                                     </template>
                                     <button type="button" @click="addItem()"
-                                            class="flex items-center text-red-500 hover:text-red-600 text-sm">
+                                            class="flex items-center accent-text-color accent-text-hover text-sm">
                                         <i class="fas fa-plus mr-1"></i> Add Other Restriction
                                     </button>
                                 </div>
@@ -470,7 +470,7 @@
                 <!-- Emergency Contact -->
                 <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-phone-alt mr-2 text-red-500"></i>
+                        <i class="fas fa-phone-alt mr-2 accent-text"></i>
                         Emergency Contacts
                     </h2>
 
@@ -542,7 +542,7 @@
                             </template>
                             
                             <button type="button" @click="addContact()"
-                                    class="flex items-center text-red-500 hover:text-red-600 text-sm font-medium">
+                                    class="flex items-center accent-text-color accent-text-hover text-sm font-medium">
                                 <i class="fas fa-plus mr-2"></i> Add Another Emergency Contact
                             </button>
                         </div>
@@ -570,7 +570,7 @@
                 <!-- PAR-Q+ Questionnaire -->
                 <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-clipboard-check mr-2 text-red-500"></i>
+                        <i class="fas fa-clipboard-check mr-2 accent-text"></i>
                         Physical Activity Readiness Questionnaire (PAR-Q+)
                     </h2>
 
@@ -600,7 +600,7 @@
                                     <label class="flex items-center">
                                         <input type="radio" name="par_q_responses[{{ $index }}]" value="1" required
                                             @checked(old("par_q_responses.{$index}", ($assessment?->par_q_responses[$index] ?? null)) === '1')
-                                            class="text-red-500 focus:ring-red-500">
+                                            class="text-blue-500 focus:ring-blue-500">
                                         <span class="ml-2 text-sm text-red-700">Yes</span>
                                     </label>
                                 </div>
@@ -616,7 +616,7 @@
                 <!-- Lifestyle Information -->
                 <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-leaf mr-2 text-red-500"></i>
+                        <i class="fas fa-leaf mr-2 accent-text"></i>
                         Lifestyle Information
                     </h2>
 
@@ -679,7 +679,7 @@
                 <!-- Medical Clearance -->
                 <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-stethoscope mr-2 text-red-500"></i>
+                        <i class="fas fa-stethoscope mr-2 accent-text"></i>
                         Medical Clearance
                     </h2>
 
@@ -719,7 +719,7 @@
                 <!-- Additional Notes -->
                 <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-sticky-note mr-2 text-red-500"></i>
+                        <i class="fas fa-sticky-note mr-2 accent-text"></i>
                         Additional Information
                     </h2>
 
@@ -745,7 +745,7 @@
                             </p>
                         </div>
                         <button type="submit"
-                                class="px-8 py-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200">
+                                class="px-8 py-3 btn-primary font-semibold rounded-lg focus:ring-2 focus:ring-offset-2 transition-colors duration-200">
                             <i class="fas fa-save mr-2"></i>
                             {{ $assessment && $assessment->is_complete ? 'Update Assessment' : 'Submit Assessment' }}
                         </button>
@@ -1052,7 +1052,7 @@
                                 return field && field.value.trim() !== '';
                         }
                     }
-                }
+                };
             }
             
             function multipleInput(fieldName, initialItems = []) {

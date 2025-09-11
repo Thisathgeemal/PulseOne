@@ -18,6 +18,7 @@ use App\Http\Controllers\HealthAssessmentController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\MealController;
 use App\Http\Controllers\MealLogController;
+use App\Http\Controllers\MemberDashboardController;
 use App\Http\Controllers\MemberBookingController;
 use App\Http\Controllers\MemberDashboardController;
 use App\Http\Controllers\MemberProfileController;
@@ -32,9 +33,13 @@ use App\Http\Controllers\TrainerDashboardController;
 use App\Http\Controllers\TrainerProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkoutPlanController;
+use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\WorkoutRequestController;
+use App\Http\Controllers\TrainerDashboardController;
+use App\Http\Controllers\DietitianDashboardController;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\FeedbackController;
 
 // Public Pages
 Route::view('/', 'home')->name('home');
@@ -204,8 +209,6 @@ Route::middleware(['auth'])->prefix('dietitian')->group(function () {
 
     // Chat Routes
     Route::view('/message', 'dietitianDashboard.message')->name('dietitian.message');
-
-    // Feedback Management
     Route::get('/feedback', [FeedbackController::class, 'dietitianIndex'])->name('dietitian.feedback');
 });
 
@@ -332,12 +335,11 @@ Route::middleware(['auth'])->prefix('member')->group(function () {
     Route::post('/health-assessment', [HealthAssessmentController::class, 'store'])->name('member.health-assessment.store');
     Route::get('/health-assessment/status', [HealthAssessmentController::class, 'checkStatus'])->name('member.health-assessment.status');
 
-    // Feedback Management (controller-powered)
-    Route::get('/feedback', [FeedbackController::class, 'memberIndex'])->name('member.feedback');
+     // Feedback Management (controller-powered)
+    Route::get('/feedback',        [FeedbackController::class, 'memberIndex'])->name('member.feedback');
     Route::get('/feedback/create', [FeedbackController::class, 'create'])->name('member.feedback.create');
-    Route::post('/feedback', [FeedbackController::class, 'store'])->name('member.feedback.store');
+    Route::post('/feedback',       [FeedbackController::class, 'store'])->name('member.feedback.store');
 
-    // Static View Routes
     Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('member.leaderboard');
     Route::get('/leaderboard/monthly', [LeaderboardController::class, 'monthly'])->name('member.leaderboard.monthly');
 

@@ -17,14 +17,14 @@
 
         {{-- Table --}}
         <div class="overflow-x-auto mt-6">
-            <table class="min-w-full bg-white shadow-md rounded-lg border text-base border-gray-200">
+            <table class="min-w-full bg-white shadow-md rounded-lg border text-base border-gray-200 booking-table">
                 <thead class="bg-gray-800 text-white">
                     <tr>
                         <th class="py-3 px-4 text-left border-b border-gray-300">Trainer</th>
                         <th class="py-3 px-4 text-left border-b border-gray-300">Date</th>
                         <th class="py-3 px-4 text-left border-b border-gray-300">Time</th>
                         <th class="py-3 px-4 text-left border-b border-gray-300">Notes</th>
-                        <th class="py-3 px-4 text-left border-b border-gray-300">Status</th>
+                        <th class="py-3 px-6 text-left border-b border-gray-300">Status</th>
                         <th class="py-3 px-4 text-left border-b border-gray-300">Actions</th>
                     </tr>
                 </thead>
@@ -43,7 +43,7 @@
                             <td class="py-3 px-4 border-b border-gray-200">
                                 {{ $b->description ?? '—' }}
                             </td>
-                            <td class="py-3 px-4 border-b border-gray-200">
+                            <td class="py-3 pl-6 pr-4 border-b border-gray-200">
                                 @php
                                     $badges = [
                                         'pending' => 'bg-yellow-100 text-yellow-800 ring-yellow-200',
@@ -55,13 +55,25 @@
                                     ];
                                 @endphp
                                 <div class="flex flex-col">
-                                    <span
-                                        class="inline-flex items-center px-2 py-0.5 rounded-full text-xs ring-1 w-fit h-8 {{ $badges[$b->status] ?? 'bg-gray-100 text-gray-700 ring-gray-200' }}">
-                                        {{ ucfirst($b->status) }}
-                                    </span>
-                                    @if ($b->status === 'declined' && $b->decline_reason)
-                                        <span class="text-xs text-red-600 mt-1 font-medium">
-                                            Reason: {{ $b->decline_reason }}
+                                    @if($b->status === 'declined')
+                                        {{-- Fixed red badge that should NOT be affected by accent changes --}}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs w-fit"
+                                style="background-color:#fee2e2 !important; color:#dc2626 !important; border:1px solid rgba(220,38,38,0.12) !important; position:relative; z-index:10001;">
+                                            {{ ucfirst($b->status) }}
+                                        </span>
+
+                                        {{-- Place reason in a white box above any underlying decorative bars so it's always readable --}}
+                                        @if ($b->decline_reason)
+                                            <!-- use utility class to keep reason above decorative fills -->
+                                            <div class="mt-1 text-sm booking-reason-on-top">
+                                                <span class="font-medium text-red-700">Reason:</span>
+                                                <span class="text-red-600"> {{ $b->decline_reason }}</span>
+                                            </div>
+                                        @endif
+                                    @else
+                                        <span
+                                            class="inline-flex items-center px-2 py-0.5 rounded-full text-xs ring-1 w-fit {{ $badges[$b->status] ?? 'bg-gray-100 text-gray-700 ring-gray-200' }}">
+                                            {{ ucfirst($b->status) }}
                                         </span>
                                     @endif
                                 </div>

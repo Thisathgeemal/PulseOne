@@ -1,20 +1,15 @@
+<style>
+:root { --accent-color: #ef4444; }
+.accent-bg { background-color: var(--accent-color) !important; color: white !important; }
+.accent-text { color: var(--accent-color) !important; }
+.accent-border { border-color: var(--accent-color) !important; }
+.btn-primary { background-color: var(--accent-color) !important; color: white !important; }
+.btn-primary:hover { background-color: var(--accent-color) !important; filter: brightness(0.9) !important; color: white !important; }
+input:focus, select:focus, textarea:focus { --tw-ring-color: var(--accent-color) !important; border-color: var(--accent-color) !important; }
+</style>
+
 <div 
-    x-data="{
-        showSettings: false,
-        showProfile: false,
-        showNotifications: false,
-        showRead: false,
-        lastScroll: 0,
-        handleScroll() {
-            const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-            if (currentScroll > this.lastScroll) {
-                this.showSettings = false;
-                this.showProfile = false;
-                this.showNotifications = false;
-            }
-            this.lastScroll = currentScroll <= 0 ? 0 : currentScroll;
-        }
-    }"
+    x-data="{ showSettings:false, showProfile:false, showNotifications:false, showRead:false, lastScroll:0, handleScroll(){ const y=window.pageYOffset||document.documentElement.scrollTop; if(y>this.lastScroll){ this.showSettings=false; this.showProfile=false; this.showNotifications=false } this.lastScroll = y<=0?0:y } }"
     x-init="window.addEventListener('scroll', () => handleScroll())"
     class="relative"
 >
@@ -71,16 +66,53 @@
         </div>
     </div>
 
-    <!-- Slide-in Settings Panel -->
+    <!-- Settings Panel -->
     <div 
         x-show="showSettings"
         x-transition
-        if (showSettings) showProfile = false;
         @click.away="showSettings = false"
         class="fixed right-0 top-16 bottom-0 w-[400px] bg-white text-black rounded-md shadow-lg z-100 p-7 overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-2xl font-bold text-gray-800">Settings</h2>
             <button @click="showSettings = false" class="text-gray-500 hover:text-red-600 text-xl">&times;</button>
+        </div>
+
+        <!-- Appearance Settings (member/admin/trainer parity) -->
+        <div class="py-4 border-t pt-4">
+            <h3 class="text-lg font-semibold mb-4">Appearance Settings</h3>
+            
+            <!-- Theme Mode -->
+            <div class="mb-6">
+                <div class="text-sm font-medium mb-3">Theme Mode</div>
+                <div class="flex items-center justify-between bg-gray-100 rounded-full p-1 w-48">
+                    <button onclick="setThemeMode('light')" id="lightBtn" class="flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all duration-200 bg-white text-gray-900 shadow-sm">
+                        <i class="fas fa-sun mr-2"></i>Light
+                    </button>
+                    <button onclick="setThemeMode('dark')" id="darkBtn" class="flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all duration-200 text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-moon mr-2"></i>Dark
+                    </button>
+                </div>
+            </div>
+
+            <!-- Accent Colors -->
+            <div class="mb-6">
+                <div class="text-sm font-medium mb-3">Accent Colors</div>
+                <div class="flex gap-3 flex-wrap">
+                    <button onclick="changeAccentColor('#ef4444')" class="accent-color-btn w-10 h-10 rounded-full border-3 border-transparent hover:border-gray-300 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105" style="background:#ef4444" data-color="#ef4444" title="Red"><i class="fas fa-check text-white text-sm opacity-0"></i></button>
+                    <button onclick="changeAccentColor('#3b82f6')" class="accent-color-btn w-10 h-10 rounded-full border-3 border-transparent hover:border-gray-300 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105" style="background:#3b82f6" data-color="#3b82f6" title="Blue"><i class="fas fa-check text-white text-sm opacity-0"></i></button>
+                    <button onclick="changeAccentColor('#10b981')" class="accent-color-btn w-10 h-10 rounded-full border-3 border-transparent hover:border-gray-300 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105" style="background:#10b981" data-color="#10b981" title="Green"><i class="fas fa-check text-white text-sm opacity-0"></i></button>
+                    <button onclick="changeAccentColor('#f59e0b')" class="accent-color-btn w-10 h-10 rounded-full border-3 border-transparent hover:border-gray-300 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105" style="background:#f59e0b" data-color="#f59e0b" title="Orange"><i class="fas fa-check text-white text-sm opacity-0"></i></button>
+                    <button onclick="changeAccentColor('#8b5cf6')" class="accent-color-btn w-10 h-10 rounded-full border-3 border-transparent hover:border-gray-300 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105" style="background:#8b5cf6" data-color="#8b5cf6" title="Purple"><i class="fas fa-check text-white text-sm opacity-0"></i></button>
+                    <button onclick="changeAccentColor('#ec4899')" class="accent-color-btn w-10 h-10 rounded-full border-3 border-transparent hover:border-gray-300 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105" style="background:#ec4899" data-color="#ec4899" title="Pink"><i class="fas fa-check text-white text-sm opacity-0"></i></button>
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="mt-4">
+                <button onclick="saveThemeSettings()" class="w-full btn-primary px-4 py-2 rounded transition-colors">
+                    <i class="fas fa-save mr-2"></i>Save Theme Settings
+                </button>
+            </div>
         </div>
 
         <!-- MFA Security -->
@@ -134,6 +166,7 @@
                 </form>
             @endif
         </div>
+        
     </div>
 
     <!-- Notification Panel -->
@@ -353,12 +386,58 @@
                 </div>
 
                 <div class="flex justify-end gap-4 pt-1">
-                    <button type="submit" class="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600">Save</button>
+                    <button type="submit" class="btn-primary text-white px-6 py-2 rounded hover:brightness-90">Save</button>
                 </div>
             </form>
         </div>
     </div>
 
+    <script>
+        // Theme helpers (same as member/admin/trainer)
+        window.setThemeMode = function(mode) {
+            const lightBtn = document.getElementById('lightBtn');
+            const darkBtn = document.getElementById('darkBtn');
+            if (mode === 'light') {
+                document.documentElement.classList.remove('theme-dark');
+                if (lightBtn) lightBtn.className = 'flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all duration-200 bg-white text-gray-900 shadow-sm';
+                if (darkBtn) darkBtn.className = 'flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all duration-200 text-gray-600 hover:text-gray-900';
+            } else {
+                document.documentElement.classList.add('theme-dark');
+                if (darkBtn) darkBtn.className = 'flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all duration-200 bg-gray-800 text-white shadow-sm';
+                if (lightBtn) lightBtn.className = 'flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all duration-200 text-gray-600 hover:text-gray-900';
+            }
+            localStorage.setItem('themeMode', mode);
+        };
+
+        window.changeAccentColor = function(color) {
+            document.documentElement.style.setProperty('--accent-color', color);
+            document.querySelectorAll('.accent-color-btn').forEach(btn => {
+                const icon = btn.querySelector('i');
+                if (btn.dataset.color === color) { icon.style.opacity = '1'; btn.style.borderColor = '#374151'; btn.style.borderWidth = '3px'; }
+                else { icon.style.opacity = '0'; btn.style.borderColor = 'transparent'; btn.style.borderWidth = '3px'; }
+            });
+            localStorage.setItem('accentColor', color);
+        };
+
+        window.saveThemeSettings = function() {
+            const n = document.createElement('div');
+            n.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            n.textContent = 'Theme settings saved successfully!';
+            document.body.appendChild(n);
+            setTimeout(() => n.remove(), 2500);
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const stored = localStorage.getItem('themeMode');
+            if (stored === 'light' || stored === 'dark') {
+                setThemeMode(stored);
+            } else {
+                const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                setThemeMode(systemPrefersDark ? 'dark' : 'light');
+            }
+            changeAccentColor(localStorage.getItem('accentColor') || '#ef4444');
+        });
+    </script>
 </div>
 
 @push('scripts')

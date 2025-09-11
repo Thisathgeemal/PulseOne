@@ -15,7 +15,11 @@ return [
     |
     */
 
-    'default' => env('BROADCAST_CONNECTION', 'null'),
+    // Use the log driver by default in local development to avoid attempting
+    // external WebSocket/Pusher connections when a local socket server isn't running.
+    'default' => env('APP_ENV') === 'local'
+        ? 'log'
+        : env('BROADCAST_CONNECTION', 'null'),
 
     /*
     |--------------------------------------------------------------------------

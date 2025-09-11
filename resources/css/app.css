@@ -9,3 +9,19 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/* Utility: ensure decline reason displays above decorative progress fills */
+.booking-reason-on-top {
+    position: relative;
+    z-index: 1000000;
+    /* mask any underlying decorative bars by matching parent bg */
+    background-color: inherit !important;
+    display: inline-block;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Safety: if leaderboard progress styles leak in, hide them within bookings table */
+.booking-table .lb-progress-bar,
+.booking-table .lb-progress-fill,
+.booking-table .lb-progress-fill::after { display: none !important; }

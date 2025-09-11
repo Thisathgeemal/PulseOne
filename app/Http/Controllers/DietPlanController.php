@@ -260,23 +260,37 @@ class DietPlanController extends Controller
         $currentWeight = $weightLogs->last()->weight ?? $startingWeight;
 
         // Calculate progress percentage with overshoot handling
-        if ($startingWeight > $targetWeight) {
+        // Guard against division by zero when starting and target weights are equal
+        if ($startingWeight == $targetWeight) {
+            // If starting equals target, consider progress complete only when current equals target
+            $progressPercentage = $currentWeight == $targetWeight ? 100 : 0;
+        } else if ($startingWeight > $targetWeight) {
             // Weight loss goal
-            if ($currentWeight >= $targetWeight) {
-                // Normal progress toward target
-                $progressPercentage = ($startingWeight - $currentWeight) / ($startingWeight - $targetWeight) * 100;
+            $denom = ($startingWeight - $targetWeight);
+            if ($denom == 0) {
+                $progressPercentage = 0;
             } else {
-                // Overshoot: progress decreases after target
-                $progressPercentage = 100 - (($targetWeight - $currentWeight) / ($startingWeight - $targetWeight) * 100);
+                if ($currentWeight >= $targetWeight) {
+                    // Normal progress toward target
+                    $progressPercentage = ($startingWeight - $currentWeight) / $denom * 100;
+                } else {
+                    // Overshoot: progress decreases after target
+                    $progressPercentage = 100 - (($targetWeight - $currentWeight) / $denom * 100);
+                }
             }
         } else {
             // Weight gain goal
-            if ($currentWeight <= $targetWeight) {
-                // Normal progress toward target
-                $progressPercentage = ($currentWeight - $startingWeight) / ($targetWeight - $startingWeight) * 100;
+            $denom = ($targetWeight - $startingWeight);
+            if ($denom == 0) {
+                $progressPercentage = 0;
             } else {
-                // Overshoot: progress decreases after target
-                $progressPercentage = 100 - (($currentWeight - $targetWeight) / ($targetWeight - $startingWeight) * 100);
+                if ($currentWeight <= $targetWeight) {
+                    // Normal progress toward target
+                    $progressPercentage = ($currentWeight - $startingWeight) / $denom * 100;
+                } else {
+                    // Overshoot: progress decreases after target
+                    $progressPercentage = 100 - (($currentWeight - $targetWeight) / $denom * 100);
+                }
             }
         }
 

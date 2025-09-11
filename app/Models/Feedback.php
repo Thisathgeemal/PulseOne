@@ -9,7 +9,8 @@ class Feedback extends Model
     use HasFactory;
 
     protected $primaryKey = 'feedback_id';
-    public $timestamps    = false;
+    // Disable automatic timestamp updates since we only have created_at, not updated_at
+    public $timestamps = false;
 
     protected $fillable = [
         'from_user_id',
@@ -23,6 +24,7 @@ class Feedback extends Model
 
     protected $casts = [
         'is_visible' => 'boolean',
+    'created_at' => 'datetime',
     ];
 
     public function fromUser()
