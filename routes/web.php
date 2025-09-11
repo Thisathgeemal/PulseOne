@@ -7,16 +7,20 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\SecuritySettingsController;
+use App\Http\Controllers\DietitianDashboardController;
 use App\Http\Controllers\DietitianProfileController;
 use App\Http\Controllers\DietPlanController;
 use App\Http\Controllers\DietRequestController;
 use App\Http\Controllers\ExerciseController;
 use App\Http\Controllers\ExerciseLogController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HealthAssessmentController;
+use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\MealController;
 use App\Http\Controllers\MealLogController;
 use App\Http\Controllers\MemberDashboardController;
 use App\Http\Controllers\MemberBookingController;
+use App\Http\Controllers\MemberDashboardController;
 use App\Http\Controllers\MemberProfileController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\MembershipTypeController;
@@ -25,6 +29,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TrainerBookingController;
+use App\Http\Controllers\TrainerDashboardController;
 use App\Http\Controllers\TrainerProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkoutPlanController;
@@ -140,12 +145,16 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     // Chat Routes
     Route::view('/message', 'adminDashboard.message')->name('admin.message');
 
-    // Feedback Management (controller-powered)
+    // Feedback Management
     Route::get('/feedback', [FeedbackController::class, 'adminIndex'])->name('admin.feedback');
     Route::patch('/feedback/{id}/toggle', [FeedbackController::class, 'adminToggleVisibility'])->name('admin.feedback.toggle');
 
-    // Static View Routes
-    Route::view('/report', 'adminDashboard.report')->name('admin.report');
+    // Analytics Routes
+    Route::get('/report', [ReportController::class, 'getReportView'])->name('admin.report');
+    Route::get('/report/monthly-revenue', [ReportController::class, 'monthlyRevenue'])->name('admin.report.monthlyRevenue');
+    Route::get('/report/monthly-users', [ReportController::class, 'getUserAnalytics'])->name('admin.report.monthlyUsers');
+    Route::get('/report/monthly-sessions', [ReportController::class, 'getMonthlySessions'])->name('admin.report.monthlySessions');
+    Route::get('/report/monthly-feedback', [ReportController::class, 'getMonthlyFeedback'])->name('admin.report.monthlyFeedback');
 });
 
 // Dietitian role routing
@@ -200,8 +209,6 @@ Route::middleware(['auth'])->prefix('dietitian')->group(function () {
 
     // Chat Routes
     Route::view('/message', 'dietitianDashboard.message')->name('dietitian.message');
-
-    // Feedback Management (controller-powered)
     Route::get('/feedback', [FeedbackController::class, 'dietitianIndex'])->name('dietitian.feedback');
 });
 
@@ -335,7 +342,7 @@ Route::middleware(['auth'])->prefix('member')->group(function () {
 
     Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('member.leaderboard');
     Route::get('/leaderboard/monthly', [LeaderboardController::class, 'monthly'])->name('member.leaderboard.monthly');
-    
+
     // Appearance Settings
     Route::view('/appearance', 'memberDashboard.appearance')->name('member.appearance');
 });
