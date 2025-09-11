@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminProfileController;
 use App\Http\Controllers\Api\UserPreferenceController;
 use App\Http\Controllers\AttendanceController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\ExerciseLogController;
 use App\Http\Controllers\HealthAssessmentController;
 use App\Http\Controllers\MealController;
 use App\Http\Controllers\MealLogController;
+use App\Http\Controllers\MemberDashboardController;
 use App\Http\Controllers\MemberBookingController;
 use App\Http\Controllers\MemberProfileController;
 use App\Http\Controllers\MembershipController;
@@ -28,8 +30,11 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkoutPlanController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\WorkoutRequestController;
+use App\Http\Controllers\TrainerDashboardController;
+use App\Http\Controllers\DietitianDashboardController;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\FeedbackController;
 
 // Public Pages
 Route::view('/', 'home')->name('home');
@@ -60,10 +65,10 @@ Route::post('/resetPassword', [LoginController::class, 'reset'])->name('password
 
 // Dashboards
 Route::middleware(['auth'])->group(function () {
-    Route::view('/member/dashboard', 'memberDashboard.dashboard')->name('Member.dashboard');
-    Route::view('/dietitian/dashboard', 'dietitianDashboard.dashboard')->name('Dietitian.dashboard');
-    Route::view('/trainer/dashboard', 'trainerDashboard.dashboard')->name('Trainer.dashboard');
-    Route::view('/admin/dashboard', 'adminDashboard.dashboard')->name('Admin.dashboard');
+    Route::get('/member/dashboard', [MemberDashboardController::class, 'dashboard'])->name('Member.dashboard');
+    Route::get('/dietitian/dashboard', [DietitianDashboardController::class, 'dashboard'])->name('Dietitian.dashboard');
+    Route::get('/trainer/dashboard', [TrainerDashboardController::class, 'dashboard'])->name('Trainer.dashboard');
+    Route::get('/admin/dashboard', [AdminDashboardController::class, 'dashboard'])->name('Admin.dashboard');
 });
 
 // Admin role routing
@@ -135,8 +140,11 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     // Chat Routes
     Route::view('/message', 'adminDashboard.message')->name('admin.message');
 
+    // Feedback Management (controller-powered)
+    Route::get('/feedback', [FeedbackController::class, 'adminIndex'])->name('admin.feedback');
+    Route::patch('/feedback/{id}/toggle', [FeedbackController::class, 'adminToggleVisibility'])->name('admin.feedback.toggle');
+
     // Static View Routes
-    Route::view('/feedback', 'adminDashboard.feedback')->name('admin.feedback');
     Route::view('/report', 'adminDashboard.report')->name('admin.report');
 });
 
@@ -193,9 +201,8 @@ Route::middleware(['auth'])->prefix('dietitian')->group(function () {
     // Chat Routes
     Route::view('/message', 'dietitianDashboard.message')->name('dietitian.message');
 
-    // Static View Routes
-    Route::view('/feedback', 'dietitianDashboard.feedback')->name('dietitian.feedback');
-
+    // Feedback Management (controller-powered)
+    Route::get('/feedback', [FeedbackController::class, 'dietitianIndex'])->name('dietitian.feedback');
 });
 
 // Trainer role routing
@@ -248,9 +255,8 @@ Route::middleware(['auth'])->prefix('trainer')->group(function () {
     // Chat Routes
     Route::view('/message', 'trainerDashboard.message')->name('trainer.message');
 
-    // Static View Routes
-    Route::view('/feedback', 'trainerDashboard.feedback')->name('trainer.feedback');
-
+    // Feedback Management (controller-powered)
+    Route::get('/feedback', [FeedbackController::class, 'trainerIndex'])->name('trainer.feedback');
 });
 
 // Member role routing
@@ -322,8 +328,11 @@ Route::middleware(['auth'])->prefix('member')->group(function () {
     Route::post('/health-assessment', [HealthAssessmentController::class, 'store'])->name('member.health-assessment.store');
     Route::get('/health-assessment/status', [HealthAssessmentController::class, 'checkStatus'])->name('member.health-assessment.status');
 
-    // Static View Routes
-    Route::view('/feedback', 'memberDashboard.feedback')->name('member.feedback');
+     // Feedback Management (controller-powered)
+    Route::get('/feedback',        [FeedbackController::class, 'memberIndex'])->name('member.feedback');
+    Route::get('/feedback/create', [FeedbackController::class, 'create'])->name('member.feedback.create');
+    Route::post('/feedback',       [FeedbackController::class, 'store'])->name('member.feedback.store');
+
     Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('member.leaderboard');
     Route::get('/leaderboard/monthly', [LeaderboardController::class, 'monthly'])->name('member.leaderboard.monthly');
     
