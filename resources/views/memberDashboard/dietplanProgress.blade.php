@@ -139,7 +139,7 @@
                     Weekly Weight
                 </button>
                 <button id="progressPhotosBtn"
-                    class="bg-yellow-100 text-yellow-800 font-semibold px-4 py-2 rounded-lg w-48 hover:bg-yellow-200 hover:scale-105 transition duration-200 shadow">
+                    class="bg-blue-100 text-blue-800 font-semibold px-4 py-2 rounded-lg w-48 hover:bg-blue-200 hover:scale-105 transition duration-200 shadow">
                     Progress Photos
                 </button>
             </div>

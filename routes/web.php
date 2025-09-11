@@ -333,7 +333,6 @@ Route::middleware(['auth'])->prefix('member')->group(function () {
     Route::get('/feedback/create', [FeedbackController::class, 'create'])->name('member.feedback.create');
     Route::post('/feedback',       [FeedbackController::class, 'store'])->name('member.feedback.store');
 
-    // Static View Routes
     Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('member.leaderboard');
     Route::get('/leaderboard/monthly', [LeaderboardController::class, 'monthly'])->name('member.leaderboard.monthly');
     

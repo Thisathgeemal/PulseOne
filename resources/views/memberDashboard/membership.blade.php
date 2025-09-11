@@ -64,7 +64,7 @@
             @csrf
             <div class="flex flex-col sm:flex-row justify-start mt-6 space-x-3">
                 <button type="button" onclick="openModal()"
-                    class="w-full sm:w-40 bg-red-500 hover:bg-red-600 text-white py-2 px-4 mb-2 md:mb-0 rounded-lg">
+                    class="w-full sm:w-40 btn-primary py-2 px-4 mb-2 md:mb-0 rounded-lg">
                     Buy Membership
                 </button>
             </div>
@@ -155,7 +155,7 @@
 
                         <div class="flex justify-end space-x-2 mt-5">
                             <button type="button" class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded" onclick="closeModal()">Cancel</button>
-                            <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded" onclick="nextStep()">Next</button>
+                            <button type="button" class="btn-primary px-4 py-2 rounded" onclick="nextStep()">Next</button>
                         </div>
                     </form>
                 </div>
@@ -288,7 +288,7 @@
                         
                         <div class="flex justify-end space-x-2 mt-5">
                             <button type="button" class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded" onclick="backStep()">Previous</button>
-                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Buy Now</button>
+                            <button type="submit" class="btn-primary px-4 py-2 rounded">Buy Now</button>
                         </div>
                     </form>
                 </div>
