@@ -22,7 +22,7 @@ class User extends Authenticatable
         'address',
         'is_active',
         'mfa_enabled',
-        'total_points',
+        'show_in_leaderboard',
     ];
 
     protected $hidden = [
@@ -30,9 +30,10 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'dob'         => 'date',
-        'is_active'   => 'boolean',
-        'mfa_enabled' => 'boolean',
+        'dob'                 => 'date',
+        'is_active'           => 'boolean',
+        'mfa_enabled'         => 'boolean',
+        'show_in_leaderboard' => 'boolean',
     ];
 
     public function roles()

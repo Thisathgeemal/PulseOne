@@ -15,7 +15,9 @@ return [
     |
     */
 
-    'default' => env('BROADCAST_CONNECTION', 'null'),
+    'default' => env('APP_ENV') === 'local'
+        ? 'log'
+        : env('BROADCAST_CONNECTION', 'null'),
 
     /*
     |--------------------------------------------------------------------------

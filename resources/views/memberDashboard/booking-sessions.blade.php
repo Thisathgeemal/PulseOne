@@ -113,7 +113,7 @@
                     'completed' => 'bg-blue-100 text-blue-700',
                     'cancelled' => 'bg-red-100 text-red-700',
                     'declined' => 'bg-yellow-100 text-yellow-700',
-                    'expired' => 'bg-red-200 text-red-700',
+                    'expired' => 'bg-red-50 text-red-600',
                     default => 'bg-gray-100 text-gray-700',
                 };
             @endphp
@@ -142,15 +142,24 @@
                         </div>
                     </div>
 
-                    <span class="inline-block text-xs font-semibold px-3 py-1 rounded-full {{ $pill }} capitalize">
-                        {{ $displayStatus }}
-                    </span>
+                    @if ($displayStatus === 'declined')
+                        <span class="inline-block text-xs font-semibold px-3 py-1 rounded-full capitalize shrink-0"
+                            style="background-color:#fee2e2 !important; color:#dc2626 !important; border:1px solid rgba(220,38,38,0.12) !important; position:relative; z-index:10001;">
+                            {{ $displayStatus }}
+                        </span>
+                    @else
+                        <span
+                            class="inline-block text-xs font-semibold px-3 py-1 rounded-full {{ $pill }} capitalize shrink-0">
+                            {{ $displayStatus }}
+                        </span>
+                    @endif
                 </div>
 
                 @if ($s->status === 'declined' && $s->decline_reason)
-                    <div class="mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm">
-                        <span class="font-medium text-red-800">Decline Reason:</span>
-                        <span class="text-red-700">{{ $s->decline_reason }}</span>
+                    <!-- use utility class to keep reason above decorative fills -->
+                    <div class="mt-2 text-sm booking-reason-on-top">
+                        <span class="font-medium text-red-700">Decline Reason:</span>
+                        <span class="text-red-600">{{ $s->decline_reason }}</span>
                     </div>
                 @endif
             </div>

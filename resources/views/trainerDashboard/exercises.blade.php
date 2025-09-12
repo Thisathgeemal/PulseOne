@@ -73,7 +73,7 @@
             <!-- Submit Button -->
             <div class="flex justify-end">
                 <button type="submit"
-                    class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md shadow font-medium transition-all">
+                    class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md shadow font-medium transition-all">
                     Add Exercise
                 </button>
             </div>
@@ -87,7 +87,7 @@
             class="flex items-center space-x-2 bg-white p-4 rounded-md">
             <label for="muscle_filter" class="text-sm font-medium text-gray-700">Filter by Muscle Group</label>
             <select name="muscle_group" id="muscle_filter" onchange="this.form.submit()"
-                class="w-60 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 text-sm">
+                class="w-60 px-3 py-2 border bg-gray-50 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 text-sm">
                 <option value="">Full Body</option>
                 @foreach ($allMuscleGroups as $muscle)
                     <option value="{{ $muscle }}" {{ request('muscle_group') == $muscle ? 'selected' : '' }}>

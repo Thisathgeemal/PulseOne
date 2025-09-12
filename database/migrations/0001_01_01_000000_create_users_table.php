@@ -21,8 +21,8 @@ return new class extends Migration
             $table->string('mobile_number');
             $table->string('address')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->boolean('show_in_leaderboard')->default(true);
             $table->boolean('mfa_enabled')->default(false);
-            $table->integer('total_points')->default(0);
             $table->string('profile_image')->nullable();
             $table->rememberToken();
             $table->timestamps();

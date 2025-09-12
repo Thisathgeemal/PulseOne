@@ -216,6 +216,8 @@
                 </div>
             </div>
 
+            <!-- Image not supported in this build -->
+
             <!-- Sidebar -->
             <div class="space-y-6">
                 <!-- Nutrition Information -->

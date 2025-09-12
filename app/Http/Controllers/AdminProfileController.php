@@ -5,16 +5,16 @@ use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AdminProfileController extends Controller
 {
-
     // Update admin profile
     public function update(Request $request)
     {
         $user = Auth::user();
 
-        $request->validate([
+        $validated = $request->validate([
             'first_name'    => 'required|string|max:255',
             'last_name'     => 'required|string|max:255',
             'mobile_number' => 'nullable|string|max:15',
@@ -24,47 +24,29 @@ class AdminProfileController extends Controller
             'dob'           => 'nullable|date',
         ]);
 
-        // Upload new profile image
+        // Handle profile image upload
         if ($request->hasFile('profile_image')) {
-            $file        = $request->file('profile_image');
-            $filename    = 'profile_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $destination = public_path('images/profile_images');
-
-            if (! file_exists($destination)) {
-                mkdir($destination, 0755, true);
-            }
-
-            // Delete old image
-            if ($user->profile_image && file_exists(public_path($user->profile_image))) {
-                unlink(public_path($user->profile_image));
-            }
-
-            $file->move($destination, $filename);
-            $user->profile_image = 'images/profile_images/' . $filename;
+            $this->updateProfileImage($user, $request->file('profile_image'));
         }
 
-        // Update name and mobile
-        $user->first_name    = $request->first_name;
-        $user->last_name     = $request->last_name;
-        $user->mobile_number = $request->mobile_number;
-        $user->address       = $request->address;
-        $user->dob           = $request->dob;
+        // Update basic details
+        $user->fill([
+            'first_name'    => $validated['first_name'],
+            'last_name'     => $validated['last_name'],
+            'mobile_number' => $validated['mobile_number'] ?? null,
+            'address'       => $validated['address'] ?? null,
+            'dob'           => $validated['dob'] ?? null,
+        ]);
 
-        // Update password if filled
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
+        // Update password if provided
+        if (! empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
         }
 
         $user->save();
         Auth::setUser($user);
 
-        Notification::create([
-            'user_id' => $user->id,
-            'title'   => 'Profile Updated',
-            'message' => 'Your profile has been updated successfully.',
-            'type'    => 'Profile',
-            'is_read' => false,
-        ]);
+        $this->notifyProfileUpdate($user);
 
         return back()->with('success', 'Admin profile updated successfully!');
     }
@@ -74,12 +56,11 @@ class AdminProfileController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->profile_image && file_exists(public_path($user->profile_image))) {
-            unlink(public_path($user->profile_image));
+        if ($user->profile_image) {
+            $this->deleteFile($user->profile_image);
+            $user->profile_image = null;
+            $user->save();
         }
-
-        $user->profile_image = null;
-        $user->save();
 
         Auth::setUser($user);
 
@@ -95,6 +76,46 @@ class AdminProfileController extends Controller
 
         return response()->json([
             'success' => Hash::check($request->password, Auth::user()->password),
+        ]);
+    }
+
+    // Handle profile image upload and update the user model.
+    protected function updateProfileImage($user, $file)
+    {
+        $filename    = 'profile_' . Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $destination = public_path('images/profile_images');
+
+        if (! file_exists($destination)) {
+            mkdir($destination, 0755, true);
+        }
+
+        // Delete old image
+        if ($user->profile_image) {
+            $this->deleteFile($user->profile_image);
+        }
+
+        $file->move($destination, $filename);
+        $user->profile_image = 'images/profile_images/' . $filename;
+    }
+
+    // Delete a file safely
+    protected function deleteFile($path)
+    {
+        $fullPath = public_path($path);
+        if (file_exists($fullPath)) {
+            unlink($fullPath);
+        }
+    }
+
+    // Send a notification for profile update
+    protected function notifyProfileUpdate($user)
+    {
+        Notification::create([
+            'user_id' => $user->id,
+            'title'   => 'Profile Updated',
+            'message' => 'Your profile has been updated successfully.',
+            'type'    => 'Profile',
+            'is_read' => false,
         ]);
     }
 }

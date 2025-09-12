@@ -111,6 +111,8 @@
             </div>
         </div>
 
+        <!-- Image not supported in this build -->
+
         <!-- Ingredients -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 class="text-xl font-semibold text-gray-800 mb-4">Ingredients</h3>

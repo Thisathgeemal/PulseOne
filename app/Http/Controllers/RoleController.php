@@ -9,15 +9,14 @@ use Illuminate\Support\Facades\DB;
 
 class RoleController extends Controller
 {
+
     // Display role details
     public function getRoleData(Request $request)
     {
         $search = $request->input('search');
 
         $roles = Role::withCount('users')
-            ->when($search, function ($query, $search) {
-                $query->where('role_name', 'LIKE', "%$search%");
-            })
+            ->when($search, fn($query) => $query->where('role_name', 'LIKE', "%$search%"))
             ->paginate(5)
             ->appends(['search' => $search]);
 
@@ -32,13 +31,10 @@ class RoleController extends Controller
         ]);
 
         try {
-            Role::create([
-                'role_name' => $validated['role_name'],
-            ]);
-
+            Role::create(['role_name' => $validated['role_name']]);
             return redirect()->route('admin.role')->with('success', 'Role created successfully!');
         } catch (\Exception $e) {
-            return redirect()->route('admin.role')->with('error', 'Failed to create role.' . $e->getMessage());
+            return redirect()->route('admin.role')->with('error', 'Failed to create role: ' . $e->getMessage());
         }
     }
 
@@ -47,7 +43,7 @@ class RoleController extends Controller
     {
         $selectedRoles = $request->input('selector');
 
-        if (! $selectedRoles || ! is_array($selectedRoles)) {
+        if (empty($selectedRoles) || ! is_array($selectedRoles)) {
             return redirect()->back()->with('error', 'No role selected for deletion.');
         }
 
@@ -61,10 +57,11 @@ class RoleController extends Controller
                     return redirect()->back()->with('error', 'Role(s) not found.');
                 }
 
+                // Deactivate user roles
                 UserRole::where('role_id', $roleId)->update(['is_active' => false]);
 
+                // Update user active status based on remaining active roles
                 $affectedUserIds = UserRole::where('role_id', $roleId)->pluck('user_id');
-
                 foreach ($affectedUserIds as $userId) {
                     $hasActiveRoles = UserRole::where('user_id', $userId)
                         ->where('is_active', true)
@@ -77,12 +74,10 @@ class RoleController extends Controller
             }
 
             DB::commit();
-
             return redirect()->route('admin.role')->with('success', 'Selected role(s) deleted successfully!');
         } catch (\Throwable $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'An error occurred while deleting roles: ' . $e->getMessage());
         }
     }
-
 }

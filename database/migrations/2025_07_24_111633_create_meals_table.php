@@ -13,6 +13,7 @@ return new class extends Migration
             $table->bigIncrements('meal_id');
             $table->string('meal_name');
             $table->string('description')->nullable();
+            $table->string('image_path')->nullable();
 
             $table->decimal('calories_per_serving', 8, 2)->default(0);
             $table->decimal('protein_grams', 8, 2)->default(0);

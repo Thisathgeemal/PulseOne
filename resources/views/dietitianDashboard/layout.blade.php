@@ -13,6 +13,19 @@
 
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script>
+        (function() {
+            try {
+                var mode = localStorage.getItem('themeMode') || 'auto';
+                var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var shouldDark = mode === 'dark' || (mode === 'auto' && prefersDark);
+                if (shouldDark) document.documentElement.classList.add('theme-dark');
+            } catch (_) {}
+        })();
+    </script>
+
+    <!-- Theme Variables -->
+    <link rel="stylesheet" href="{{ asset('css/theme-variables.css') }}">
 
     <!-- Alpine.js -->
     {{-- <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script> --}}

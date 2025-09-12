@@ -9,7 +9,8 @@
             <p class="text-sm text-gray-300 mt-1">Monitor your workout performance and improvements.</p>
         </div>
 
-        <div id="dailyProgressSection" class="hidden bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-center shadow-md mx-auto">
+        <div id="dailyProgressSection"
+            class="hidden bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-center shadow-md mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-left">
                 <div class="col-span-1 bg-gray-100 p-4 rounded-lg shadow">
                     <h3 class="text-lg text-center font-semibold mb-2 text-blue-800">Completed Exercise</h3>
@@ -30,7 +31,8 @@
             </div>
         </div>
 
-        <div id="weeklyProgressSection" class="hidden bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-center shadow-md mx-auto">
+        <div id="weeklyProgressSection"
+            class="hidden bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-center shadow-md mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-left">
                 <div class="col-span-1 bg-gray-100 p-4 rounded-lg shadow">
                     <h3 class="text-lg text-center font-semibold mb-2 text-green-800">Number of Days</h3>
@@ -54,7 +56,8 @@
                     <p id="progress-text" class="text-sm text-center font-semibold mt-4 text-gray-700">
                         {{ min($progressPercentage, 100) }}% completed
                         @if ($extra > 0)
-                            <span class="text-green-600">+ {{ $extra }}%  Going above and beyond! Keep crushing it 🔥</span>
+                            <span class="text-green-600">+ {{ $extra }}% Going above and beyond! Keep crushing it
+                                🔥</span>
                         @endif
                     </p>
                 </div>
@@ -62,7 +65,8 @@
             </div>
         </div>
 
-        <div id="PhotosTrackSection" class="hidden bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-center shadow-md mx-auto">
+        <div id="PhotosTrackSection"
+            class="hidden bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-center shadow-md mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-left">
                 <!-- Monthly Photos Count -->
                 <div class="col-span-1 bg-gray-100 p-4 rounded-lg shadow">
@@ -124,7 +128,8 @@
             </div>
         </div>
 
-        <div id="monthlyProgressSection" class="hidden bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-center shadow-md mx-auto">
+        <div id="monthlyProgressSection"
+            class="hidden bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-center shadow-md mx-auto">
 
             @php
                 // Extract values from backend variable
@@ -150,15 +155,16 @@
                 <!-- Progress Bar -->
                 <div class="col-span-1 md:col-span-3 bg-gray-100 p-4 rounded-lg shadow">
                     <div class="w-full bg-gray-300 rounded-full h-4 mt-2">
-                        <div id="progress-bar" 
-                            class="bg-purple-500 h-4 rounded-full transition-all duration-300 ease-in-out" 
+                        <div id="progress-bar"
+                            class="bg-purple-500 h-4 rounded-full transition-all duration-300 ease-in-out"
                             style="width: {{ $monthlyDisplayedWidth }}%;">
                         </div>
                     </div>
                     <p id="progress-text" class="text-sm text-center font-semibold mt-4 text-gray-700">
                         {{ $monthlyDisplayedWidth }}% completed
                         @if ($monthlyExtra > 0)
-                            <span class="text-purple-600">+ {{ $monthlyExtra }}% Exceptional consistency! Keep dominating 🔥</span>
+                            <span class="text-purple-600">+ {{ $monthlyExtra }}% Exceptional consistency! Keep dominating
+                                🔥</span>
                         @endif
                     </p>
                 </div>
@@ -170,16 +176,20 @@
     <!-- Buttons -->
     <div class="w-full max-w-xs md:max-w-7xl p-8 bg-white rounded-lg my-4 text-center shadow-md mx-auto">
         <div class="flex flex-col sm:flex-row sm:flex-wrap gap-4 justify-start text-left">
-            <button id="dailyLogBtn" class="bg-blue-100 text-blue-800 font-semibold px-4 py-2 rounded-lg w-48 hover:bg-blue-200 hover:scale-105 transition duration-200 shadow">
+            <button id="dailyLogBtn"
+                class="bg-blue-100 text-blue-800 font-semibold px-4 py-2 rounded-lg w-48 hover:bg-blue-200 hover:scale-105 transition duration-200 shadow">
                 Daily Exercise Log
             </button>
-            <button id="weeklyLogBtn" class="bg-green-100 text-green-800 font-semibold px-4 py-2 rounded-lg w-48 hover:bg-green-200 hover:scale-105 transition duration-200 shadow">
+            <button id="weeklyLogBtn"
+                class="bg-green-100 text-green-800 font-semibold px-4 py-2 rounded-lg w-48 hover:bg-green-200 hover:scale-105 transition duration-200 shadow">
                 Weekly Workout Log
             </button>
-            <button id="monthlyLogBtn" class="bg-purple-100 text-purple-800 font-semibold px-4 py-2 rounded-lg w-48 hover:bg-purple-300 hover:scale-105 transition duration-200 shadow">
+            <button id="monthlyLogBtn"
+                class="bg-purple-100 text-purple-800 font-semibold px-4 py-2 rounded-lg w-48 hover:bg-purple-300 hover:scale-105 transition duration-200 shadow">
                 Monthly workout Log
             </button>
-            <button id="progressPhotosBtn" class="bg-yellow-100 text-yellow-800 font-semibold px-4 py-2 rounded-lg w-48 hover:bg-yellow-200 hover:scale-105 transition duration-200 shadow">
+            <button id="progressPhotosBtn"
+                class="bg-blue-100 text-blue-800 font-semibold px-4 py-2 rounded-lg w-48 hover:bg-blue-200 hover:scale-105 transition duration-200 shadow">
                 Progress Photos
             </button>
         </div>
@@ -187,12 +197,14 @@
 
     <!-- Sections -->
     <div id="sections" class="mt-4">
-        <div id="dailyLogSection" class="hidden bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-center shadow-md mx-auto">
+        <div id="dailyLogSection"
+            class="hidden bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-center shadow-md mx-auto">
             <!-- Header -->
             <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-                <h2 class="text-xl text-gray-800 sm:text-2xl font-bold">Daily Exercise Log ({{ \Carbon\Carbon::today()->format('F d, Y') }})</h2>
+                <h2 class="text-xl text-gray-800 sm:text-2xl font-bold">Daily Exercise Log
+                    ({{ \Carbon\Carbon::today()->format('F d, Y') }})</h2>
                 <button onclick="openDailyLogModal()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
-                    + Log Exercise 
+                    + Log Exercise
                 </button>
             </div>
 
@@ -210,14 +222,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($todayLogs as $index => $log)
+                        @foreach ($todayLogs as $index => $log)
                             <tr class="hover:bg-gray-100 transition duration-150">
                                 <td class="py-3 px-4 text-left border-b border-gray-200">{{ $index + 1 }}</td>
-                                <td class="py-3 px-4 text-left border-b border-gray-200">{{ $log->exercise->name ?? '-' }}</td>
+                                <td class="py-3 px-4 text-left border-b border-gray-200">{{ $log->exercise->name ?? '-' }}
+                                </td>
                                 <td class="py-3 px-4 text-left border-b border-gray-200">{{ $log->sets_completed }}</td>
                                 <td class="py-3 px-4 text-left border-b border-gray-200">{{ $log->reps_completed }}</td>
                                 <td class="py-3 px-4 text-left border-b border-gray-200">{{ $log->weight }}</td>
-                                <td class="py-3 px-4 text-left border-b border-gray-200">{{ $log->created_at->format('h:i A') }}</td>
+                                <td class="py-3 px-4 text-left border-b border-gray-200">
+                                    {{ $log->created_at->format('h:i A') }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -225,20 +239,22 @@
             </div>
 
             <!-- Request Modal -->
-            <div id="dailyLogModal" role="dialog" aria-modal="true" class="fixed inset-0 flex backdrop-blur-sm bg-white/20 hidden items-center justify-center z-50">
+            <div id="dailyLogModal" role="dialog" aria-modal="true"
+                class="fixed inset-0 flex backdrop-blur-sm bg-white/20 hidden items-center justify-center z-50">
                 <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-[0_0_15px_4px_rgba(241,30,19,0.5)]">
                     <h2 class="text-md md:text-3xl font-bold text-center mb-5">Add Daily Exercise Log</h2>
-                    
+
                     <!-- Form -->
                     <form action="{{ route('member.workoutplan.exercise.log') }}" method="POST" class="space-y-4">
                         @csrf
 
                         <input type="hidden" name="workoutplan_id" value="{{ $workoutPlan->workoutplan_id }}">
-                        
+
                         <!-- Exercise -->
                         <div>
                             <label class="block mb-1 text-left text-sm font-medium text-gray-700">Exercise</label>
-                            <select id="exerciseSelect" name="exercise_id" required class="border px-4 py-2 rounded w-full focus:outline-none focus:ring-red-500 focus:border-red-500">
+                            <select id="exerciseSelect" name="exercise_id" required
+                                class="border px-4 py-2 rounded w-full focus:outline-none focus:ring-red-500 focus:border-red-500">
                                 <option value="">Select Exercise</option>
                                 @foreach ($exercises as $ex)
                                     @if (!in_array($ex->exercise->exercise_id, $todayLogs->pluck('exercise_id')->toArray()))
@@ -248,32 +264,39 @@
                                     @endif
                                 @endforeach
                             </select>
-                        </div>                    
+                        </div>
 
                         <!-- Sets Completed -->
                         <div>
-                            <label for="sets_completed" class="block text-left text-sm font-medium text-gray-700">Sets Completed</label>
-                            <input type="number" name="sets_completed" min="0" placeholder="Enter Completed Sets"
+                            <label for="sets_completed" class="block text-left text-sm font-medium text-gray-700">Sets
+                                Completed</label>
+                            <input type="number" name="sets_completed" min="0"
+                                placeholder="Enter Completed Sets"
                                 class="w-full mt-1 px-3 py-2 border rounded-md border-gray-300 text-sm focus:outline-none focus:ring-red-500 focus:border-red-500" />
                         </div>
 
                         <!-- Reps Completed -->
                         <div>
-                            <label for="reps_completed" class="block text-left text-sm font-medium text-gray-700">Reps Completed</label>
-                            <input type="number" name="reps_completed" min="0" placeholder="Enter Completed Reps"
+                            <label for="reps_completed" class="block text-left text-sm font-medium text-gray-700">Reps
+                                Completed</label>
+                            <input type="number" name="reps_completed" min="0"
+                                placeholder="Enter Completed Reps"
                                 class="w-full mt-1 px-3 py-2 border rounded-md border-gray-300 text-sm focus:outline-none focus:ring-red-500 focus:border-red-500" />
                         </div>
 
                         <!-- Weight  -->
                         <div>
-                            <label for="weight" class="block text-left text-sm font-medium text-gray-700">Weight (kg)</label>
-                            <input type="number" name="weight" step="0.1" min="0" placeholder="Enter Weight"
+                            <label for="weight" class="block text-left text-sm font-medium text-gray-700">Weight
+                                (kg)</label>
+                            <input type="number" name="weight" step="0.1" min="0"
+                                placeholder="Enter Weight"
                                 class="w-full mt-1 px-3 py-2 border rounded-md border-gray-300 text-sm focus:outline-none focus:ring-red-500 focus:border-red-500" />
                         </div>
 
                         <!-- Action Buttons -->
                         <div class="flex justify-end space-x-2 mt-6">
-                            <button type="button" onclick="closeDailyLogModal()" class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded">
+                            <button type="button" onclick="closeDailyLogModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded">
                                 Cancel
                             </button>
                             <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
@@ -285,7 +308,8 @@
             </div>
         </div>
 
-        <div id="weeklyLogSection" class="hidden bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-center shadow-md mx-auto">
+        <div id="weeklyLogSection"
+            class="hidden bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-center shadow-md mx-auto">
             <!-- Header -->
             <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <h2 class="text-xl text-gray-800 sm:text-2xl font-bold my-1">
@@ -307,13 +331,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($weeklyLogs as $index => $log)
+                        @foreach ($weeklyLogs as $index => $log)
                             <tr class="hover:bg-gray-100 transition duration-150">
                                 <td class="py-3 px-4 text-left border-b border-gray-200">{{ $index + 1 }}</td>
-                                <td class="py-3 px-4 text-left border-b border-gray-200">{{ \Carbon\Carbon::parse($log->log_date)->format('M d, Y') }}</td>
+                                <td class="py-3 px-4 text-left border-b border-gray-200">
+                                    {{ \Carbon\Carbon::parse($log->log_date)->format('M d, Y') }}</td>
                                 <td class="py-3 px-4 text-left border-b border-gray-200">{{ $log->total_exercises }}</td>
-                                <td class="py-3 px-4 text-left border-b border-gray-200">{{ $log->completed_exercises }}</td>
-                                <td class="py-3 px-4 text-left border-b border-gray-200">{{ $log->completion_percentage }}%</td>
+                                <td class="py-3 px-4 text-left border-b border-gray-200">{{ $log->completed_exercises }}
+                                </td>
+                                <td class="py-3 px-4 text-left border-b border-gray-200">
+                                    {{ $log->completion_percentage }}%</td>
                                 <td class="py-3 px-4 text-left border-b border-gray-200">{{ $log->workout_duration }}</td>
                             </tr>
                         @endforeach
@@ -322,65 +349,56 @@
             </div>
         </div>
 
-        <div id="progressPhotosSection" class="hidden bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-center shadow-md mx-auto">
+        <div id="progressPhotosSection"
+            class="hidden bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-center shadow-md mx-auto">
             <!-- Header -->
             <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-                <h2 class="text-xl text-gray-800 sm:text-2xl font-bold">Progress Photos ({{ \Carbon\Carbon::now()->format('F Y') }}) </h2>
-                <button onclick="openProgressPhotosModal()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
-                    + Add Photo 
+                <h2 class="text-xl text-gray-800 sm:text-2xl font-bold">Progress Photos
+                    ({{ \Carbon\Carbon::now()->format('F Y') }}) </h2>
+                <button onclick="openProgressPhotosModal()"
+                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
+                    + Add Photo
                 </button>
             </div>
 
             <!-- Request Modal -->
-            <div id="progressPhotosModal" role="dialog" aria-modal="true" class="fixed inset-0 flex backdrop-blur-sm bg-white/20 hidden items-center justify-center z-50">
+            <div id="progressPhotosModal" role="dialog" aria-modal="true"
+                class="fixed inset-0 flex backdrop-blur-sm bg-white/20 hidden items-center justify-center z-50">
                 <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-[0_0_15px_4px_rgba(241,30,19,0.5)]">
                     <h2 class="text-md md:text-3xl font-bold text-center mb-5">Add Progress Photo</h2>
-                    
+
                     <!-- Form -->
-                    <form action="{{ route('member.workoutplan.photo') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                    <form action="{{ route('member.workoutplan.photo') }}" method="POST" enctype="multipart/form-data"
+                        class="space-y-4">
                         @csrf
 
                         <input type="hidden" name="workoutplan_id" value="{{ $workoutPlan->workoutplan_id }}">
-                        
+
                         <!-- Date of Photo -->
                         <div>
                             <label for="photoDate" class="block mb-2 font-semibold text-left">Date of Photo:</label>
-                            <input 
-                                type="date" 
-                                id="photoDate" 
-                                name="photoDate" 
-                                required 
-                                class="border rounded p-2 mb-4 w-full focus:outline-none focus:ring-red-500 focus:border-red-500" 
-                            />
-                        </div>                    
+                            <input type="date" id="photoDate" name="photoDate" required
+                                class="border rounded p-2 mb-4 w-full focus:outline-none focus:ring-red-500 focus:border-red-500" />
+                        </div>
 
                         <!-- Photo Upload Input -->
                         <div>
                             <label for="photoFile" class="block mb-2 font-semibold text-left">Upload Photo:</label>
-                            <input 
-                                type="file" 
-                                id="photoFile" 
-                                name="photoFile" 
-                                accept="image/*" 
-                                required 
-                                class="mb-4 w-full border rounded p-2 focus:outline-none focus:ring-red-500 focus:border-red-500" 
-                            />
+                            <input type="file" id="photoFile" name="photoFile" accept="image/*" required
+                                class="mb-4 w-full border rounded p-2 focus:outline-none focus:ring-red-500 focus:border-red-500" />
                         </div>
 
                         <!-- Optional Notes Textarea -->
                         <div>
                             <label for="photoNote" class="block mb-2 font-semibold text-left">Notes (optional):</label>
-                            <textarea 
-                                id="photoNote" 
-                                name="photoNote" 
-                                rows="2" 
-                                class="border rounded p-2 w-full focus:outline-none focus:ring-red-500 focus:border-red-500"
-                            ></textarea>
+                            <textarea id="photoNote" name="photoNote" rows="2"
+                                class="border rounded p-2 w-full focus:outline-none focus:ring-red-500 focus:border-red-500"></textarea>
                         </div>
 
                         <!-- Action Buttons -->
                         <div class="flex justify-end space-x-2 mt-6">
-                            <button type="button" onclick="closeProgressPhotosModal()" class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded">
+                            <button type="button" onclick="closeProgressPhotosModal()"
+                                class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded">
                                 Cancel
                             </button>
                             <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
@@ -395,11 +413,13 @@
             <div id="photoGallery" class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-6">
                 @foreach ($photos as $photo)
                     <div class="border rounded overflow-hidden shadow-md">
-                        <img src="{{ asset('storage/' . $photo->photo_path) }}" alt="Progress photo on {{ $photo->photo_date }}" class="w-full h-48 object-cover" />
+                        <img src="{{ asset('storage/' . $photo->photo_path) }}"
+                            alt="Progress photo on {{ $photo->photo_date }}" class="w-full h-48 object-cover" />
                         <div class="p-2 text-left">
-                            <p class="text-sm font-semibold">Date: {{ \Carbon\Carbon::parse($photo->photo_date)->format('Y-m-d') }}</p>
+                            <p class="text-sm font-semibold">Date:
+                                {{ \Carbon\Carbon::parse($photo->photo_date)->format('Y-m-d') }}</p>
                             @if ($photo->note)
-                            <p class="text-xs mt-1 text-gray-600">Note: {{ $photo->note }}</p>
+                                <p class="text-xs mt-1 text-gray-600">Note: {{ $photo->note }}</p>
                             @endif
                         </div>
                     </div>
@@ -407,7 +427,8 @@
             </div>
         </div>
 
-        <div id="monthlyLogSection" class="hidden bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-center shadow-md mx-auto">
+        <div id="monthlyLogSection"
+            class="hidden bg-white p-8 rounded-lg w-full max-w-xs md:max-w-7xl my-4 text-center shadow-md mx-auto">
             <!-- Header -->
             <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <h2 class="text-xl text-gray-800 sm:text-2xl font-bold my-1">
@@ -429,13 +450,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($monthlyLogs as $index => $log)
+                        @foreach ($monthlyLogs as $index => $log)
                             <tr class="hover:bg-gray-100 transition duration-150">
                                 <td class="py-3 px-4 text-left border-b border-gray-200">{{ $index + 1 }}</td>
-                                <td class="py-3 px-4 text-left border-b border-gray-200">{{ \Carbon\Carbon::parse($log->log_date)->format('M d, Y') }}</td>
+                                <td class="py-3 px-4 text-left border-b border-gray-200">
+                                    {{ \Carbon\Carbon::parse($log->log_date)->format('M d, Y') }}</td>
                                 <td class="py-3 px-4 text-left border-b border-gray-200">{{ $log->total_exercises }}</td>
-                                <td class="py-3 px-4 text-left border-b border-gray-200">{{ $log->completed_exercises }}</td>
-                                <td class="py-3 px-4 text-left border-b border-gray-200">{{ $log->completion_percentage }}%</td>
+                                <td class="py-3 px-4 text-left border-b border-gray-200">{{ $log->completed_exercises }}
+                                </td>
+                                <td class="py-3 px-4 text-left border-b border-gray-200">
+                                    {{ $log->completion_percentage }}%</td>
                                 <td class="py-3 px-4 text-left border-b border-gray-200">{{ $log->workout_duration }}</td>
                             </tr>
                         @endforeach
@@ -452,51 +476,51 @@
     </div>
 
     @push('scripts')
-        @if(session('success'))
-        <script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: "{{ session('success') }}",
-                confirmButtonText: 'OK',
-                confirmButtonColor: '#d32f2f'
-            });
-        </script>
+        @if (session('success'))
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: "{{ session('success') }}",
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#d32f2f'
+                });
+            </script>
         @endif
 
-        @if(session('error'))
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: "{{ session('error') }}",
-                confirmButtonText: 'OK',
-                confirmButtonColor: '#d32f2f'
-            });
-        </script>
+        @if (session('error'))
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: "{{ session('error') }}",
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#d32f2f'
+                });
+            </script>
         @endif
 
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 // Button keys mapped to section identifiers
                 const buttons = {
                     dailyLogBtn: 'daily',
                     weeklyLogBtn: 'weekly',
-                    monthlyLogBtn: 'monthly', 
+                    monthlyLogBtn: 'monthly',
                     progressPhotosBtn: 'progressPhotos',
                 };
 
                 const progressSections = {
                     daily: document.getElementById('dailyProgressSection'),
                     weekly: document.getElementById('weeklyProgressSection'),
-                    monthly: document.getElementById('monthlyProgressSection'), 
+                    monthly: document.getElementById('monthlyProgressSection'),
                     progressPhotos: document.getElementById('PhotosTrackSection'),
                 };
 
                 const contentSections = {
                     daily: document.getElementById('dailyLogSection'),
                     weekly: document.getElementById('weeklyLogSection'),
-                    monthly: document.getElementById('monthlyLogSection'), 
+                    monthly: document.getElementById('monthlyLogSection'),
                     progressPhotos: document.getElementById('progressPhotosSection'),
                 };
 
@@ -506,7 +530,7 @@
 
                 // Add click listeners to buttons to toggle sections
                 Object.entries(buttons).forEach(([btnId, key]) => {
-                    document.getElementById(btnId)?.addEventListener('click', function () {
+                    document.getElementById(btnId)?.addEventListener('click', function() {
                         // Hide all sections
                         Object.values(progressSections).forEach(sec => sec?.classList.add('hidden'));
                         Object.values(contentSections).forEach(sec => sec?.classList.add('hidden'));
@@ -534,8 +558,6 @@
             function closeProgressPhotosModal() {
                 document.getElementById('progressPhotosModal').classList.add('hidden');
             }
-
         </script>
-
     @endpush
 @endsection

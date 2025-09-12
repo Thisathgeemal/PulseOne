@@ -160,7 +160,7 @@ class MemberBookingController extends Controller
     public function sessions()
     {
         $memberId = Auth::id();
-        $now      = now();
+        $now      = now()->utc();
 
         // Upcoming sessions: approved bookings in the future for this member
         $upcoming = Booking::with('trainer')

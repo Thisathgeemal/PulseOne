@@ -62,10 +62,10 @@ class TrainerBookingController extends Controller
             // Resolve the request date (local app TZ)
             $appTz    = config('app.timezone');
             $dateOnly = $booking->date
-            ? Carbon::parse($booking->date, $appTz)->toDateString()
-            : ($booking->start_at
-                ? $booking->start_at->clone()->timezone($appTz)->toDateString()
-                : now($appTz)->toDateString());
+                ? Carbon::parse($booking->date, $appTz)->toDateString()
+                : ($booking->start_at
+                    ? $booking->start_at->clone()->timezone($appTz)->toDateString()
+                    : now($appTz)->toDateString());
 
             // Normalize chosen time to "H:i:s" in local TZ
             $chosenTimeLocal = Carbon::parse($data['time'], $appTz)->format('H:i:s');
@@ -123,8 +123,8 @@ class TrainerBookingController extends Controller
             foreach ($approved as $ex) {
                 // Convert existing to local for fair comparison
                 $exStartLocal = $ex->start_at
-                ? $ex->start_at->clone()->timezone($appTz)->seconds(0)
-                : Carbon::parse(
+                    ? $ex->start_at->clone()->timezone($appTz)->seconds(0)
+                    : Carbon::parse(
                     (Carbon::parse($ex->date, $appTz)->toDateString() . ' ' .
                         (strlen($ex->time ?? '') === 5 ? $ex->time . ':00' : ($ex->time ?? '00:00:00'))
                     ),
@@ -232,7 +232,7 @@ class TrainerBookingController extends Controller
     public function sessions()
     {
         $trainerId = Auth::id();
-        $now       = now();
+        $now       = now()->utc();
 
         // Upcoming sessions: approved bookings in the future for this trainer
         $upcoming = Booking::with('member')

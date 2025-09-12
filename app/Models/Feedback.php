@@ -23,6 +23,7 @@ class Feedback extends Model
 
     protected $casts = [
         'is_visible' => 'boolean',
+        'created_at' => 'datetime',
     ];
 
     public function fromUser()

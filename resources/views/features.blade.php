@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>PULSEONE</title>
+    <title>PULSEONE | Features</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700,800,900" rel="stylesheet" />
 
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -19,15 +19,52 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <style>
-        .feature-card:hover .icon-glow {
-            transform: scale(1.1);
-            filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.5));
-        }
+    <!-- AOS Animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
+    <style>
+        .gradient-text {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .feature-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px) scale(1.02);
+        }
+        .feature-card:hover .icon-glow {
+            transform: scale(1.2);
+            filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.6));
+        }
         .feature-card:hover .hover-info {
             opacity: 1;
             transform: translateY(0);
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+        .floating-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
         }
     </style>
 
@@ -38,56 +75,241 @@
     @include('components.header')
     
     <!-- Hero Section -->
-    <section class="bg-black text-white py-20">
-        <div class="container mx-auto text-center px-4">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">CORE FEATURES OF PULSEONE</h1>
-            <p class="text-lg text-gray-200">Empowering fitness journeys with smart, integrated solutions.</p>
+    <section class="relative bg-gradient-to-br from-black via-gray-900 to-red-900 text-white py-32 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-red-600/30 to-transparent"></div>
+        <div class="absolute top-10 right-10 w-72 h-72 bg-red-600/20 rounded-full blur-3xl floating-animation"></div>
+        <div class="absolute bottom-10 left-10 w-96 h-96 bg-red-500/10 rounded-full blur-3xl floating-animation" style="animation-delay: -3s;"></div>
+        
+        <div class="relative container mx-auto text-center px-4" data-aos="fade-up">
+            <h1 class="text-5xl md:text-7xl font-black mb-6 tracking-tight">
+                CORE <span class="gradient-text">FEATURES</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed">
+                Empowering fitness journeys with smart, integrated solutions that revolutionize how you train, eat, and achieve your goals.
+            </p>
+            
+            <!-- Feature Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16" data-aos="fade-up" data-aos-delay="200">
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-red-400 mb-2">10+</div>
+                    <div class="text-sm text-gray-300">Core Features</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-red-400 mb-2">24/7</div>
+                    <div class="text-sm text-gray-300">System Access</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-red-400 mb-2">AI</div>
+                    <div class="text-sm text-gray-300">Powered Plans</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-red-400 mb-2">Real-time</div>
+                    <div class="text-sm text-gray-300">Tracking</div>
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- Features Grid -->
-    <section class="py-16 bg-white">
-        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12">
-            @php
-                $features = [
-                    ['icon' => 'fa-user-check', 'title' => 'QR Attendance System', 'short' => 'Check-in to the gym securely.', 'full' => 'Scan a unique QR daily for contactless check-in and precise attendance tracking.'],
-                    ['icon' => 'fa-dumbbell', 'title' => 'Personalized Workout Plans', 'short' => 'Plans made for you.', 'full' => 'Trainers create weekly goal-based workout plans that adapt to your progress.'],
-                    ['icon' => 'fa-apple-alt', 'title' => 'Diet Plan Integration', 'short' => 'Track your meals easily.', 'full' => 'Dietitians assign custom diet plans with tracking and updates based on your goals.'],
-                    ['icon' => 'fa-user-cog', 'title' => 'Role-Based Dashboards', 'short' => 'Tailored interfaces.', 'full' => 'Separate dashboards for Admins, Trainers, Dietitians & Members with relevant tools.'],
-                    ['icon' => 'fa-chart-line', 'title' => 'Progress Tracking', 'short' => 'See your results.', 'full' => 'Track performance metrics across your training and meal journey with ease.'],
-                    ['icon' => 'fa-shield-alt', 'title' => 'Security & 2FA', 'short' => 'Stay protected.', 'full' => 'Secure accounts with two-factor authentication and active session management.']
-                ];
-            @endphp
+    <section class="py-24 bg-white relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-red-50 to-transparent rounded-full transform -translate-x-48 -translate-y-48"></div>
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-red-50 to-transparent rounded-full transform translate-x-48 translate-y-48"></div>
+        
+        <div class="relative container mx-auto px-6">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-4">
+                    Powerful <span class="gradient-text">Features</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Discover the comprehensive suite of tools designed to transform your fitness experience
+                </p>
+            </div>
 
-            @foreach($features as $feature)
-                <div class="relative group bg-white border shadow-md rounded-lg p-6 transition duration-300 overflow-hidden hover:z-10">
-                    <!-- Front Content -->
-                    <div class="transition-all duration-300 group-hover:opacity-0 group-hover:scale-95">
-                        <div class="text-red-600 text-5xl mb-4 transition-transform duration-300 group-hover:scale-110">
-                            <i class="fas {{ $feature['icon'] }}"></i>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @php
+                    $features = [
+                        [
+                            'icon' => 'fa-qrcode', 
+                            'title' => 'QR Attendance System', 
+                            'short' => 'Contactless check-in solution', 
+                            'full' => 'Scan a unique QR code daily for contactless check-in and precise attendance tracking. Completely secure and hygienic.',
+                            'color' => 'blue'
+                        ],
+                        [
+                            'icon' => 'fa-dumbbell', 
+                            'title' => 'Personalized Workout Plans', 
+                            'short' => 'AI-powered fitness routines', 
+                            'full' => 'Trainers create weekly goal-based workout plans that adapt to your progress and fitness level dynamically.',
+                            'color' => 'green'
+                        ],
+                        [
+                            'icon' => 'fa-apple-alt', 
+                            'title' => 'Diet Plan Integration', 
+                            'short' => 'Smart nutrition tracking', 
+                            'full' => 'Dietitians assign custom diet plans with real-time tracking and updates based on your specific health goals.',
+                            'color' => 'orange'
+                        ],
+                        [
+                            'icon' => 'fa-user-cog', 
+                            'title' => 'Role-Based Dashboards', 
+                            'short' => 'Tailored user interfaces', 
+                            'full' => 'Separate dashboards for Admins, Trainers, Dietitians & Members with relevant tools and analytics.',
+                            'color' => 'purple'
+                        ],
+                        [
+                            'icon' => 'fa-chart-line', 
+                            'title' => 'Progress Tracking', 
+                            'short' => 'Comprehensive analytics', 
+                            'full' => 'Track performance metrics across your training and meal journey with detailed charts and insights.',
+                            'color' => 'teal'
+                        ],
+                        [
+                            'icon' => 'fa-shield-alt', 
+                            'title' => 'Security & 2FA', 
+                            'short' => 'Enterprise-grade protection', 
+                            'full' => 'Secure accounts with two-factor authentication and active session management for complete peace of mind.',
+                            'color' => 'red'
+                        ],
+                        [
+                            'icon' => 'fa-calendar-check', 
+                            'title' => 'Session Booking', 
+                            'short' => 'Smart scheduling system', 
+                            'full' => 'Book training sessions with preferred trainers, manage schedules, and receive automated reminders.',
+                            'color' => 'indigo'
+                        ],
+                        [
+                            'icon' => 'fa-comments', 
+                            'title' => 'Feedback System', 
+                            'short' => 'Interactive communication', 
+                            'full' => 'Rate and review trainers, dietitians, and services. Build better relationships through transparent feedback.',
+                            'color' => 'pink'
+                        ],
+                        [
+                            'icon' => 'fa-mobile-alt', 
+                            'title' => 'Mobile Responsive', 
+                            'short' => 'Access anywhere, anytime', 
+                            'full' => 'Fully responsive design that works seamlessly across all devices - desktop, tablet, and mobile.',
+                            'color' => 'gray'
+                        ]
+                    ];
+                @endphp
+
+                @foreach($features as $index => $feature)
+                    <div class="feature-card group bg-white border border-gray-100 shadow-lg rounded-2xl p-8 transition-all duration-300 hover:shadow-2xl" 
+                         data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
+                        
+                        <!-- Front Content -->
+                        <div class="relative z-10">
+                            <div class="w-16 h-16 bg-{{ $feature['color'] }}-100 rounded-full flex items-center justify-center mb-6 icon-glow transition-all duration-300">
+                                <i class="fas {{ $feature['icon'] }} text-2xl text-{{ $feature['color'] }}-600"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-gray-900 group-hover:text-{{ $feature['color'] }}-600 transition-colors duration-300">
+                                {{ $feature['title'] }}
+                            </h3>
+                            <p class="text-gray-600 mb-4">{{ $feature['short'] }}</p>
+                            
+                            <!-- Detailed description on hover -->
+                            <div class="hover-info opacity-0 transform translate-y-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
+                                <div class="border-t border-gray-200 pt-4">
+                                    <p class="text-sm text-gray-700 leading-relaxed">{{ $feature['full'] }}</p>
+                                </div>
+                            </div>
                         </div>
-                        <h3 class="text-xl font-semibold mb-2">{{ $feature['title'] }}</h3>
-                        <p class="text-gray-600">{{ $feature['short'] }}</p>
                     </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
 
-                    <!-- Hover Back Content -->
-                    <div class="absolute inset-0 bg-white flex flex-col justify-center items-center text-center p-6 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out">
-                        <h4 class="text-lg font-bold mb-2">{{ $feature['title'] }}</h4>
-                        <p class="text-sm text-gray-700">{{ $feature['full'] }}</p>
+    <!-- Feature Showcase -->
+    <section class="py-24 bg-gradient-to-br from-gray-50 to-red-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-4">
+                    See It In <span class="gradient-text">Action</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Experience how our features work together to create the ultimate fitness platform
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div data-aos="fade-right">
+                    <h3 class="text-3xl font-bold text-gray-900 mb-6">
+                        Complete Fitness <span class="gradient-text">Ecosystem</span>
+                    </h3>
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-red-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-900 mb-2">Integrated Tracking</h4>
+                                <p class="text-gray-600">All your fitness data in one place - workouts, nutrition, progress, and more.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-red-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-900 mb-2">Expert Guidance</h4>
+                                <p class="text-gray-600">Connect with certified trainers and nutritionists for personalized advice.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-red-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-900 mb-2">Smart Analytics</h4>
+                                <p class="text-gray-600">AI-powered insights help you understand your progress and optimize your routine.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            @endforeach
+                <div data-aos="fade-left" class="relative">
+                    <div class="absolute inset-0 bg-gradient-to-br from-red-600/20 to-transparent rounded-2xl transform rotate-3"></div>
+                    <img src="{{ asset('images/features/dashboard-showcase.jpg') }}" alt="Dashboard" class="relative rounded-2xl shadow-2xl w-full">
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- CTA Banner -->
-    <section class="bg-red-600 text-white py-12 text-center">
-        <h2 class="text-3xl font-bold uppercase">Experience fitness redefined with PULSEONE.</h2>
-        <p class="mt-2 text-lg">Join us and take control of your health and well-being today!</p>
+    <section class="py-20 bg-gradient-to-r from-red-600 to-red-700 text-white text-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-black/20"></div>
+        <div class="relative container mx-auto px-4" data-aos="fade-up">
+            <h2 class="text-4xl md:text-5xl font-black mb-6">
+                Experience Fitness <span class="text-red-200">Redefined</span>
+            </h2>
+            <p class="text-xl mb-8 opacity-90 max-w-3xl mx-auto">
+                Join us and take control of your health and well-being today with our comprehensive fitness platform!
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{{ route('register') }}" class="px-8 py-4 bg-white text-red-600 font-bold rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-105">
+                    Get Started Free
+                </a>
+                <a href="{{ route('contact') }}" class="px-8 py-4 border-2 border-white text-white font-bold rounded-full hover:bg-white hover:text-red-600 transition-all duration-300">
+                    Request Demo
+                </a>
+            </div>
+        </div>
     </section>
 
     <!-- Footer -->
     @include('components.footer')
 
+    <!-- AOS Script -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            AOS.init({
+                duration: 800,
+                once: true,
+                offset: 100
+            });
+        });
+    </script>
 </body>
 </html>

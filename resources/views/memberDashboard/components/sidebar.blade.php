@@ -20,7 +20,7 @@
         <li>
             <a href="{{ route('Member.dashboard') }}"
                 class="flex items-center gap-3 px-3 py-2 rounded-lg 
-                      {{ request()->routeIs('Member.dashboard') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                      {{ request()->routeIs('Member.dashboard') ? 'accent-bg text-white font-semibold' : 'hover:bg-gray-100' }}">
                 <i class="fas fa-house"></i> Dashboard
             </a>
         </li>
@@ -29,7 +29,7 @@
         <li @click.away="openUsers = false">
             <button @click="openUsers = !openUsers"
                 class="w-full flex items-center gap-3 px-3 py-2 rounded-lg focus:outline-none
-                        {{ request()->routeIs('member.qr') || request()->routeIs('member.attendance') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                        {{ request()->routeIs('member.qr') || request()->routeIs('member.attendance') ? 'accent-bg text-white font-semibold' : 'hover:bg-gray-100' }}">
                 <i class="fas fa-qrcode"></i> QR
                 <i :class="openUsers ? 'fa fa-chevron-circle-up' : 'fa fa-chevron-circle-down'"
                     class="ml-auto transition-all duration-300"></i>
@@ -43,7 +43,7 @@
                     <li>
                         <a href="{{ route($route) }}"
                             class="flex items-center gap-3 px-3 py-2 rounded-lg
-                                  {{ request()->routeIs($route) ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                                  {{ request()->routeIs($route) ? 'accent-bg text-white font-semibold' : 'hover:bg-gray-100' }}">
                             <i class="{{ $data['icon'] }}"></i> {{ $data['label'] }}
                         </a>
                     </li>
@@ -99,7 +99,7 @@
             <li @click.away="{{ $dropdown['openVar'] }} = false">
                 <button @click="{{ $dropdown['openVar'] }} = !{{ $dropdown['openVar'] }}"
                     class="w-full flex items-center gap-3 px-3 py-2 rounded-lg focus:outline-none
-            {{ collect(array_keys($dropdown['routes']))->contains(fn($route) => request()->routeIs($route)) ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+            {{ collect(array_keys($dropdown['routes']))->contains(fn($route) => request()->routeIs($route)) ? 'accent-bg text-white font-semibold' : 'hover:bg-gray-100' }}">
                     <i class="{{ $dropdown['icon'] }}"></i> {{ $dropdown['label'] }}
                     <i :class="{{ $dropdown['openVar'] }} ? 'fa fa-chevron-circle-up' : 'fa fa-chevron-circle-down'"
                         class="ml-auto transition-all duration-300"></i>
@@ -121,7 +121,7 @@
                             @else
                                 <a href="{{ $route === 'member.dietplan.progress' ? $data['url'] : route($route) }}"
                                     class="flex items-center gap-3 px-3 py-2 rounded-lg
-                           {{ request()->routeIs($route) ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                           {{ request()->routeIs($route) ? 'accent-bg text-white font-semibold' : 'hover:bg-gray-100' }}">
                                     <i class="{{ $data['icon'] }}"></i> {{ $data['label'] }}
                                 </a>
                             @endif
@@ -135,10 +135,10 @@
         <li x-data="healthAssessmentStatus()">
             <a href="{{ route('member.health-assessment') }}"
                 class="flex items-center gap-3 px-3 py-2 rounded-lg 
-                      {{ request()->routeIs('member.health-assessment*') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }} relative">
+                      {{ request()->routeIs('member.health-assessment*') ? 'accent-bg text-white font-semibold' : 'hover:bg-gray-100' }} relative">
                 <i class="fas fa-heartbeat"></i> Health Assessment
                 <span x-show="!isComplete && showAlert"
-                    class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-red-500 h-2 w-2 rounded-full animate-pulse"></span>
+                    class="absolute right-2 top-1/2 transform -translate-y-1/2 accent-bg h-2 w-2 rounded-full animate-pulse"></span>
                 <span x-show="needsUpdate && showAlert"
                     class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-500 h-2 w-2 rounded-full animate-pulse"></span>
             </a>
@@ -155,7 +155,7 @@
             <li>
                 <a href="{{ route($route) }}"
                     class="flex items-center gap-3 px-3 py-2 rounded-lg
-                          {{ request()->routeIs($route) ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                          {{ request()->routeIs($route) ? 'accent-bg text-white font-semibold' : 'hover:bg-gray-100' }}">
                     <i class="{{ $data['icon'] }}"></i> {{ $data['label'] }}
                 </a>
             </li>
@@ -166,7 +166,7 @@
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit"
-                    class="w-full text-left flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 text-red-600 font-semibold">
+                    class="w-full text-left flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 accent-text font-semibold">
                     <i class="fa fa-power-off"></i> Log out
                 </button>
             </form>

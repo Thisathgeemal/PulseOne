@@ -25,16 +25,6 @@ class DietRequestController extends Controller
         return view('dietitianDashboard.request', compact('requests'));
     }
 
-    // Show Diet Request
-    public function show(DietRequest $dietRequest)
-    {
-        if (! Auth::user()->hasRole('Dietitian')) {
-            abort(403);
-        }
-
-        return view('dietitianDashboard.dietRequest_view', compact('dietRequest'));
-    }
-
     // Assign Diet Request
     public function assign(DietRequest $dietRequest)
     {
@@ -62,8 +52,8 @@ class DietRequestController extends Controller
         $req->save();
 
         $message = $request->status === 'Approved'
-        ? 'Request approved successfully.'
-        : 'Request rejected successfully.';
+            ? 'Request approved successfully.'
+            : 'Request rejected successfully.';
 
         Notification::create([
             'user_id' => $req->member_id,

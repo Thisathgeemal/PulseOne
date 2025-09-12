@@ -84,7 +84,7 @@
                                     class="cancel-booking-form">
                                     @csrf
                                     <button type="submit"
-                                        class="cancel-btn px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition">
+                                        class="cancel-btn px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition">
                                         Cancel
                                     </button>
                                 </form>
