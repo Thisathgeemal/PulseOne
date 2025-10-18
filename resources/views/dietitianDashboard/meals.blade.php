@@ -132,27 +132,61 @@
             @foreach ($meals as $meal)
                 <div
                     class="group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
-                    <!-- Meal Image Placeholder -->
-                    <div
-                        class="h-40 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center relative">
-                        <span class="text-5xl">🍽️</span>
+                    <!-- Meal Image: show image if available, otherwise placeholder -->
+                    @php
+                        $path = $meal->image_path ?? null;
+                        $hasImage = !empty($path);
+                        if ($hasImage) {
+                            $imgUrl =
+                                str_starts_with($path, 'images/') || str_starts_with($path, 'public/')
+                                    ? asset($path)
+                                    : asset('storage/' . $path);
+                        }
+                    @endphp
 
-                        {{-- Delete button --}}
-                        <form action="{{ route('dietitian.meals.destroy', $meal) }}" method="POST"
-                            class="delete-form absolute top-3 right-3 z-50">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" title="Delete"
-                                class="delete-btn text-white hover:text-black transition-colors text-xl">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </form>
+                    @if ($hasImage)
+                        <div class="h-40 overflow-hidden relative">
+                            <img src="{{ $imgUrl }}?v={{ time() }}" alt="{{ $meal->meal_name }}"
+                                class="w-full h-40 object-cover">
 
-                        @if (!$meal->is_public)
-                            <span
-                                class="absolute top-3.5 right-9 px-2 py-1 bg-black bg-opacity-50 text-white text-xs rounded-full">Private</span>
-                        @endif
-                    </div>
+                            {{-- Delete button --}}
+                            <form action="{{ route('dietitian.meals.destroy', $meal) }}" method="POST"
+                                class="delete-form absolute top-3 right-3 z-50">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" title="Delete"
+                                    class="delete-btn text-white hover:text-black transition-colors text-xl">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+
+                            @if (!$meal->is_public)
+                                <span
+                                    class="absolute top-3.5 right-9 px-2 py-1 bg-black bg-opacity-50 text-white text-xs rounded-full">Private</span>
+                            @endif
+                        </div>
+                    @else
+                        <div
+                            class="h-40 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center relative">
+                            <span class="text-5xl">🍽️</span>
+
+                            {{-- Delete button --}}
+                            <form action="{{ route('dietitian.meals.destroy', $meal) }}" method="POST"
+                                class="delete-form absolute top-3 right-3 z-50">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" title="Delete"
+                                    class="delete-btn text-white hover:text-black transition-colors text-xl">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+
+                            @if (!$meal->is_public)
+                                <span
+                                    class="absolute top-3.5 right-9 px-2 py-1 bg-black bg-opacity-50 text-white text-xs rounded-full">Private</span>
+                            @endif
+                        </div>
+                    @endif
 
                     <div class="p-4">
                         <div class="mb-3">

@@ -70,128 +70,128 @@
     @include('components.header')
     
     <!-- Hero Section -->
-    <section class="relative bg-gradient-to-br from-black via-gray-900 to-red-900 text-white py-32 overflow-hidden">
+    <section class="relative bg-gradient-to-br from-black via-gray-900 to-red-900 text-white py-16 sm:py-24 lg:py-32 overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-r from-red-600/30 to-transparent"></div>
-        <div class="absolute top-10 right-10 w-72 h-72 bg-red-600/20 rounded-full blur-3xl floating-animation"></div>
-        <div class="absolute bottom-10 left-10 w-96 h-96 bg-red-500/10 rounded-full blur-3xl floating-animation" style="animation-delay: -3s;"></div>
+        <div class="absolute top-5 sm:top-10 right-5 sm:right-10 w-48 sm:w-72 h-48 sm:h-72 bg-red-600/20 rounded-full blur-3xl floating-animation"></div>
+        <div class="absolute bottom-5 sm:bottom-10 left-5 sm:left-10 w-64 sm:w-96 h-64 sm:h-96 bg-red-500/10 rounded-full blur-3xl floating-animation" style="animation-delay: -3s;"></div>
         
         <div class="relative container mx-auto text-center px-4" data-aos="fade-up">
-            <h1 class="text-5xl md:text-7xl font-black mb-6 tracking-tight">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black mb-4 sm:mb-6 tracking-tight leading-tight">
                 CHALLENGES <span class="gradient-text">WE TACKLE</span>
             </h1>
-            <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed">
+            <p class="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-6 sm:mb-8 max-w-4xl mx-auto leading-relaxed">
                 Addressing real-world fitness & wellness barriers with smart digital solutions that actually work.
             </p>
             
             <!-- Challenge Stats -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16" data-aos="fade-up" data-aos-delay="200">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mt-8 sm:mt-16" data-aos="fade-up" data-aos-delay="200">
                 <div class="text-center stats-animation">
-                    <div class="text-4xl font-bold text-red-400 mb-2">90%</div>
-                    <div class="text-sm text-gray-300">Motivation Issues</div>
+                    <div class="text-2xl sm:text-3xl lg:text-4xl font-bold text-red-400 mb-1 sm:mb-2">90%</div>
+                    <div class="text-xs sm:text-sm text-gray-300">Motivation Issues</div>
                 </div>
                 <div class="text-center stats-animation" style="animation-delay: 0.5s;">
-                    <div class="text-4xl font-bold text-red-400 mb-2">75%</div>
-                    <div class="text-sm text-gray-300">Time Constraints</div>
+                    <div class="text-2xl sm:text-3xl lg:text-4xl font-bold text-red-400 mb-1 sm:mb-2">75%</div>
+                    <div class="text-xs sm:text-sm text-gray-300">Time Constraints</div>
                 </div>
                 <div class="text-center stats-animation" style="animation-delay: 1s;">
-                    <div class="text-4xl font-bold text-red-400 mb-2">85%</div>
-                    <div class="text-sm text-gray-300">Diet Struggles</div>
+                    <div class="text-2xl sm:text-3xl lg:text-4xl font-bold text-red-400 mb-1 sm:mb-2">85%</div>
+                    <div class="text-xs sm:text-sm text-gray-300">Diet Struggles</div>
                 </div>
                 <div class="text-center stats-animation" style="animation-delay: 1.5s;">
-                    <div class="text-4xl font-bold text-red-400 mb-2">100%</div>
-                    <div class="text-sm text-gray-300">PULSEONE Solutions</div>
+                    <div class="text-2xl sm:text-3xl lg:text-4xl font-bold text-red-400 mb-1 sm:mb-2">100%</div>
+                    <div class="text-xs sm:text-sm text-gray-300">PULSEONE Solutions</div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Challenges Grid -->
-        <!-- Challenges Grid -->
-    <section class="py-24 bg-white relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-red-50 to-transparent rounded-full transform -translate-x-48 -translate-y-48"></div>
-        <div class="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-red-50 to-transparent rounded-full transform translate-x-48 translate-y-48"></div>
+    <!-- Challenges Grid -->
+    <section class="py-12 sm:py-16 lg:py-24 bg-white relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-64 sm:w-96 h-64 sm:h-96 bg-gradient-to-br from-red-50 to-transparent rounded-full transform -translate-x-32 sm:-translate-x-48 -translate-y-32 sm:-translate-y-48"></div>
+        <div class="absolute bottom-0 right-0 w-64 sm:w-96 h-64 sm:h-96 bg-gradient-to-tl from-red-50 to-transparent rounded-full transform translate-x-32 sm:translate-x-48 translate-y-32 sm:translate-y-48"></div>
         
-        <div class="relative container mx-auto px-6">
-            <div class="text-center mb-16" data-aos="fade-up">
-                <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-4">
+        <div class="relative container mx-auto px-4 sm:px-6">
+            <div class="text-center mb-12 sm:mb-16" data-aos="fade-up">
+                <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-4">
                     Common <span class="gradient-text">Fitness Barriers</span>
                 </h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                <p class="text-base sm:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
                     We understand the real challenges people face in their fitness journey and provide targeted solutions
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
 
                 <!-- Challenge 1 -->
-                <div class="challenge-card group bg-white shadow-xl rounded-2xl p-8 border border-gray-100 hover:border-red-200 transition-all duration-300 min-h-[300px]" data-aos="fade-up" data-aos-delay="100">
+                <div class="challenge-card group bg-white shadow-xl rounded-2xl p-4 sm:p-6 lg:p-8 border border-gray-100 hover:border-red-200 transition-all duration-300 min-h-[250px] sm:min-h-[300px]" data-aos="fade-up" data-aos-delay="100">
                     <!-- Front Content -->
                     <div class="relative z-10 h-full flex flex-col">
-                        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                            <i class="fas fa-user-clock text-2xl text-red-600"></i>
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-red-100 rounded-full flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-user-clock text-lg sm:text-xl lg:text-2xl text-red-600"></i>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-gray-900 group-hover:text-red-600 transition-colors duration-300">Lack of Time</h3>
-                        <p class="text-gray-600 mb-6 flex-grow">Busy schedules make consistent fitness routines nearly impossible for modern professionals.</p>
+                        <h3 class="text-lg sm:text-xl lg:text-2xl font-bold mb-3 sm:mb-4 text-gray-900 group-hover:text-red-600 transition-colors duration-300">Lack of Time</h3>
+                        <p class="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 flex-grow">Busy schedules make consistent fitness routines nearly impossible for modern professionals.</p>
                         
-                        <!-- Solution on hover -->
-                        <div class="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
-                            <div class="border-t border-red-200 pt-4">
-                                <h4 class="font-bold text-red-600 mb-2">Our Solution:</h4>
-                                <p class="text-sm text-gray-700">Flexible workout plans and home routines that fit into any schedule. Quick 15-30 minute sessions available.</p>
+                        <!-- Solution - always visible on mobile, hover on desktop -->
+                        <div class="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 transform translate-y-0 sm:translate-y-4 sm:group-hover:translate-y-0">
+                            <div class="border-t border-red-200 pt-3 sm:pt-4">
+                                <h4 class="font-bold text-red-600 mb-1 sm:mb-2 text-sm sm:text-base">Our Solution:</h4>
+                                <p class="text-xs sm:text-sm text-gray-700">Flexible workout plans and home routines that fit into any schedule. Quick 15-30 minute sessions available.</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Challenge 2 -->
-                <div class="challenge-card group bg-white shadow-xl rounded-2xl p-8 border border-gray-100 hover:border-red-200 transition-all duration-300 min-h-[300px]" data-aos="fade-up" data-aos-delay="200">
+                <div class="challenge-card group bg-white shadow-xl rounded-2xl p-4 sm:p-6 lg:p-8 border border-gray-100 hover:border-red-200 transition-all duration-300 min-h-[250px] sm:min-h-[300px]" data-aos="fade-up" data-aos-delay="200">
                     <div class="relative z-10 h-full flex flex-col">
-                        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                            <i class="fas fa-battery-empty text-2xl text-red-600"></i>
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-red-100 rounded-full flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-battery-empty text-lg sm:text-xl lg:text-2xl text-red-600"></i>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-gray-900 group-hover:text-red-600 transition-colors duration-300">Motivation Drops</h3>
-                        <p class="text-gray-600 mb-6 flex-grow">Staying motivated without proper support system leads to eventual burnout and giving up.</p>
+                        <h3 class="text-lg sm:text-xl lg:text-2xl font-bold mb-3 sm:mb-4 text-gray-900 group-hover:text-red-600 transition-colors duration-300">Motivation Drops</h3>
+                        <p class="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 flex-grow">Staying motivated without proper support system leads to eventual burnout and giving up.</p>
                         
-                        <div class="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
-                            <div class="border-t border-red-200 pt-4">
-                                <h4 class="font-bold text-red-600 mb-2">Our Solution:</h4>
-                                <p class="text-sm text-gray-700">Progress tracking, achievement badges, community features, and personal trainer support to keep you inspired.</p>
+                        <div class="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 transform translate-y-0 sm:translate-y-4 sm:group-hover:translate-y-0">
+                            <div class="border-t border-red-200 pt-3 sm:pt-4">
+                                <h4 class="font-bold text-red-600 mb-1 sm:mb-2 text-sm sm:text-base">Our Solution:</h4>
+                                <p class="text-xs sm:text-sm text-gray-700">Progress tracking, achievement badges, community features, and personal trainer support to keep you inspired.</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Challenge 3 -->
-                <div class="challenge-card group bg-white shadow-xl rounded-2xl p-8 border border-gray-100 hover:border-red-200 transition-all duration-300 min-h-[300px]" data-aos="fade-up" data-aos-delay="300">
+                <div class="challenge-card group bg-white shadow-xl rounded-2xl p-4 sm:p-6 lg:p-8 border border-gray-100 hover:border-red-200 transition-all duration-300 min-h-[250px] sm:min-h-[300px]" data-aos="fade-up" data-aos-delay="300">
                     <div class="relative z-10 h-full flex flex-col">
-                        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                            <i class="fas fa-apple-alt text-2xl text-red-600"></i>
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-red-100 rounded-full flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-apple-alt text-lg sm:text-xl lg:text-2xl text-red-600"></i>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-gray-900 group-hover:text-red-600 transition-colors duration-300">Diet Discipline</h3>
-                        <p class="text-gray-600 mb-6 flex-grow">Maintaining healthy eating habits is one of the biggest challenges in any fitness journey.</p>
+                        <h3 class="text-lg sm:text-xl lg:text-2xl font-bold mb-3 sm:mb-4 text-gray-900 group-hover:text-red-600 transition-colors duration-300">Diet Discipline</h3>
+                        <p class="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 flex-grow">Maintaining healthy eating habits is one of the biggest challenges in any fitness journey.</p>
                         
-                        <div class="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
-                            <div class="border-t border-red-200 pt-4">
-                                <h4 class="font-bold text-red-600 mb-2">Our Solution:</h4>
-                                <p class="text-sm text-gray-700">Custom diet plans, meal tracking, nutritionist consultations, and automated reminders for healthy eating.</p>
+                        <div class="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 transform translate-y-0 sm:translate-y-4 sm:group-hover:translate-y-0">
+                            <div class="border-t border-red-200 pt-3 sm:pt-4">
+                                <h4 class="font-bold text-red-600 mb-1 sm:mb-2 text-sm sm:text-base">Our Solution:</h4>
+                                <p class="text-xs sm:text-sm text-gray-700">Custom diet plans, meal tracking, nutritionist consultations, and automated reminders for healthy eating.</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Challenge 4 -->
-                <div class="challenge-card group bg-white shadow-xl rounded-2xl p-8 border border-gray-100 hover:border-red-200 transition-all duration-300 min-h-[300px]" data-aos="fade-up" data-aos-delay="400">
+                <div class="challenge-card group bg-white shadow-xl rounded-2xl p-4 sm:p-6 lg:p-8 border border-gray-100 hover:border-red-200 transition-all duration-300 min-h-[250px] sm:min-h-[300px]" data-aos="fade-up" data-aos-delay="400">
                     <div class="relative z-10 h-full flex flex-col">
-                        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                            <i class="fas fa-chart-line text-2xl text-red-600"></i>
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-red-100 rounded-full flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-chart-line text-lg sm:text-xl lg:text-2xl text-red-600"></i>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-gray-900 group-hover:text-red-600 transition-colors duration-300">Tracking Progress</h3>
-                        <p class="text-gray-600 mb-6 flex-grow">Without proper measurement tools, it's impossible to know if your efforts are paying off.</p>
+                        <h3 class="text-lg sm:text-xl lg:text-2xl font-bold mb-3 sm:mb-4 text-gray-900 group-hover:text-red-600 transition-colors duration-300">Tracking Progress</h3>
+                        <p class="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 flex-grow">Without proper measurement tools, it's impossible to know if your efforts are paying off.</p>
                         
-                        <div class="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
-                            <div class="border-t border-red-200 pt-4">
-                                <h4 class="font-bold text-red-600 mb-2">Our Solution:</h4>
-                                <p class="text-sm text-gray-700">Comprehensive analytics with visual charts, body metrics tracking, and performance insights.</p>
+                        <div class="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 transform translate-y-0 sm:translate-y-4 sm:group-hover:translate-y-0">
+                            <div class="border-t border-red-200 pt-3 sm:pt-4">
+                                <h4 class="font-bold text-red-600 mb-1 sm:mb-2 text-sm sm:text-base">Our Solution:</h4>
+                                <p class="text-xs sm:text-sm text-gray-700">Comprehensive analytics with visual charts, body metrics tracking, and performance insights.</p>
                             </div>
                         </div>
                     </div>
@@ -252,7 +252,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="bg-white p-8 rounded-2xl shadow-lg" data-aos="fade-up" data-aos-delay="100">
                     <div class="flex items-center mb-6">
-                        <img src="{{ asset('images/success/user-1.jpg') }}" alt="Success Story" class="w-16 h-16 rounded-full object-cover mr-4">
+                        <img src="{{ asset('images/user-1.png') }}" alt="Success Story" class="w-16 h-16 rounded-full object-cover mr-4">
                         <div>
                             <h4 class="font-bold text-gray-900">Maria Santos</h4>
                             <p class="text-gray-600 text-sm">Busy Executive</p>
@@ -264,7 +264,7 @@
 
                 <div class="bg-white p-8 rounded-2xl shadow-lg" data-aos="fade-up" data-aos-delay="200">
                     <div class="flex items-center mb-6">
-                        <img src="{{ asset('images/success/user-2.jpg') }}" alt="Success Story" class="w-16 h-16 rounded-full object-cover mr-4">
+                        <img src="{{ asset('images/user-2.png') }}" alt="Success Story" class="w-16 h-16 rounded-full object-cover mr-4">
                         <div>
                             <h4 class="font-bold text-gray-900">James Wilson</h4>
                             <p class="text-gray-600 text-sm">Software Developer</p>
@@ -276,7 +276,7 @@
 
                 <div class="bg-white p-8 rounded-2xl shadow-lg" data-aos="fade-up" data-aos-delay="300">
                     <div class="flex items-center mb-6">
-                        <img src="{{ asset('images/success/user-3.jpg') }}" alt="Success Story" class="w-16 h-16 rounded-full object-cover mr-4">
+                        <img src="{{ asset('images/user-3.png') }}" alt="Success Story" class="w-16 h-16 rounded-full object-cover mr-4">
                         <div>
                             <h4 class="font-bold text-gray-900">Lisa Chen</h4>
                             <p class="text-gray-600 text-sm">Marketing Manager</p>
@@ -290,31 +290,24 @@
     </section>
 
     <!-- Call-to-Action -->
-    <section class="py-24 bg-gradient-to-r from-red-600 to-red-700 text-white relative overflow-hidden">
-        <div class="absolute inset-0 bg-black/20"></div>
-        <div class="relative container mx-auto text-center px-6" data-aos="fade-up">
-            <h2 class="text-4xl md:text-5xl font-black mb-6">
+    <section class="py-24 text-center relative overflow-hidden" style="background: linear-gradient(90deg,#dc2626 0%,#ef4444 50%,#dc2626 100%);">
+        <div class="relative container mx-auto px-6" data-aos="fade-up">
+            <h2 class="text-4xl md:text-5xl font-black mb-6 text-white">
                 WE'RE NOT JUST SOLVING PROBLEMS,<br>
-                <span class="text-red-200">WE'RE TRANSFORMING LIVES</span>
+                <span class="text-black">WE'RE TRANSFORMING LIVES</span>
             </h2>
-            <p class="text-xl mb-8 opacity-90 max-w-4xl mx-auto">
+            <p class="text-xl mb-8 max-w-4xl mx-auto text-white/90">
                 PULSEONE bridges the gap between intention and action, guiding every step of your wellness journey with personalized solutions that actually work.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('register') }}" class="px-8 py-4 bg-white text-red-600 font-bold rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-105">
+                <a href="{{ route('register') }}" class="px-8 py-4 bg-white text-red-600 font-bold rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-105 shadow">
                     Start Solving Your Challenges
                 </a>
-                <a href="{{ route('contact') }}" class="px-8 py-4 border-2 border-white text-white font-bold rounded-full hover:bg-white hover:text-red-600 transition-all duration-300">
+                <a href="{{ route('contact') }}" class="px-8 py-4 border-2 border-white text-white font-bold rounded-full hover:bg-white hover:text-red-600 transition-all duration-300 shadow">
                     Learn How We Help
                 </a>
             </div>
         </div>
-    </section>
-
-    <!-- Call-to-Action -->
-    <section class="bg-[#1E1E1E] text-white py-12 text-center px-6">
-        <h2 class="text-3xl font-bold">WE’RE NOT JUST SOLVING PROBLEMS, WE'RE TRANSFORMING LIVES.</h2>
-        <p class="mt-3 text-lg">PULSEONE bridges the gap between intention and action, guiding every step of your wellness journey.</p>
     </section>
 
     <!-- Footer -->

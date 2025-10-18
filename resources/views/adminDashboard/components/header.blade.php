@@ -171,6 +171,7 @@
     showProfile: false,
     showNotifications: false,
     showRead: false,
+    showSidebar: false,
     lastScroll: 0,
     handleScroll() {
         const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
@@ -185,12 +186,19 @@
 
     <!-- Topbar -->
     <div class="flex items-center justify-between bg-[#1E1E1E] text-white px-6 py-3 shadow-sm">
-        <!-- Left: Welcome Message -->
+        <!-- Left: Hamburger + Welcome -->
         <div class="flex items-center gap-4 text-lg font-semibold">
+            <button id="mobile-sidebar-open" aria-controls="mobile-admin-sidebar" aria-expanded="false"
+                @click="showSidebar = !showSidebar"
+                :aria-expanded="showSidebar"
+                class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 bg-white/5 hover:bg-white/10 transition"
+                aria-label="Open sidebar">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
             <i class="fa-solid fa-user-tie text-white text-xl"></i>
-            <span class="font-semibold">
-                Welcome, {{ Auth::user()->first_name }}
-            </span>
+            <span class="font-semibold">Welcome, {{ Auth::user()->first_name }}</span>
         </div>
 
         <!-- Right: Icons -->
@@ -595,6 +603,128 @@
                         class="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600">Save</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Mobile slide-in sidebar (duplication of admin sidebar for mobile) -->
+    <div x-show="showSidebar" x-transition @click.away="showSidebar = false" x-cloak
+        class="fixed inset-y-0 left-0 w-64 bg-white text-black border-r shadow-lg z-50 -translate-x-full lg:hidden"
+        :class="{'translate-x-0': showSidebar}">
+        <div class="p-4">
+            <div class="flex items-center justify-between mb-4">
+                <a href="{{ route('Admin.dashboard') }}">
+                    <img src="{{ asset('images/logo - side.png') }}" alt="PulseOne Logo" class="h-10">
+                </a>
+                <button @click="showSidebar = false" class="text-gray-500 hover:text-red-600 text-xl">&times;</button>
+            </div>
+
+            <!-- Mobile Navigation (copied from sidebar) -->
+            <ul class="space-y-4 text-sm text-gray-800 font-medium">
+                <li>
+                    <a href="{{ route('Admin.dashboard') }}"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg {{ request()->routeIs('Admin.dashboard') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                        <i class="fas fa-house"></i> Dashboard
+                    </a>
+                </li>
+
+                <li x-data="{ openUsersMobile: @json(request()->routeIs('admin.admin') || request()->routeIs('admin.trainer') || request()->routeIs('admin.dietitian') || request()->routeIs('admin.member') || request()->routeIs('admin.role')) }" @click.away="openUsersMobile = false">
+                    <button @click="openUsersMobile = !openUsersMobile"
+                        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg focus:outline-none {{ request()->routeIs('admin.admin') || request()->routeIs('admin.trainer') || request()->routeIs('admin.dietitian') || request()->routeIs('admin.member') || request()->routeIs('admin.role') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                        <i class="fa fa-users"></i> Users
+                        <i :class="openUsersMobile ? 'fa fa-chevron-circle-up' : 'fa fa-chevron-circle-down'" class="ml-auto transition-all duration-300"></i>
+                    </button>
+
+                    <ul x-show="openUsersMobile" x-transition x-cloak class="mt-2 space-y-1 pl-6">
+                        @php
+                            $email = auth()->user()->email ?? '';
+                        @endphp
+
+                        @foreach ([
+            'admin.admin' => ['icon' => 'fa-solid fa-user-tie', 'label' => 'Admin'],
+            'admin.dietitian' => ['icon' => 'fa-solid fa-user', 'label' => 'Dietitian'],
+            'admin.trainer' => ['icon' => 'fa-solid fa-user', 'label' => 'Trainer'],
+            'admin.member' => ['icon' => 'fa-solid fa-user', 'label' => 'Member'],
+            'admin.role' => ['icon' => 'fa fa-user-plus', 'label' => 'UserRole'],
+        ] as $route => $data)
+                            @if (in_array($route, ['admin.admin', 'admin.role']) && $email !== 'pulseone.app@gmail.com')
+                                @continue
+                            @endif
+
+                            <li>
+                                <a href="{{ route($route) }}"
+                                    class="flex items-center gap-3 px-3 py-2 rounded-lg {{ request()->routeIs($route) ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                                    <i class="{{ $data['icon'] }}"></i> {{ $data['label'] }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </li>
+
+                <li x-data="{ openQRMob: {{ request()->routeIs('admin.qr.display') || request()->routeIs('admin.attendance') ? 'true' : 'false' }} }" @click.away="openQRMob = false">
+                    <button @click="openQRMob = !openQRMob" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg focus:outline-none {{ request()->routeIs('admin.qr.display') || request()->routeIs('admin.attendance') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                        <i class="fas fa-qrcode"></i> QR
+                        <i :class="openQRMob ? 'fa fa-chevron-circle-up' : 'fa fa-chevron-circle-down'" class="ml-auto transition-all duration-300"></i>
+                    </button>
+
+                    <ul x-show="openQRMob" x-transition x-cloak class="mt-2 space-y-1 pl-6">
+                        @foreach ([
+            'admin.qr.display' => ['icon' => 'fas fa-desktop', 'label' => 'QR Display'],
+            'admin.attendance' => ['icon' => 'fas fa-calendar-check', 'label' => 'Attendance'],
+        ] as $route => $data)
+                            <li>
+                                <a href="{{ route($route) }}"
+                                    class="flex items-center gap-3 px-3 py-2 rounded-lg {{ request()->routeIs($route) ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                                    <i class="{{ $data['icon'] }}"></i> {{ $data['label'] }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </li>
+
+                <li x-data="{ openSubscriptionMob: {{ request()->routeIs('admin.membership') || request()->routeIs('admin.membertype') ? 'true' : 'false' }} }" @click.away="openSubscriptionMob = false">
+                    <button @click="openSubscriptionMob = !openSubscriptionMob" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg focus:outline-none {{ request()->routeIs('admin.membership') || request()->routeIs('admin.membertype') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                        <i class="fa fa-book"></i> Subscription
+                        <i :class="openSubscriptionMob ? 'fa fa-chevron-circle-up' : 'fa fa-chevron-circle-down'" class="ml-auto transition-all duration-300"></i>
+                    </button>
+
+                    <ul x-show="openSubscriptionMob" x-transition x-cloak class="mt-2 space-y-1 pl-6">
+                        @foreach ([
+            'admin.membership' => ['icon' => 'fas fa-id-card', 'label' => 'Membership'],
+            'admin.membertype' => ['icon' => 'fas fa-tags', 'label' => 'Membership Type'],
+        ] as $route => $data)
+                            <li>
+                                <a href="{{ route($route) }}"
+                                    class="flex items-center gap-3 px-3 py-2 rounded-lg {{ request()->routeIs($route) ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                                    <i class="{{ $data['icon'] }}"></i> {{ $data['label'] }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </li>
+
+                @foreach ([
+                'admin.payment' => ['icon' => 'fas fa-credit-card', 'label' => 'Payment'],
+                'admin.message' => ['icon' => 'fas fa-comment-alt', 'label' => 'Message'],
+                'admin.feedback' => ['icon' => 'fas fa-comment-dots', 'label' => 'Feedback'],
+                'admin.report' => ['icon' => 'fa fa-line-chart', 'label' => 'Report'],
+            ] as $route => $data)
+                    <li>
+                        <a href="{{ route($route) }}"
+                            class="flex items-center gap-3 px-3 py-2 rounded-lg {{ request()->routeIs($route) ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                            <i class="{{ $data['icon'] }}"></i> {{ $data['label'] }}
+                        </a>
+                    </li>
+                @endforeach
+
+                <li>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="w-full text-left flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 text-red-600 font-semibold">
+                            <i class="fa fa-power-off"></i> Log out
+                        </button>
+                    </form>
+                </li>
+            </ul>
         </div>
     </div>
 

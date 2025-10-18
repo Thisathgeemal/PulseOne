@@ -42,6 +42,30 @@
         .stats-counter:hover {
             transform: scale(1.05);
         }
+        .parallax-bg {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .parallax-bg {
+                background-attachment: scroll;
+            }
+            .floating-animation {
+                animation: none;
+            }
+            h1, h2, h3 {
+                line-height: 1.2;
+            }
+        }
     </style>
 
 </head>
@@ -51,95 +75,77 @@
     @include('components.header')
     
     <!-- Hero Section -->
-    <section class="relative bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white py-32 px-6 overflow-hidden">
+    <section class="relative bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white py-16 sm:py-24 lg:py-32 px-4 sm:px-6 overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-r from-red-600/20 to-transparent"></div>
-        <div class="absolute top-10 right-10 w-72 h-72 bg-red-600/10 rounded-full blur-3xl floating-animation"></div>
-        <div class="absolute bottom-10 left-10 w-96 h-96 bg-red-500/5 rounded-full blur-3xl floating-animation" style="animation-delay: -3s;"></div>
+        <div class="absolute top-5 sm:top-10 right-5 sm:right-10 w-48 sm:w-72 h-48 sm:h-72 bg-red-600/10 rounded-full blur-3xl floating-animation"></div>
+        <div class="absolute bottom-5 sm:bottom-10 left-5 sm:left-10 w-64 sm:w-96 h-64 sm:h-96 bg-red-500/5 rounded-full blur-3xl floating-animation" style="animation-delay: -3s;"></div>
         
         <div class="relative max-w-6xl mx-auto text-center" data-aos="fade-up">
-            <h1 class="text-5xl md:text-7xl font-black mb-6 tracking-tight">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black mb-4 sm:mb-6 tracking-tight leading-tight">
                 ABOUT <span class="gradient-text">PULSEONE</span>
             </h1>
-            <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed">
+            <p class="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-6 sm:mb-8 max-w-4xl mx-auto leading-relaxed">
                 Your trusted partner for smarter fitness and health tracking. We simplify your journey, whether you're a beginner or a pro.
             </p>
-            <div class="flex flex-wrap justify-center gap-8 mt-12" data-aos="fade-up" data-aos-delay="200">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mt-8 sm:mt-12" data-aos="fade-up" data-aos-delay="200">
                 <div class="stats-counter text-center">
-                    <div class="text-4xl font-bold text-red-500">500+</div>
-                    <div class="text-sm text-gray-400">Active Members</div>
+                    <div class="text-2xl sm:text-3xl lg:text-4xl font-bold text-red-500">500+</div>
+                    <div class="text-xs sm:text-sm text-gray-400">Active Members</div>
                 </div>
                 <div class="stats-counter text-center">
-                    <div class="text-4xl font-bold text-red-500">50+</div>
-                    <div class="text-sm text-gray-400">Expert Trainers</div>
+                    <div class="text-2xl sm:text-3xl lg:text-4xl font-bold text-red-500">50+</div>
+                    <div class="text-xs sm:text-sm text-gray-400">Expert Trainers</div>
                 </div>
                 <div class="stats-counter text-center">
-                    <div class="text-4xl font-bold text-red-500">1000+</div>
-                    <div class="text-sm text-gray-400">Workouts Completed</div>
+                    <div class="text-2xl sm:text-3xl lg:text-4xl font-bold text-red-500">1000+</div>
+                    <div class="text-xs sm:text-sm text-gray-400">Workouts Completed</div>
                 </div>
                 <div class="stats-counter text-center">
-                    <div class="text-4xl font-bold text-red-500">99%</div>
-                    <div class="text-sm text-gray-400">Satisfaction Rate</div>
+                    <div class="text-2xl sm:text-3xl lg:text-4xl font-bold text-red-500">99%</div>
+                    <div class="text-xs sm:text-sm text-gray-400">Satisfaction Rate</div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Who We Are -->
-    <section class="py-20 bg-white px-6">
-        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div data-aos="fade-right">
-                <h2 class="text-3xl font-bold mb-4 text-gray-800">WHO WE ARE</h2>
-                <p class="text-gray-600 leading-relaxed mb-4 text-justify">
-                    PULSEONE is more than just a fitness platform. We're a technology-powered ecosystem that connects members, trainers, and dietitians through personalized dashboards, goal-oriented plans, and smart tracking tools.
-                </p>
-                <p class="text-gray-600">
-                    Whether it's achieving physical goals or maintaining diet discipline, our platform adapts to your needs. We’re built to serve real gyms, real people, and real goals.
-                </p>
-            </div>
-            <div data-aos="fade-left">
-                <img src="{{ asset('images/about-fitness.jpg') }}" alt="Fitness Team" class="rounded-lg shadow-lg">
-            </div>
-        </div>
-    </section>
-
-    <!-- Who We Are -->
-    <section class="py-24 bg-white px-6 relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-red-50 to-transparent rounded-full transform translate-x-48 -translate-y-48"></div>
+    <section class="py-12 sm:py-16 lg:py-24 bg-white px-4 sm:px-6 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 sm:w-96 h-64 sm:h-96 bg-gradient-to-br from-red-50 to-transparent rounded-full transform translate-x-32 sm:translate-x-48 -translate-y-32 sm:-translate-y-48"></div>
         <div class="max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
                 <div data-aos="fade-right" class="relative">
-                    <div class="absolute -top-4 -left-4 w-24 h-24 bg-red-100 rounded-full"></div>
-                    <h2 class="text-4xl md:text-5xl font-black mb-6 text-gray-900 relative">
+                    <div class="absolute -top-2 sm:-top-4 -left-2 sm:-left-4 w-16 sm:w-24 h-16 sm:h-24 bg-red-100 rounded-full"></div>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-4 sm:mb-6 text-gray-900 relative leading-tight">
                         WHO <span class="gradient-text">WE ARE</span>
                     </h2>
-                    <p class="text-lg text-gray-600 leading-relaxed mb-6">
+                    <p class="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed mb-4 sm:mb-6">
                         PULSEONE is more than just a fitness platform. We're a technology-powered ecosystem that connects members, trainers, and dietitians through personalized dashboards, goal-oriented plans, and smart tracking tools.
                     </p>
-                    <p class="text-lg text-gray-600 leading-relaxed mb-8">
+                    <p class="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed mb-6 sm:mb-8">
                         Whether it's achieving physical goals or maintaining diet discipline, our platform adapts to your needs. We're built to serve real gyms, real people, and real goals.
                     </p>
-                    <div class="flex flex-wrap gap-4">
-                        <div class="flex items-center gap-3 bg-red-50 px-4 py-2 rounded-full">
-                            <i class="fas fa-check-circle text-red-600"></i>
-                            <span class="font-medium">AI-Powered Plans</span>
+                    <div class="flex flex-wrap gap-2 sm:gap-4">
+                        <div class="flex items-center gap-2 sm:gap-3 bg-red-50 px-3 sm:px-4 py-1 sm:py-2 rounded-full">
+                            <i class="fas fa-check-circle text-red-600 text-xs sm:text-sm"></i>
+                            <span class="font-medium text-xs sm:text-sm">Personalized Plans</span>
                         </div>
-                        <div class="flex items-center gap-3 bg-red-50 px-4 py-2 rounded-full">
-                            <i class="fas fa-check-circle text-red-600"></i>
-                            <span class="font-medium">24/7 Support</span>
+                        <div class="flex items-center gap-2 sm:gap-3 bg-red-50 px-3 sm:px-4 py-1 sm:py-2 rounded-full">
+                            <i class="fas fa-check-circle text-red-600 text-xs sm:text-sm"></i>
+                            <span class="font-medium text-xs sm:text-sm">24/7 Support</span>
                         </div>
-                        <div class="flex items-center gap-3 bg-red-50 px-4 py-2 rounded-full">
-                            <i class="fas fa-check-circle text-red-600"></i>
-                            <span class="font-medium">Real-time Tracking</span>
+                        <div class="flex items-center gap-2 sm:gap-3 bg-red-50 px-3 sm:px-4 py-1 sm:py-2 rounded-full">
+                            <i class="fas fa-check-circle text-red-600 text-xs sm:text-sm"></i>
+                            <span class="font-medium text-xs sm:text-sm">Real-time Tracking</span>
                         </div>
                     </div>
                 </div>
-                <div data-aos="fade-left" class="relative">
+                <div data-aos="fade-left" class="relative order-first lg:order-last">
                     <div class="absolute inset-0 bg-gradient-to-br from-red-600/20 to-transparent rounded-2xl transform rotate-3"></div>
-                    <img src="{{ asset('images/about/team-fitness.jpg') }}" alt="Fitness Team" class="relative rounded-2xl shadow-2xl w-full h-96 object-cover">
-                    <div class="absolute -bottom-6 -right-6 bg-white p-6 rounded-xl shadow-xl">
+                    <img src="{{ asset('images/team-fitness.png') }}" alt="Fitness Team" class="relative rounded-2xl shadow-2xl w-full h-64 sm:h-80 lg:h-96 object-cover">
+                    <div class="absolute -bottom-3 sm:-bottom-6 -right-3 sm:-right-6 bg-white p-3 sm:p-6 rounded-xl shadow-xl">
                         <div class="text-center">
-                            <div class="text-2xl font-bold text-red-600">5+</div>
-                            <div class="text-sm text-gray-600">Years Experience</div>
+                            <div class="text-lg sm:text-2xl font-bold text-red-600">5+</div>
+                            <div class="text-xs sm:text-sm text-gray-600">Years Experience</div>
                         </div>
                     </div>
                 </div>
@@ -148,38 +154,40 @@
     </section>
 
     <!-- Our Mission -->
-    <section class="py-24 bg-gradient-to-br from-gray-50 to-red-50 px-6 relative">
+        <!-- Our Mission -->
+    <section class="py-12 sm:py-16 lg:py-24 bg-gradient-to-br from-gray-50 to-red-50 px-4 sm:px-6 relative parallax-bg" style="background-image: url('{{ asset('images/about/mission-bg.jpg') }}');">
+        <div class="absolute inset-0 bg-white/90"></div>
         <div class="relative max-w-4xl mx-auto text-center" data-aos="fade-up">
-            <div class="inline-block p-3 bg-red-100 rounded-full mb-6">
-                <i class="fas fa-bullseye text-3xl text-red-600"></i>
+            <div class="inline-block p-2 sm:p-3 bg-red-100 rounded-full mb-4 sm:mb-6">
+                <i class="fas fa-bullseye text-red-600 text-lg sm:text-xl"></i>
             </div>
-            <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-6">
-                Our <span class="gradient-text">Mission</span>
+            <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-4 sm:mb-6 text-gray-900 leading-tight">
+                OUR <span class="gradient-text">MISSION</span>
             </h2>
-            <p class="text-xl text-gray-700 leading-relaxed mb-8">
-                To empower fitness communities with technology-driven solutions, making health management seamless, personalized, and effective for everyone.
+            <p class="text-base sm:text-lg lg:text-xl text-gray-700 leading-relaxed mb-6 sm:mb-8 max-w-3xl mx-auto">
+                To bridge the gap between technology and fitness, making health tracking accessible, engaging, and effective for everyone. We believe fitness should be personal, achievable, and supported by smart tools.
             </p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-                <div class="text-center" data-aos="zoom-in" data-aos-delay="100">
-                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-heart text-red-600 text-2xl"></i>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8 sm:mt-12">
+                <div class="bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-red-100" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                        <i class="fas fa-heart text-red-600 text-sm sm:text-base"></i>
                     </div>
-                    <h3 class="font-bold text-gray-900 mb-2">Health First</h3>
-                    <p class="text-gray-600">Prioritizing member wellness above all</p>
+                    <h3 class="text-sm sm:text-base lg:text-lg font-bold mb-2 text-gray-900">Health First</h3>
+                    <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">Prioritizing sustainable health habits over quick fixes</p>
                 </div>
-                <div class="text-center" data-aos="zoom-in" data-aos-delay="200">
-                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-rocket text-red-600 text-2xl"></i>
+                <div class="bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-red-100" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                        <i class="fas fa-users text-red-600 text-sm sm:text-base"></i>
                     </div>
-                    <h3 class="font-bold text-gray-900 mb-2">Innovation</h3>
-                    <p class="text-gray-600">Cutting-edge technology solutions</p>
+                    <h3 class="text-sm sm:text-base lg:text-lg font-bold mb-2 text-gray-900">Community Driven</h3>
+                    <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">Building supportive networks for accountability and motivation</p>
                 </div>
-                <div class="text-center" data-aos="zoom-in" data-aos-delay="300">
-                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-users text-red-600 text-2xl"></i>
+                <div class="bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-red-100" data-aos="fade-up" data-aos-delay="300">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                        <i class="fas fa-chart-line text-red-600 text-sm sm:text-base"></i>
                     </div>
-                    <h3 class="font-bold text-gray-900 mb-2">Community</h3>
-                    <p class="text-gray-600">Building stronger fitness communities</p>
+                    <h3 class="text-sm sm:text-base lg:text-lg font-bold mb-2 text-gray-900">Data-Driven</h3>
+                    <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">Using insights and analytics to optimize your progress</p>
                 </div>
             </div>
         </div>
@@ -231,8 +239,46 @@
         </div>
     </section>
 
-    <!-- Enhanced Testimonials -->
+    <!-- Team Section -->
     <section class="py-24 bg-gray-50 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-4">
+                    Meet Our <span class="gradient-text">Team</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Passionate professionals dedicated to revolutionizing your fitness journey
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                @php
+                    $team = [
+                        ['name' => 'Omar Ali', 'role' => 'Fitness Trainer', 'img' => 'trainer1.jpg'],
+                        ['name' => 'Ravindu Perera', 'role' => 'Fitness Instructor & Wellness Coach', 'img' => 'trainer2.jpg'],
+                        ['name' => 'Natalie Fernando', 'role' => 'Fitness Trainer & Sports Messiah', 'img' => 'trainer3.jpg'],
+                        ['name' => 'John Smith', 'role' => 'Yoga Expert', 'img' => 'trainer4.jpg'],
+                        ['name' => 'Ayesha Silva', 'role' => 'Pilates Instructor', 'img' => 'trainer5.jpg'],
+                        ['name' => 'Kavin Raj', 'role' => 'CrossFit Coach', 'img' => 'trainer6.jpg'],
+                    ];
+                @endphp
+
+                @foreach($team as $i => $member)
+                    <div class="text-center group" data-aos="fade-up" data-aos-delay="{{ ($i + 1) * 100 }}">
+                        <div class="relative mb-6">
+                            <img src="{{ asset('images/' . $member['img']) }}" alt="{{ $member['name'] }}" class="w-48 h-48 rounded-full mx-auto object-cover group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-red-600/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900">{{ $member['name'] }}</h3>
+                        <p class="text-red-600 font-medium">{{ $member['role'] }}</p>
+                        <p class="text-gray-600 mt-2"></p>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced Testimonials -->
+    <section class="py-24 bg-white px-6">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-16" data-aos="fade-up">
                 <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-4">
@@ -245,7 +291,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="bg-gradient-to-br from-white to-red-50 p-8 rounded-2xl shadow-lg border border-red-100" data-aos="fade-right">
                     <div class="flex items-center mb-6">
-                        <img src="{{ asset('images/testimonials/user-1.jpg') }}" alt="User" class="w-16 h-16 rounded-full object-cover mr-4">
+                        <img src="{{ asset('images/user-1.png') }}" alt="User" class="w-16 h-16 rounded-full object-cover mr-4">
                         <div>
                             <h4 class="font-bold text-gray-900">Ayeshi R.</h4>
                             <p class="text-gray-600 text-sm">Member</p>
@@ -262,7 +308,7 @@
                 </div>
                 <div class="bg-gradient-to-br from-white to-red-50 p-8 rounded-2xl shadow-lg border border-red-100" data-aos="fade-up">
                     <div class="flex items-center mb-6">
-                        <img src="{{ asset('images/testimonials/user-2.jpg') }}" alt="User" class="w-16 h-16 rounded-full object-cover mr-4">
+                        <img src="{{ asset('images/user-2.png') }}" alt="User" class="w-16 h-16 rounded-full object-cover mr-4">
                         <div>
                             <h4 class="font-bold text-gray-900">Kanishka S.</h4>
                             <p class="text-gray-600 text-sm">Trainer</p>
@@ -279,7 +325,7 @@
                 </div>
                 <div class="bg-gradient-to-br from-white to-red-50 p-8 rounded-2xl shadow-lg border border-red-100" data-aos="fade-left">
                     <div class="flex items-center mb-6">
-                        <img src="{{ asset('images/testimonials/user-3.jpg') }}" alt="User" class="w-16 h-16 rounded-full object-cover mr-4">
+                        <img src="{{ asset('images/user-3.png') }}" alt="User" class="w-16 h-16 rounded-full object-cover mr-4">
                         <div>
                             <h4 class="font-bold text-gray-900">Hafsa M.</h4>
                             <p class="text-gray-600 text-sm">Admin</p>
@@ -299,19 +345,19 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="py-24 bg-gradient-to-r from-red-600 to-red-700 text-white px-6">
-        <div class="max-w-4xl mx-auto text-center" data-aos="fade-up">
-            <h2 class="text-4xl md:text-5xl font-black mb-6">
+    <section class="relative -mt-16 sm:-mt-24 pt-16 pb-16 bg-white text-gray-900 px-6" style="z-index:20;">
+        <div class="max-w-4xl mx-auto text-center rounded-2xl shadow-2xl p-8 sm:p-12 bg-red-50" data-aos="zoom-in">
+            <h2 class="text-3xl md:text-4xl lg:text-5xl font-black mb-4 text-gray-900">
                 Ready to Transform Your Fitness Journey?
             </h2>
-            <p class="text-xl mb-8 opacity-90">
+            <p class="text-lg md:text-xl mb-6 text-gray-700 max-w-2xl mx-auto">
                 Join thousands of satisfied users who've already revolutionized their health with PULSEONE
             </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('register') }}" class="px-8 py-4 bg-white text-red-600 font-bold rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-105">
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mt-6">
+                <a href="{{ route('register') }}" class="px-8 py-4 bg-red-600 text-white font-bold rounded-full hover:bg-red-700 transition-all duration-200 transform hover:scale-105 shadow-lg">
                     Start Your Journey Today
                 </a>
-                <a href="{{ route('contact') }}" class="px-8 py-4 border-2 border-white text-white font-bold rounded-full hover:bg-white hover:text-red-600 transition-all duration-300">
+                <a href="{{ route('contact') }}" class="px-8 py-4 border-2 border-red-600 text-red-600 font-bold rounded-full hover:bg-red-600 hover:text-white transition-all duration-200 shadow-lg">
                     Learn More
                 </a>
             </div>
@@ -325,7 +371,13 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     
     <script>
-        document.addEventListener('DOMContentLoaded', () => AOS.init());
+        document.addEventListener('DOMContentLoaded', () => {
+            AOS.init({
+                duration: 800,
+                once: true,
+                offset: 100
+            });
+        });
     </script>
 </body>
 </html>

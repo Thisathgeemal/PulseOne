@@ -10,8 +10,8 @@
             <i class="fas fa-qrcode text-blue-500"></i> Scan QR to Check In
         </h2>
 
-        {{-- QR Form --}}
-        <form action="{{ route('checkin') }}" method="POST" class="space-y-6" id="qrCheckinForm">
+    {{-- QR Form --}}
+    <form action="{{ route('checkin-token') }}" method="POST" class="space-y-6" id="qrCheckinForm">
             @csrf
             <div>
                 <label for="qr_code" class="block text-sm font-semibold text-gray-700 mb-1">QR Code Token</label>

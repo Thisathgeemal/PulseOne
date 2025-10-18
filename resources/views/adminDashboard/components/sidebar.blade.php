@@ -1,5 +1,5 @@
 <!-- Sidebar -->
-<div class="sidebar bg-white min-h-screen w-64 border-r shadow-sm flex flex-col py-6" x-data="{
+<div class="sidebar hidden md:flex bg-white min-h-screen w-64 border-r shadow-sm flex flex-col py-6" x-data="{
     openUsers: @json(request()->routeIs('admin.admin') ||
             request()->routeIs('admin.trainer') ||
             request()->routeIs('admin.dietitian') ||
@@ -159,6 +159,5 @@
             </form>
         </li>
     </ul>
-
 
 </div>

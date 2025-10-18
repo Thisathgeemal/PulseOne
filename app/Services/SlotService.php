@@ -28,8 +28,19 @@ class SlotService
             ->whereIn('weekday', [$weekdayIso, $weekdayZero])
             ->get();
 
+        // If the trainer has no explicit availability set (common on new/seedless DBs),
+        // provide a safe default working block so members can still pick times.
+        // This prevents the UI from showing "no times" when the DB simply lacks rows.
         if ($blocks->isEmpty()) {
-            return [];
+            // Default: 08:00 - 17:00, 60 minute slots, 10 minute buffer
+            $default = (object) [
+                'start_time'   => '08:00:00',
+                'end_time'     => '17:00:00',
+                'slot_minutes' => 60,
+                'buffer_minutes' => 10,
+            ];
+
+            $blocks = collect([$default]);
         }
 
         // Approved bookings for the date

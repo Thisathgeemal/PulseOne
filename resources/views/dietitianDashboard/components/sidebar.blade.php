@@ -1,5 +1,5 @@
 <!-- Sidebar -->
-<div class="bg-white min-h-screen w-64 border-r shadow-sm flex flex-col py-6" x-data="{ openUsers: false }">
+<div class="bg-white min-h-screen w-64 border-r shadow-sm flex flex-col py-6 hidden md:flex" x-data="{ openUsers: false }">
 
     <!-- Logo -->
     <div class="px-6 mb-5">

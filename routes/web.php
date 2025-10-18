@@ -33,7 +33,7 @@ use App\Http\Controllers\TrainerProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkoutPlanController;
 use App\Http\Controllers\WorkoutRequestController;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Public Pages
@@ -57,22 +57,23 @@ Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->na
 Route::post('/register/member', [RegisterController::class, 'registerMember'])->name('register.member');
 Route::post('/register/payment', [RegisterController::class, 'registerPayment'])->name('register.payment');
 
+// Helper route to go back from payment to registration details (clears session-stored member data)
+Route::post('/register/back', function (Request $request) {
+    $request->session()->forget('member_data');
+    return redirect()->route('register');
+})->name('register.back');
+
 // Forgot and Reset Password
 Route::get('/forgotPassword', [LoginController::class, 'showForgotPasswordForm'])->name('password.request');
 Route::post('/forgotPassword', [LoginController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('/resetPassword/{token}', [LoginController::class, 'showResetForm'])->name('password.reset');
 Route::post('/resetPassword', [LoginController::class, 'reset'])->name('password.update');
 
-// Dashboards
-Route::middleware(['auth'])->group(function () {
-    Route::get('/member/dashboard', [MemberDashboardController::class, 'dashboard'])->name('Member.dashboard');
-    Route::get('/dietitian/dashboard', [DietitianDashboardController::class, 'dashboard'])->name('Dietitian.dashboard');
-    Route::get('/trainer/dashboard', [TrainerDashboardController::class, 'dashboard'])->name('Trainer.dashboard');
-    Route::get('/admin/dashboard', [AdminDashboardController::class, 'dashboard'])->name('Admin.dashboard');
-});
-
 // Admin role routing
-Route::middleware(['auth'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+
+    // Dashboard
+    Route::get('/dashboard', [AdminDashboardController::class, 'dashboard'])->name('Admin.dashboard');
 
     // Admin Routes
     Route::get('/admin', [UserController::class, 'getAdminData'])->name('admin.admin');
@@ -153,7 +154,10 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 });
 
 // Dietitian role routing
-Route::middleware(['auth'])->prefix('dietitian')->group(function () {
+Route::middleware(['auth', 'dietitian'])->prefix('dietitian')->group(function () {
+
+    // Dashboard
+    Route::get('/dashboard', [DietitianDashboardController::class, 'dashboard'])->name('Dietitian.dashboard');
 
     // Profile
     Route::get('/profile', [UserController::class, 'getMemberData'])->name('dietitian.profile');
@@ -210,7 +214,10 @@ Route::middleware(['auth'])->prefix('dietitian')->group(function () {
 });
 
 // Trainer role routing
-Route::middleware(['auth'])->prefix('trainer')->group(function () {
+Route::middleware(['auth', 'trainer'])->prefix('trainer')->group(function () {
+
+    // Dashboard
+    Route::get('/dashboard', [TrainerDashboardController::class, 'dashboard'])->name('Trainer.dashboard');
 
     // Profile
     Route::get('trainer/profile', [UserController::class, 'getTrainerData'])->name('trainer.profile');
@@ -264,7 +271,10 @@ Route::middleware(['auth'])->prefix('trainer')->group(function () {
 });
 
 // Member role routing
-Route::middleware(['auth'])->prefix('member')->group(function () {
+Route::middleware(['auth', 'member'])->prefix('member')->group(function () {
+
+    // Dashboard
+    Route::get('/dashboard', [MemberDashboardController::class, 'dashboard'])->name('Member.dashboard');
 
     // Profile Routes
     Route::get('/profile', [UserController::class, 'getMemberData'])->name('member.profile');

@@ -22,7 +22,6 @@ class UserFactory extends Factory
             'address'        => $this->faker->address(),
             'is_active'      => true,
             'mfa_enabled'    => false,
-            'total_points'   => 0,
             'profile_image'  => null,
             'remember_token' => Str::random(10),
         ];

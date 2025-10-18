@@ -26,8 +26,8 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header Box -->
         <div class="bg-black rounded-xl p-6 mb-8 shadow-lg">
-            <h1 class="text-2xl font-bold text-white mb-2">My Feedbacks</h1>
-            <p class="text-sm text-gray-300 opacity-90">{{ $description }}</p>
+            <h1 class="text-3xl font-bold text-white mb-2">My Feedbacks</h1>
+            <p class="text-white opacity-90">{{ $description }}</p>
         </div>
 
         @if ($items->count() > 0)
@@ -116,9 +116,17 @@
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-12 h-12 rounded-full overflow-hidden ring-2 ring-white shadow-lg">
-                                        @if ($fb->fromUser->profile_image)
-                                            <img src="{{ asset('storage/profile_images/' . $fb->fromUser->profile_image) }}"
-                                                alt="{{ $fb->fromUser->first_name }}"
+                                        @if (!empty($fb->fromUser->profile_image))
+                                            @php
+                                                $img = $fb->fromUser->profile_image;
+                                                // If stored value is just a filename (like "profile_xxx.jpg"),
+                                                // prepend the storage path. If it already contains 'storage/' or
+                                                // looks like a URL, leave it as-is.
+                                                if (strpos($img, 'storage/') === false && strpos($img, 'http') === false && strpos($img, '/') === false) {
+                                                    $img = 'storage/profile_images/' . $img;
+                                                }
+                                            @endphp
+                                            <img src="{{ asset($img) }}" alt="{{ $fb->fromUser->first_name }}"
                                                 class="w-full h-full object-cover">
                                         @else
                                             <div class="w-full h-full bg-white flex items-center justify-center">

@@ -109,6 +109,18 @@ class MemberBookingController extends Controller
             // Convert string date to Carbon object
             $date      = Carbon::parse($dateStr);
             $available = $slots->getAvailableSlots($trainerId, $date);
+            // Helpful debug: if no slots are returned, log trainer availability state.
+            if (empty($available)) {
+                $hasRows = \App\Models\TrainerAvailability::where('trainer_id', $trainerId)
+                    ->whereIn('weekday', [$date->isoWeekday(), $date->dayOfWeek])
+                    ->exists();
+                if (! $hasRows) {
+                    \Log::warning('No TrainerAvailability rows for trainer; using defaults', [
+                        'trainer_id' => $trainerId,
+                        'date' => $dateStr,
+                    ]);
+                }
+            }
             return response()->json(['slots' => $available]);
         } catch (\Exception $e) {
             \Log::error('Slots loading error', [

@@ -90,7 +90,7 @@ class MealController extends Controller
         });
 
         try {
-            Meal::create([
+            $meal = Meal::create([
                 'created_by_dietitian_id' => Auth::id(),
                 'meal_name'               => $request->meal_name,
                 'description'             => $request->description,
@@ -120,7 +120,7 @@ class MealController extends Controller
             Notification::create([
                 'user_id' => Auth::id(),
                 'title'   => 'Meal Added Successfully',
-                'message' => 'You have successfully added the meal "' . $meal->meal_name . '".',
+                'message' => 'You have successfully added the meal "' . ($meal->meal_name ?? $request->meal_name) . '".',
                 'type'    => 'Diet Plan',
                 'is_read' => false,
             ]);

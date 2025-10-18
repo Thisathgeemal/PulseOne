@@ -167,26 +167,33 @@
 </style>
 
 <div x-data="{
-    showSettings: false,
-    showProfile: false,
-    showNotifications: false,
-    showRead: false,
-    lastScroll: 0,
-    handleScroll() {
-        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-        if (currentScroll > this.lastScroll) {
-            this.showSettings = false;
-            this.showProfile = false;
-            this.showNotifications = false;
+        showSettings: false,
+        showProfile: false,
+        showNotifications: false,
+        showRead: false,
+        showSidebar: false,
+        lastScroll: 0,
+        handleScroll() {
+            const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+            if (currentScroll > this.lastScroll) {
+                this.showSettings = false;
+                this.showProfile = false;
+                this.showNotifications = false;
+            }
+            this.lastScroll = currentScroll <= 0 ? 0 : currentScroll;
         }
-        this.lastScroll = currentScroll <= 0 ? 0 : currentScroll;
-    }
-}" x-init="window.addEventListener('scroll', () => handleScroll())" class="relative">
+    }" x-init="window.addEventListener('scroll', () => handleScroll())" class="relative">
 
     <!-- Topbar -->
     <div class="flex items-center justify-between bg-[#1E1E1E] text-white px-6 py-3 shadow-sm">
-        <!-- Left: Welcome Message -->
+        <!-- Left: Hamburger + Welcome Message -->
         <div class="flex items-center gap-4 text-lg font-semibold">
+            <!-- Hamburger Icon (Mobile Only) -->
+            <button @click="showSidebar = !showSidebar"
+                class="md:hidden text-white text-2xl hover:text-yellow-400 focus:outline-none">
+                <i class="fas fa-bars"></i>
+            </button>
+
             <i class="fa-solid fa-user-tie text-white text-xl"></i>
             <span class="font-semibold">
                 Welcome, {{ Auth::user()->first_name }}
@@ -237,6 +244,153 @@
                     </div>
                 @endif
             </button>
+        </div>
+    </div>
+
+    <!-- Sidebar Panel (Mobile Only) -->
+    <div x-show="showSidebar" x-transition @click.away="showSidebar = false"
+        class="fixed inset-y-0 left-0 w-64 bg-white text-black shadow-lg z-50 overflow-y-auto transform transition-transform duration-300 -translate-x-full lg:hidden"
+        :class="{'translate-x-0': showSidebar}">
+        
+        <div x-data="{
+            openUsers: {{ request()->routeIs('member.qr') || request()->routeIs('member.attendance') ? 'true' : 'false' }},
+            openWorkout: {{ request()->routeIs('member.workoutplan.*') ? 'true' : 'false' }},
+            openDiet: {{ request()->routeIs('member.dietplan.*') ? 'true' : 'false' }},
+            openBooking: {{ request()->routeIs('member.bookings.*') ? 'true' : 'false' }},
+        }" class="flex flex-col min-h-full">
+
+            <!-- Logo -->
+            <div class="px-6 mb-5 mt-10 flex justify-between items-center">
+                <a href="{{ route('Member.dashboard') }}">
+                    <img src="{{ asset('images/logo - side.png') }}" alt="PulseOne Logo" class="h-12 -mt-3">
+                </a>
+                <button @click="showSidebar = false" class="text-gray-500 hover:text-red-600 text-2xl">&times;</button>
+            </div>
+
+            <!-- Navigation -->
+            <ul class="flex-grow space-y-4 px-4 text-sm text-gray-800 font-medium">
+
+                <!-- Dashboard -->
+                <li>
+                    <a href="{{ route('Member.dashboard') }}"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg 
+                    {{ request()->routeIs('Member.dashboard') ? 'accent-bg text-white font-semibold' : 'hover:bg-gray-100' }}">
+                    <i class="fas fa-house"></i> Dashboard
+                    </a>
+                </li>
+
+                <!-- QR Dropdown -->
+                <li @click.away="openUsers = false">
+                    <button @click="openUsers = !openUsers"
+                            class="w-full flex items-center gap-3 px-3 py-2 rounded-lg focus:outline-none
+                            {{ request()->routeIs('member.qr') || request()->routeIs('member.attendance') ? 'accent-bg text-white font-semibold' : 'hover:bg-gray-100' }}">
+                        <i class="fas fa-qrcode"></i> QR
+                        <i :class="openUsers ? 'fa fa-chevron-circle-up' : 'fa fa-chevron-circle-down'" class="ml-auto transition-all duration-300"></i>
+                    </button>
+
+                    <ul x-show="openUsers" x-transition x-cloak class="mt-2 space-y-1 pl-6">
+                        @foreach ([
+                            'member.qr' => ['icon' => 'fas fa-qrcode', 'label' => 'QR Scanner'],
+                            'member.attendance' => ['icon' => 'fas fa-calendar-check', 'label' => 'Attendance'],
+                        ] as $route => $data)
+                            <li>
+                                <a href="{{ route($route) }}"
+                                class="flex items-center gap-3 px-3 py-2 rounded-lg
+                                {{ request()->routeIs($route) ? 'accent-bg text-white font-semibold' : 'hover:bg-gray-100' }}">
+                                <i class="{{ $data['icon'] }}"></i> {{ $data['label'] }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </li>
+
+                <!-- Workout, Diet, Booking Dropdowns -->
+                @php
+                    $dropdowns = [
+                        'member.workoutplan' => [
+                            'icon' => 'fas fa-dumbbell', 'label' => 'Workout Plan', 'openVar' => 'openWorkout',
+                            'routes' => [
+                                'member.workoutplan.request' => ['icon' => 'fas fa-paper-plane', 'label' => 'Request'],
+                                'member.workoutplan.myplan' => ['icon' => 'fas fa-file-alt', 'label' => 'My Plan'],
+                                'member.workoutplan.progress' => ['icon' => 'fas fa-chart-line', 'label' => 'Progress Tracking'],
+                            ],
+                        ],
+                        'member.dietplan' => [
+                            'icon' => 'fas fa-utensils', 'label' => 'Diet Plan', 'openVar' => 'openDiet',
+                            'routes' => [
+                                'member.dietplan.request' => ['icon' => 'fas fa-paper-plane', 'label' => 'Request'],
+                                'member.dietplan.myplan' => ['icon' => 'fas fa-file-alt', 'label' => 'My Plan'],
+                                'member.dietplan.progress' => ['icon' => 'fas fa-chart-line', 'label' => 'Progress Tracking', 'url' => $activeDietPlan ? route('member.dietplan.progress', $activeDietPlan->dietplan_id) : null],
+                            ],
+                        ],
+                        'member.bookings' => [
+                            'icon' => 'fas fa-calendar-check', 'label' => 'Booking', 'openVar' => 'openBooking',
+                            'routes' => [
+                                'member.bookings.index' => ['icon' => 'fas fa-calendar', 'label' => 'Sessions'],
+                                'member.bookings.sessions' => ['icon' => 'fas fa-user-clock', 'label' => 'My Sessions'],
+                            ],
+                        ],
+                    ];
+                @endphp
+
+                @foreach ($dropdowns as $key => $dropdown)
+                    <li @click.away="{{ $dropdown['openVar'] }} = false">
+                        <button @click="{{ $dropdown['openVar'] }} = !{{ $dropdown['openVar'] }}"
+                                class="w-full flex items-center gap-3 px-3 py-2 rounded-lg focus:outline-none
+                                {{ collect(array_keys($dropdown['routes']))->contains(fn($route) => request()->routeIs($route)) ? 'accent-bg text-white font-semibold' : 'hover:bg-gray-100' }}">
+                            <i class="{{ $dropdown['icon'] }}"></i> {{ $dropdown['label'] }}
+                            <i :class="{{ $dropdown['openVar'] }} ? 'fa fa-chevron-circle-up' : 'fa fa-chevron-circle-down'" class="ml-auto transition-all duration-300"></i>
+                        </button>
+                        <ul x-show="{{ $dropdown['openVar'] }}" x-transition x-cloak class="mt-2 space-y-1 pl-6">
+                            @foreach ($dropdown['routes'] as $route => $data)
+                                <li>
+                                    @if ($route === 'member.dietplan.progress' && is_null($data['url']))
+                                        <button onclick="Swal.fire({icon: 'warning', title: 'No Active Diet Plan', text: 'Please start an active diet plan first!', confirmButtonColor: '#d32f2f'})"
+                                                class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 w-full">
+                                            <i class="{{ $data['icon'] }}"></i> {{ $data['label'] }}
+                                        </button>
+                                    @else
+                                        <a href="{{ $route === 'member.dietplan.progress' ? $data['url'] : route($route) }}"
+                                        class="flex items-center gap-3 px-3 py-2 rounded-lg
+                                        {{ request()->routeIs($route) ? 'accent-bg text-white font-semibold' : 'hover:bg-gray-100' }}">
+                                        <i class="{{ $data['icon'] }}"></i> {{ $data['label'] }}
+                                        </a>
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ul>
+                    </li>
+                @endforeach
+
+                <!-- Health Assessment & Other Links (Membership, Payment, Message, etc.) -->
+                @foreach ([
+                    'member.health-assessment' => ['icon' => 'fas fa-heartbeat', 'label' => 'Health Assessment'],
+                    'member.membership' => ['icon' => 'fas fa-id-card', 'label' => 'Membership'],
+                    'member.payment' => ['icon' => 'fas fa-credit-card', 'label' => 'Payment'],
+                    'member.message' => ['icon' => 'fas fa-comment-alt', 'label' => 'Message'],
+                    'member.feedback' => ['icon' => 'fas fa-comment-dots', 'label' => 'Feedback'],
+                    'member.leaderboard' => ['icon' => 'fas fa-trophy', 'label' => 'Leaderboard'],
+                ] as $route => $data)
+                    <li>
+                        <a href="{{ route($route) }}"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg
+                        {{ request()->routeIs($route) ? 'accent-bg text-white font-semibold' : 'hover:bg-gray-100' }}">
+                        <i class="{{ $data['icon'] }}"></i> {{ $data['label'] }}
+                        </a>
+                    </li>
+                @endforeach
+
+                <!-- Logout -->
+                <li>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit"
+                                class="w-full text-left flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 accent-text font-semibold">
+                            <i class="fa fa-power-off"></i> Log out
+                        </button>
+                    </form>
+                </li>
+            </ul>
         </div>
     </div>
 
@@ -631,6 +785,12 @@
     @endif
 
     <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('headerState', () => ({
+                showSidebar: false
+            }))
+        })
+
         document.getElementById('verifyPasswordBtn')?.addEventListener('click', async () => {
             const password = document.getElementById('current_password').value;
             const icon = document.getElementById('checkIcon');

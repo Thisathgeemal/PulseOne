@@ -40,6 +40,7 @@
     showProfile: false,
     showNotifications: false,
     showRead: false,
+    showSidebar: false,
     lastScroll: 0,
     handleScroll() {
         const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
@@ -50,12 +51,21 @@
         }
         this.lastScroll = currentScroll <= 0 ? 0 : currentScroll;
     }
-}" x-init="window.addEventListener('scroll', () => handleScroll())" class="relative">
+} " x-init="window.addEventListener('scroll', () => $data.handleScroll())" class="relative">
 
     <!-- Topbar -->
     <div class="flex items-center justify-between bg-[#1E1E1E] text-white px-6 py-3 shadow-sm">
-        <!-- Left: Welcome Message -->
+        <!-- Left: Hamburger + Welcome Message -->
         <div class="flex items-center gap-4 text-lg font-semibold">
+            <button id="mobile-sidebar-open" aria-controls="mobile-trainer-sidebar" aria-expanded="false"
+                @click="showSidebar = !showSidebar"
+                :aria-expanded="showSidebar"
+                class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 bg-white/5 hover:bg-white/10 transition"
+                aria-label="Open sidebar">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
             <i class="fa-solid fa-user-tie text-white text-xl"></i>
             <span class="font-semibold">
                 Welcome, {{ Auth::user()->first_name }}
@@ -110,7 +120,7 @@
     </div>
 
     <!-- Slide-in Settings Panel -->
-    <div x-show="showSettings" x-transition if (showSettings) showProfile=false; @click.away="showSettings = false"
+    <div x-show="showSettings" x-transition @click.away="showSettings = false"
         class="fixed right-0 top-16 bottom-0 w-[400px] bg-white text-black rounded-md shadow-lg z-100 p-7 overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-2xl font-bold text-gray-800">Settings</h2>
@@ -230,6 +240,121 @@
                     </button>
                 </form>
             @endif
+        </div>
+    </div>
+
+    <!-- Mobile slide-in sidebar (duplication of trainer sidebar for mobile) -->
+    <div x-show="showSidebar" x-transition @click.away="showSidebar = false" x-cloak
+        id="mobile-trainer-sidebar"
+        class="fixed inset-y-0 left-0 w-64 bg-white text-black border-r shadow-lg z-50 -translate-x-full lg:hidden"
+        :class="{'translate-x-0': showSidebar}">
+        <div class="p-4">
+            <div class="flex items-center justify-between mb-4">
+                <a href="{{ route('Trainer.dashboard') }}">
+                    <img src="{{ asset('images/logo - side.png') }}" alt="PulseOne Logo" class="h-10">
+                </a>
+                <button @click="showSidebar = false" class="text-gray-500 hover:text-red-600 text-xl">&times;</button>
+            </div>
+
+            <!-- Mobile Navigation (copied from sidebar with nested groups) -->
+            <ul class="space-y-4 text-sm text-gray-800 font-medium">
+                <li>
+                    <a href="{{ route('Trainer.dashboard') }}"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg {{ request()->routeIs('Trainer.dashboard') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                        <i class="fas fa-house"></i> Dashboard
+                    </a>
+                </li>
+
+                <li x-data="{ openUsersMobile: @json(request()->routeIs('trainer.qr') || request()->routeIs('trainer.attendance')) }" @click.away="openUsersMobile = false">
+                    <button @click="openUsersMobile = !openUsersMobile"
+                        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg focus:outline-none {{ request()->routeIs('trainer.qr') || request()->routeIs('trainer.attendance') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                        <i class="fas fa-qrcode"></i> QR
+                        <i :class="openUsersMobile ? 'fa fa-chevron-circle-up' : 'fa fa-chevron-circle-down'" class="ml-auto transition-all duration-300"></i>
+                    </button>
+
+                    <ul x-show="openUsersMobile" x-transition x-cloak class="mt-2 space-y-1 pl-6">
+                        @foreach ([
+            'trainer.qr' => ['icon' => 'fas fa-qrcode', 'label' => 'QR Scanner'],
+            'trainer.attendance' => ['icon' => 'fas fa-calendar-check', 'label' => 'Attendance'],
+        ] as $route => $data)
+                            <li>
+                                <a href="{{ route($route) }}"
+                                    class="flex items-center gap-3 px-3 py-2 rounded-lg {{ request()->routeIs($route) ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                                    <i class="{{ $data['icon'] }}"></i> {{ $data['label'] }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </li>
+
+                <li x-data="{ openWorkoutMobile: @json(request()->routeIs('trainer.workoutplan') || request()->routeIs('trainer.request')) }" @click.away="openWorkoutMobile = false">
+                    <button @click="openWorkoutMobile = !openWorkoutMobile"
+                        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg focus:outline-none {{ request()->routeIs('trainer.workoutplan') || request()->routeIs('trainer.request') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                        <i class="fas fa-dumbbell"></i> Workout Plan
+                        <i :class="openWorkoutMobile ? 'fa fa-chevron-circle-up' : 'fa fa-chevron-circle-down'" class="ml-auto transition-all duration-300"></i>
+                    </button>
+
+                    <ul x-show="openWorkoutMobile" x-transition x-cloak class="mt-2 space-y-1 pl-6">
+                        <li>
+                            <a href="{{ route('trainer.request') }}"
+                                class="flex items-center gap-3 px-3 py-2 rounded-lg {{ request()->routeIs('trainer.request') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                                <i class="fas fa-paper-plane"></i> Requests
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('trainer.workoutplan') }}"
+                                class="flex items-center gap-3 px-3 py-2 rounded-lg {{ request()->routeIs('trainer.workoutplan') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                                <i class="fas fa-dumbbell"></i> My Plans
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li x-data="{ openBookingMob: {{ request()->routeIs('trainer.bookings.*') ? 'true' : 'false' }} }" @click.away="openBookingMob = false">
+                    <button @click="openBookingMob = !openBookingMob" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg focus:outline-none {{ request()->routeIs('trainer.bookings.*') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                        <i class="fas fa-calendar-check"></i> Booking
+                        <i :class="openBookingMob ? 'fa fa-chevron-circle-up' : 'fa fa-chevron-circle-down'" class="ml-auto transition-all duration-300"></i>
+                    </button>
+
+                    <ul x-show="openBookingMob" x-transition x-cloak class="mt-2 space-y-1 pl-6">
+                        <li>
+                            <a href="{{ route('trainer.bookings.requests') }}"
+                                class="flex items-center gap-3 px-3 py-2 rounded-lg {{ request()->routeIs('trainer.bookings.requests') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                                <i class="fas fa-paper-plane"></i> Requests
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('trainer.bookings.sessions') }}"
+                                class="flex items-center gap-3 px-3 py-2 rounded-lg {{ request()->routeIs('trainer.bookings.sessions') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                                <i class="fas fa-calendar-alt"></i> My Sessions
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                @foreach ([
+                'trainer.exercises' => ['icon' => 'fas fa-running', 'label' => 'Exercises'],
+                'trainer.member.health-assessments' => ['icon' => 'fas fa-notes-medical', 'label' => 'Health Assessments'],
+                'trainer.message' => ['icon' => 'fas fa-comment-alt', 'label' => 'Message'],
+                'trainer.feedback' => ['icon' => 'fas fa-comment-dots', 'label' => 'Feedback'],
+            ] as $route => $data)
+                    <li>
+                        <a href="{{ route($route) }}"
+                            class="flex items-center gap-3 px-3 py-2 rounded-lg {{ request()->routeIs($route) ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                            <i class="{{ $data['icon'] }}"></i> {{ $data['label'] }}
+                        </a>
+                    </li>
+                @endforeach
+
+                <li>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="w-full text-left flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 text-red-600 font-semibold">
+                            <i class="fas fa-power-off"></i> Log out
+                        </button>
+                    </form>
+                </li>
+            </ul>
         </div>
     </div>
 

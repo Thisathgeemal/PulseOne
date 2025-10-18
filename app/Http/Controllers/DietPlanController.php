@@ -195,7 +195,7 @@ class DietPlanController extends Controller
         // Add Photo Progress Data (weekly and monthly percentage)
         $photoProgressData = $this->getPhotoProgressData($memberId);
 
-        return view('memberdashboard.dietplanProgress', array_merge(
+        return view('memberDashboard.dietplanProgress', array_merge(
             compact('dietPlan', 'photoProgressData'),
             $dailyData,
             $weeklyWeightData,
@@ -453,7 +453,7 @@ class DietPlanController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('dietitianDashboard.dietPlan', compact('plans'));
+        return view('dietitianDashboard.dietplan', compact('plans'));
     }
 
     // Show diet plan creation form

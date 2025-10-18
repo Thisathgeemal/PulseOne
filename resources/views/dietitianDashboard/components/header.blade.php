@@ -36,6 +36,7 @@
 </style>
 
 <div x-data="{
+    showSidebar: false,
     showSettings: false,
     showProfile: false,
     showNotifications: false,
@@ -50,12 +51,23 @@
         }
         this.lastScroll = currentScroll <= 0 ? 0 : currentScroll;
     }
-    }" x-init="window.addEventListener('scroll', () => handleScroll())" class="relative">
+    }" x-init="window.addEventListener('scroll', () => $data.handleScroll())" class="relative">
 
     <!-- Topbar -->
     <div class="flex items-center justify-between bg-[#1E1E1E] text-white px-6 py-3 shadow-sm">
-        <!-- Left: Welcome Message -->
+        <!-- Left: Mobile Hamburger + Welcome Message -->
         <div class="flex items-center gap-4 text-lg font-semibold">
+            <!-- Mobile hamburger -->
+            <button id="mobile-dietitian-sidebar-open" aria-controls="mobile-dietitian-sidebar" aria-expanded="false"
+                @click="showSidebar = !showSidebar"
+                :aria-expanded="showSidebar"
+                class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 bg-white/5 hover:bg-white/10 transition mr-2"
+                aria-label="Open sidebar">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+
             <i class="fa-solid fa-user-tie text-white text-xl"></i>
             <span class="font-semibold">
                 Welcome, {{ Auth::user()->first_name }}
@@ -109,8 +121,66 @@
         </div>
     </div>
 
+    <!-- Mobile backdrop (normal translucent overlay) -->
+    <div x-show="showSidebar" x-transition.opacity class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" @click="showSidebar = false" x-cloak></div>
+
+    <!-- Mobile Slide-in Sidebar -->
+    <aside x-show="showSidebar" x-cloak
+        x-transition:enter="transition transform duration-300"
+        x-transition:enter-start="-translate-x-full"
+        x-transition:enter-end="translate-x-0"
+        x-transition:leave="transition transform duration-300"
+        x-transition:leave-start="translate-x-0"
+        x-transition:leave-end="-translate-x-full"
+        class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg z-50 md:hidden overflow-y-auto"
+        id="mobile-dietitian-sidebar" @click.away="showSidebar = false">
+        <div class="p-4 border-b flex items-center justify-between">
+            <a href="{{ route('Dietitian.dashboard') }}">
+                <img src="{{ asset('images/logo - side.png') }}" alt="PulseOne" class="h-10">
+            </a>
+            <button @click="showSidebar = false" class="text-gray-700 text-2xl">&times;</button>
+        </div>
+
+        <nav class="p-4">
+            <ul class="space-y-3 text-sm text-gray-800 font-medium">
+                <li>
+                    <a href="{{ route('Dietitian.dashboard') }}"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg {{ request()->routeIs('Dietitian.dashboard') ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                        <i class="fas fa-house"></i> Dashboard
+                    </a>
+                </li>
+
+                @foreach ([
+                'dietitian.request' => ['icon' => 'fas fa-paper-plane', 'label' => 'Request'],
+                'dietitian.dietplan' => ['icon' => 'fas fa-apple-alt', 'label' => 'Diet Plan'],
+                'dietitian.meals' => ['icon' => 'fas fa-utensils', 'label' => 'Meals'],
+                'dietitian.member.health-assessments' => ['icon' => 'fas fa-notes-medical', 'label' => 'Health Assessments'],
+                'dietitian.message' => ['icon' => 'fas fa-comment-alt', 'label' => 'Message'],
+                'dietitian.feedback' => ['icon' => 'fas fa-comment-dots', 'label' => 'Feedback'],
+            ] as $route => $data)
+                    <li>
+                        <a href="{{ route($route) }}"
+                            class="flex items-center gap-3 px-3 py-2 rounded-lg {{ request()->routeIs($route) ? 'bg-red-500 text-white font-semibold' : 'hover:bg-gray-100' }}">
+                            <i class="{{ $data['icon'] }}"></i> {{ $data['label'] }}
+                        </a>
+                    </li>
+                @endforeach
+
+                <li>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit"
+                            class="w-full text-left flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 text-red-600 font-semibold">
+                            <i class="fa fa-power-off"></i> Log out
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
     <!-- Slide-in Settings Panel -->
-    <div x-show="showSettings" x-transition if (showSettings) showProfile=false; @click.away="showSettings = false"
+    <div x-show="showSettings" x-transition @click.away="showSettings = false"
         class="fixed right-0 top-16 bottom-0 w-[400px] bg-white text-black rounded-md shadow-lg z-100 p-7 overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-2xl font-bold text-gray-800">Settings</h2>
@@ -684,11 +754,11 @@
         };
 
         window.saveThemeSettings = function() {
-            const notification = document.createElement('div');
-            notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-            notification.textContent = 'Theme settings saved successfully!';
+            const n = document.createElement('div');
+            n.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            n.textContent = 'Theme settings saved successfully!';
             document.body.appendChild(n);
-            setTimeout(() => notification.remove(), 2500);
+            setTimeout(() => n.remove(), 2500);
         };
 
         document.addEventListener('DOMContentLoaded', () => {

@@ -1,5 +1,5 @@
 <!-- Sidebar -->
-<div class="bg-white min-h-screen w-64 border-r shadow-sm flex flex-col py-6" x-data="{
+<div class="hidden md:flex bg-white min-h-screen w-64 border-r shadow-sm flex flex-col py-6" x-data="{
     openUsers: {{ request()->routeIs('trainer.qr') || request()->routeIs('trainer.attendance') ? 'true' : 'false' }},
     openBooking: {{ request()->routeIs('trainer.bookings.*') ? 'true' : 'false' }},
     openWorkoutPlan: {{ request()->routeIs('trainer.workoutplan') || request()->routeIs('trainer.request') ? 'true' : 'false' }},

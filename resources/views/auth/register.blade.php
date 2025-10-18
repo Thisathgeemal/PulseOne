@@ -40,7 +40,7 @@
         style="background-image: url('{{ url('images/gym-red.jpg') }}');">
         <div class="flex flex-col md:flex-row justify-center items-center gap-6 w-full max-w-5xl mx-auto px-4 py-12">
             <!-- Registration Form -->
-            <div id="create-form" class="w-full max-w-sm md:max-w-md bg-white rounded-xl shadow-xl p-8">
+            <div id="create-form" class="w-full max-w-sm md:max-w-md bg-white rounded-xl shadow-xl p-8 {{ session()->has('member_data') ? 'hidden' : '' }}">
                 <h2 class="text-3xl md:text-4xl font-bold text-center mb-3">Create Account</h2>
 
                 <form method="POST" action="{{ route('register.member') }}" class="space-y-6">
@@ -192,7 +192,7 @@
             <!-- Payment Form -->
             @if (session()->has('member_data'))
                 <div id="payment-form"
-                    class="w-full max-w-sm md:max-w-md bg-white rounded-xl shadow-xl p-8 {{ $showPayment ? '' : 'hidden' }}">
+                    class="w-full max-w-sm md:max-w-md bg-white rounded-xl shadow-xl p-8 {{ session()->has('member_data') ? '' : 'hidden' }}">
                     <h2 class="text-3xl md:text-4xl font-bold text-center mb-3">Complete Payment</h2>
 
                     <form method="POST" action="{{ route('register.payment') }}" class="space-y-6">
@@ -352,14 +352,26 @@
                             </button>
                         </div>
 
-                        <!-- link login -->
-                        <div class="mt-4 text-center">
-                            <p class="text-sm text-gray-600">
-                                Already have an account?
-                                <a href="{{ route('login') }}"
-                                    class="text-red-600 hover:text-red-500 font-semibold">Sign in</a>
-                            </p>
-                        </div>
+                            <div class="mt-4 flex items-center justify-between">
+                                <!-- Back to details (when on payment view) -->
+                                <form method="POST" action="{{ route('register.back') }}">
+                                    @csrf
+                                    <button type="submit" class="text-sm text-gray-600 hover:underline flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M7.707 14.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L4.414 9H17a1 1 0 110 2H4.414l3.293 3.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                        Back to Details
+                                    </button>
+                                </form>
+
+                                <!-- link login -->
+                                <div class="text-center">
+                                    <p class="text-sm text-gray-600">
+                                        Already have an account?
+                                        <a href="{{ route('login') }}" class="text-red-600 hover:text-red-500 font-semibold">Sign in</a>
+                                    </p>
+                                </div>
+                            </div>
 
                     </form>
                 </div>

@@ -1,10 +1,11 @@
 <!-- Sidebar -->
-<div class="bg-white min-h-screen w-64 border-r shadow-sm flex flex-col py-6" x-data="{
-    openUsers: {{ request()->routeIs('member.qr') || request()->routeIs('member.attendance') ? 'true' : 'false' }},
-    openWorkout: {{ request()->routeIs('member.workoutplan.*') ? 'true' : 'false' }},
-    openDiet: {{ request()->routeIs('member.dietplan.*') ? 'true' : 'false' }},
-    openBooking: {{ request()->routeIs('member.bookings.*') ? 'true' : 'false' }},
-}">
+<div class="hidden md:flex bg-white min-h-screen w-64 border-r shadow-sm flex-col py-6"
+    x-data="{
+        openUsers: {{ request()->routeIs('member.qr') || request()->routeIs('member.attendance') ? 'true' : 'false' }},
+        openWorkout: {{ request()->routeIs('member.workoutplan.*') ? 'true' : 'false' }},
+        openDiet: {{ request()->routeIs('member.dietplan.*') ? 'true' : 'false' }},
+        openBooking: {{ request()->routeIs('member.bookings.*') ? 'true' : 'false' }},
+    }">
 
     <!-- Logo -->
     <div class="px-6 mb-5">
@@ -37,9 +38,9 @@
 
             <ul x-show="openUsers" x-transition x-cloak class="mt-2 space-y-1 pl-6">
                 @foreach ([
-        'member.qr' => ['icon' => 'fas fa-qrcode', 'label' => 'QR Scanner'],
-        'member.attendance' => ['icon' => 'fas fa-calendar-check', 'label' => 'Attendance'],
-    ] as $route => $data)
+                        'member.qr' => ['icon' => 'fas fa-qrcode', 'label' => 'QR Scanner'],
+                        'member.attendance' => ['icon' => 'fas fa-calendar-check', 'label' => 'Attendance'],
+                    ] as $route => $data)
                     <li>
                         <a href="{{ route($route) }}"
                             class="flex items-center gap-3 px-3 py-2 rounded-lg
@@ -146,12 +147,12 @@
 
         <!-- Other Links -->
         @foreach ([
-        'member.membership' => ['icon' => 'fas fa-id-card', 'label' => 'Membership'],
-        'member.payment' => ['icon' => 'fas fa-credit-card', 'label' => 'Payment'],
-        'member.message' => ['icon' => 'fas fa-comment-alt', 'label' => 'Message'],
-        'member.feedback' => ['icon' => 'fas fa-comment-dots', 'label' => 'Feedback'],
-        'member.leaderboard' => ['icon' => 'fas fa-trophy', 'label' => 'Leaderboard'],
-    ] as $route => $data)
+                'member.membership' => ['icon' => 'fas fa-id-card', 'label' => 'Membership'],
+                'member.payment' => ['icon' => 'fas fa-credit-card', 'label' => 'Payment'],
+                'member.message' => ['icon' => 'fas fa-comment-alt', 'label' => 'Message'],
+                'member.feedback' => ['icon' => 'fas fa-comment-dots', 'label' => 'Feedback'],
+                'member.leaderboard' => ['icon' => 'fas fa-trophy', 'label' => 'Leaderboard'],
+            ] as $route => $data)
             <li>
                 <a href="{{ route($route) }}"
                     class="flex items-center gap-3 px-3 py-2 rounded-lg
@@ -174,3 +175,17 @@
 
     </ul>
 </div>
+
+@push('scripts')
+    <script>
+        // Provide Alpine helper used by sidebar to show health assessment alert dots
+        function healthAssessmentStatus() {
+            return {
+                // These default values will be overridden by server-rendered Alpine scopes if necessary
+                isComplete: @json($assessment?->is_complete ?? false),
+                needsUpdate: @json($needsUpdate ?? false),
+                showAlert: true,
+            }
+        }
+    </script>
+@endpush

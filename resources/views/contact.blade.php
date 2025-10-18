@@ -45,97 +45,97 @@
     @include('components.header')
 
     <!-- Hero -->
-    <section class="relative bg-gradient-to-br from-black via-gray-900 to-red-900 text-white py-32 overflow-hidden">
+    <section class="relative bg-gradient-to-br from-black via-gray-900 to-red-900 text-white py-16 sm:py-24 lg:py-32 overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-r from-red-600/30 to-transparent"></div>
-        <div class="absolute top-10 right-10 w-72 h-72 bg-red-600/20 rounded-full blur-3xl animate-pulse"></div>
-        <div class="absolute bottom-10 left-10 w-96 h-96 bg-red-500/10 rounded-full blur-3xl animate-pulse" style="animation-delay: -3s;"></div>
+        <div class="absolute top-5 sm:top-10 right-5 sm:right-10 w-48 sm:w-72 h-48 sm:h-72 bg-red-600/20 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-5 sm:bottom-10 left-5 sm:left-10 w-64 sm:w-96 h-64 sm:h-96 bg-red-500/10 rounded-full blur-3xl animate-pulse" style="animation-delay: -3s;"></div>
         
         <div class="relative max-w-6xl mx-auto text-center px-4" data-aos="fade-up">
-            <h1 class="text-5xl md:text-7xl font-black mb-6 tracking-tight">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black mb-4 sm:mb-6 tracking-tight leading-tight">
                 GET IN <span class="bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent">TOUCH</span>
             </h1>
-            <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed">
+            <p class="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-6 sm:mb-8 max-w-4xl mx-auto leading-relaxed">
                 We're here to support your fitness journey. Have questions, feedback, or need assistance? Reach out to us today!
             </p>
             
             <!-- Quick Contact Stats -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16" data-aos="fade-up" data-aos-delay="200">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mt-8 sm:mt-16" data-aos="fade-up" data-aos-delay="200">
                 <div class="text-center">
-                    <div class="text-4xl font-bold text-red-400 mb-2">24/7</div>
-                    <div class="text-sm text-gray-300">Support Available</div>
+                    <div class="text-2xl sm:text-3xl lg:text-4xl font-bold text-red-400 mb-1 sm:mb-2">24/7</div>
+                    <div class="text-xs sm:text-sm text-gray-300">Support Available</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-4xl font-bold text-red-400 mb-2">&lt;1hr</div>
-                    <div class="text-sm text-gray-300">Response Time</div>
+                    <div class="text-2xl sm:text-3xl lg:text-4xl font-bold text-red-400 mb-1 sm:mb-2">&lt;1hr</div>
+                    <div class="text-xs sm:text-sm text-gray-300">Response Time</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-4xl font-bold text-red-400 mb-2">5+</div>
-                    <div class="text-sm text-gray-300">Contact Methods</div>
+                    <div class="text-2xl sm:text-3xl lg:text-4xl font-bold text-red-400 mb-1 sm:mb-2">5+</div>
+                    <div class="text-xs sm:text-sm text-gray-300">Contact Methods</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-4xl font-bold text-red-400 mb-2">100%</div>
-                    <div class="text-sm text-gray-300">Satisfaction Rate</div>
+                    <div class="text-2xl sm:text-3xl lg:text-4xl font-bold text-red-400 mb-1 sm:mb-2">100%</div>
+                    <div class="text-xs sm:text-sm text-gray-300">Satisfaction Rate</div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Contact Section -->
-    <section class="py-24 px-4 max-w-7xl mx-auto bg-white" data-aos="fade-up">
-        <div class="text-center mb-16">
-            <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-4">
+    <section class="py-12 sm:py-16 lg:py-24 px-4 max-w-7xl mx-auto bg-white" data-aos="fade-up">
+        <div class="text-center mb-12 sm:mb-16">
+            <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-4">
                 Let's <span class="bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">Connect</span>
             </h2>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p class="text-base sm:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
                 Choose your preferred way to reach out - we're here to help you succeed
             </p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 lg:gap-12 items-start">
             <!-- Enhanced Contact Form -->
-            <div class="relative bg-white rounded-2xl shadow-2xl p-8 md:p-12 transform hover:shadow-3xl transition duration-300 border border-gray-100">
+            <div class="relative bg-white rounded-2xl shadow-2xl p-6 sm:p-8 lg:p-12 transform hover:shadow-3xl transition duration-300 border border-gray-100">
                 <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-600 to-red-800 rounded-t-2xl"></div>
-                <div class="absolute -top-6 left-8 bg-red-600 p-4 rounded-full shadow-lg">
-                    <i class="fas fa-paper-plane text-white text-xl"></i>
+                <div class="absolute -top-4 sm:-top-6 left-6 sm:left-8 bg-red-600 p-3 sm:p-4 rounded-full shadow-lg">
+                    <i class="fas fa-paper-plane text-white text-lg sm:text-xl"></i>
                 </div>
                 
-                <h3 class="text-2xl md:text-3xl font-black text-gray-900 mb-8 mt-4">Send Us a Message</h3>
+                <h3 class="text-xl sm:text-2xl lg:text-3xl font-black text-gray-900 mb-6 sm:mb-8 mt-4">Send Us a Message</h3>
                 
-                <form action="#" method="POST" class="space-y-6">
+                <form action="#" method="POST" class="space-y-4 sm:space-y-6">
                     @csrf
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <div class="relative group">
                             <label class="block text-sm font-bold text-gray-700 mb-2">First Name *</label>
                             <input type="text" name="first_name" required
-                                class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 transition bg-gray-50 hover:bg-white group-hover:border-red-300">
-                            <i class="fas fa-user absolute right-4 top-12 text-red-600 opacity-50"></i>
+                                class="w-full px-3 sm:px-4 py-3 sm:py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 transition bg-gray-50 hover:bg-white group-hover:border-red-300 text-sm sm:text-base">
+                            <i class="fas fa-user absolute right-3 sm:right-4 top-10 sm:top-12 text-red-600 opacity-50"></i>
                         </div>
                         <div class="relative group">
                             <label class="block text-sm font-bold text-gray-700 mb-2">Last Name *</label>
                             <input type="text" name="last_name" required
-                                class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 transition bg-gray-50 hover:bg-white group-hover:border-red-300">
-                            <i class="fas fa-user absolute right-4 top-12 text-red-600 opacity-50"></i>
+                                class="w-full px-3 sm:px-4 py-3 sm:py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 transition bg-gray-50 hover:bg-white group-hover:border-red-300 text-sm sm:text-base">
+                            <i class="fas fa-user absolute right-3 sm:right-4 top-10 sm:top-12 text-red-600 opacity-50"></i>
                         </div>
                     </div>
                     
                     <div class="relative group">
                         <label class="block text-sm font-bold text-gray-700 mb-2">Email Address *</label>
                         <input type="email" name="email" required
-                            class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 transition bg-gray-50 hover:bg-white group-hover:border-red-300">
-                        <i class="fas fa-envelope absolute right-4 top-12 text-red-600 opacity-50"></i>
+                            class="w-full px-3 sm:px-4 py-3 sm:py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 transition bg-gray-50 hover:bg-white group-hover:border-red-300 text-sm sm:text-base">
+                        <i class="fas fa-envelope absolute right-3 sm:right-4 top-10 sm:top-12 text-red-600 opacity-50"></i>
                     </div>
                     
                     <div class="relative group">
                         <label class="block text-sm font-bold text-gray-700 mb-2">Phone Number</label>
                         <input type="tel" name="phone"
-                            class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 transition bg-gray-50 hover:bg-white group-hover:border-red-300">
-                        <i class="fas fa-phone absolute right-4 top-12 text-red-600 opacity-50"></i>
+                            class="w-full px-3 sm:px-4 py-3 sm:py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 transition bg-gray-50 hover:bg-white group-hover:border-red-300 text-sm sm:text-base">
+                        <i class="fas fa-phone absolute right-3 sm:right-4 top-10 sm:top-12 text-red-600 opacity-50"></i>
                     </div>
                     
                     <div class="relative group">
                         <label class="block text-sm font-bold text-gray-700 mb-2">Subject *</label>
                         <select name="subject" required
-                            class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 transition bg-gray-50 hover:bg-white group-hover:border-red-300">
+                            class="w-full px-3 sm:px-4 py-3 sm:py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 transition bg-gray-50 hover:bg-white group-hover:border-red-300 text-sm sm:text-base">
                             <option value="">Select a subject</option>
                             <option value="general">General Inquiry</option>
                             <option value="support">Technical Support</option>
@@ -143,18 +143,18 @@
                             <option value="feedback">Feedback</option>
                             <option value="partnership">Partnership</option>
                         </select>
-                        <i class="fas fa-tag absolute right-4 top-12 text-red-600 opacity-50"></i>
+                        <i class="fas fa-tag absolute right-3 sm:right-4 top-10 sm:top-12 text-red-600 opacity-50"></i>
                     </div>
                     
                     <div class="relative group">
                         <label class="block text-sm font-bold text-gray-700 mb-2">Your Message *</label>
-                        <textarea name="message" rows="6" required placeholder="Tell us how we can help you..."
-                            class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 transition bg-gray-50 hover:bg-white group-hover:border-red-300 resize-none"></textarea>
-                        <i class="fas fa-comment absolute right-4 top-12 text-red-600 opacity-50"></i>
+                        <textarea name="message" rows="4" sm:rows="6" required placeholder="Tell us how we can help you..."
+                            class="w-full px-3 sm:px-4 py-3 sm:py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-red-600 focus:border-red-600 transition bg-gray-50 hover:bg-white group-hover:border-red-300 resize-none text-sm sm:text-base"></textarea>
+                        <i class="fas fa-comment absolute right-3 sm:right-4 top-10 sm:top-12 text-red-600 opacity-50"></i>
                     </div>
                     
                     <button type="submit"
-                        class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white py-4 rounded-xl transition font-bold text-lg hover:scale-105 duration-200 shadow-lg hover:shadow-xl">
+                        class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white py-3 sm:py-4 rounded-xl transition font-bold text-sm sm:text-lg hover:scale-105 duration-200 shadow-lg hover:shadow-xl">
                         <i class="fas fa-paper-plane mr-2"></i>
                         Send Message
                     </button>
@@ -162,58 +162,58 @@
             </div>
 
             <!-- Enhanced Contact Info -->
-            <div class="space-y-8">
+            <div class="space-y-6 sm:space-y-8">
                 <!-- Contact Information Card -->
-                <div class="relative bg-white rounded-2xl shadow-2xl p-8 md:p-12 transform hover:shadow-3xl transition duration-300 border border-gray-100">
+                <div class="relative bg-white rounded-2xl shadow-2xl p-4 sm:p-6 lg:p-8 xl:p-12 transform hover:shadow-3xl transition duration-300 border border-gray-100">
                     <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-600 to-red-800 rounded-t-2xl"></div>
-                    <div class="absolute -top-6 left-8 bg-red-600 p-4 rounded-full shadow-lg">
-                        <i class="fas fa-info-circle text-white text-xl"></i>
+                    <div class="absolute -top-3 sm:-top-6 left-4 sm:left-8 bg-red-600 p-2 sm:p-4 rounded-full shadow-lg">
+                        <i class="fas fa-info-circle text-white text-sm sm:text-xl"></i>
                     </div>
                     
-                    <div class="flex justify-center md:justify-start mb-8 mt-4">
-                        <img src="{{ asset('images/logo.png') }}" alt="PulseOne Logo" class="w-40 h-auto">
+                    <div class="flex justify-center md:justify-start mb-4 sm:mb-6 lg:mb-8 mt-2 sm:mt-4">
+                        <img src="{{ asset('images/logo.png') }}" alt="PulseOne Logo" class="w-24 sm:w-32 lg:w-40 h-auto">
                     </div>
                     
-                    <h3 class="text-2xl md:text-3xl font-black text-gray-900 mb-8">Contact Information</h3>
+                    <h3 class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-black text-gray-900 mb-4 sm:mb-6 lg:mb-8">Contact Information</h3>
                     
-                    <div class="space-y-6">
-                        <div class="flex items-start gap-4 p-4 rounded-xl bg-red-50 border border-red-100 hover:border-red-200 transition-colors duration-300">
-                            <div class="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-map-marker-alt text-white text-lg"></i>
+                    <div class="space-y-3 sm:space-y-4 lg:space-y-6">
+                        <div class="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl bg-red-50 border border-red-100 hover:border-red-200 transition-colors duration-300">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-map-marker-alt text-white text-xs sm:text-sm lg:text-lg"></i>
                             </div>
                             <div>
-                                <h4 class="font-bold text-gray-900 mb-1">Address</h4>
-                                <span class="text-gray-700">No. 25, Kandy Road, Colombo 07, Sri Lanka</span>
+                                <h4 class="font-bold text-gray-900 mb-1 text-sm sm:text-base">Address</h4>
+                                <span class="text-gray-700 text-xs sm:text-sm lg:text-base">No. 25, Kandy Road, Colombo 07, Sri Lanka</span>
                             </div>
                         </div>
                         
-                        <div class="flex items-start gap-4 p-4 rounded-xl bg-red-50 border border-red-100 hover:border-red-200 transition-colors duration-300">
-                            <div class="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-envelope text-white text-lg"></i>
+                        <div class="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl bg-red-50 border border-red-100 hover:border-red-200 transition-colors duration-300">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-envelope text-white text-xs sm:text-sm lg:text-lg"></i>
                             </div>
                             <div>
-                                <h4 class="font-bold text-gray-900 mb-1">Email</h4>
-                                <a href="mailto:support@pulseone.fit" class="text-red-600 hover:text-red-700 transition-colors">support@pulseone.fit</a>
+                                <h4 class="font-bold text-gray-900 mb-1 text-sm sm:text-base">Email</h4>
+                                <a href="mailto:support@pulseone.fit" class="text-red-600 hover:text-red-700 transition-colors text-xs sm:text-sm lg:text-base">support@pulseone.fit</a>
                             </div>
                         </div>
                         
-                        <div class="flex items-start gap-4 p-4 rounded-xl bg-red-50 border border-red-100 hover:border-red-200 transition-colors duration-300">
-                            <div class="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-phone-alt text-white text-lg"></i>
+                        <div class="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl bg-red-50 border border-red-100 hover:border-red-200 transition-colors duration-300">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-phone-alt text-white text-xs sm:text-sm lg:text-lg"></i>
                             </div>
                             <div>
-                                <h4 class="font-bold text-gray-900 mb-1">Phone</h4>
-                                <a href="tel:+94712345678" class="text-red-600 hover:text-red-700 transition-colors">+94 71 234 5678</a>
+                                <h4 class="font-bold text-gray-900 mb-1 text-sm sm:text-base">Phone</h4>
+                                <a href="tel:+94712345678" class="text-red-600 hover:text-red-700 transition-colors text-xs sm:text-sm lg:text-base">+94 71 234 5678</a>
                             </div>
                         </div>
                         
-                        <div class="flex items-start gap-4 p-4 rounded-xl bg-red-50 border border-red-100 hover:border-red-200 transition-colors duration-300">
-                            <div class="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-clock text-white text-lg"></i>
+                        <div class="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl bg-red-50 border border-red-100 hover:border-red-200 transition-colors duration-300">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-clock text-white text-xs sm:text-sm lg:text-lg"></i>
                             </div>
                             <div>
-                                <h4 class="font-bold text-gray-900 mb-1">Business Hours</h4>
-                                <div class="text-gray-700 text-sm">
+                                <h4 class="font-bold text-gray-900 mb-1 text-sm sm:text-base">Business Hours</h4>
+                                <div class="text-gray-700 text-xs sm:text-sm">
                                     <div>Mon - Fri: 6:00 AM - 10:00 PM</div>
                                     <div>Sat - Sun: 7:00 AM - 9:00 PM</div>
                                 </div>
